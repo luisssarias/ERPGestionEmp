@@ -23,7 +23,7 @@ return(
 <View style={styles.card}>
 
 <Image
-source={{uri:"https://i.imgur.com/6oK6b4N.jpg"}}
+source={require('../assets/LAPTOP.png')}
 style={styles.image}
 />
 
@@ -48,7 +48,7 @@ style={styles.image}
 <View style={styles.card}>
 
 <Image
-source={{uri:"https://i.imgur.com/hy7O3nH.jpg"}}
+source={require('../assets/MOUSE.png')}
 style={styles.image}
 />
 
