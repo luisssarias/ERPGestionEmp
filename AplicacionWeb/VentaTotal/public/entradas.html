@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entradas de Inventario</title>
+
+<link rel="stylesheet" href="css/entradas.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<aside class="sidebar">
+
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+
+<div>
+<h3>Sistema ERP</h3>
+<p>Versión 1.0</p>
+</div>
+</div>
+
+<nav>
+
+<a class="menu" href="dashboard.html">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu active" href="entradas.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu" href="ventas.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu" href="usuarios.html">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<main class="main">
+
+<header class="topbar">
+
+<h1>VentaTotal</h1>
+
+<div class="search">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar...">
+</div>
+
+<div class="profile">
+
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h4>Admin</h4>
+<p>Administrador</p>
+</div>
+
+</div>
+
+</header>
+
+
+<div class="content">
+
+<div class="page-header">
+<h2>Registro de Entradas de Inventario</h2>
+<p>Gestiona las entradas de productos y mantén actualizado tu inventario</p>
+</div>
+
+
+<div class="entrada-card">
+
+<h3><i class="fa-solid fa-arrow-trend-up"></i> Nueva Entrada de Inventario</h3>
+
+<div class="form-grid">
+
+<div class="form-group">
+
+<label>Buscar Producto *</label>
+
+<div class="buscar">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar por nombre o código...">
+</div>
+
+
+<div class="producto-info">
+
+<div class="producto-icon">
+<i class="fa-solid fa-box"></i>
+</div>
+
+<div>
+
+<h4>SSD Samsung 1TB</h4>
+<p>Código: PROD007</p>
+
+<div class="stock-info">
+
+<div>
+<span>Stock Actual</span>
+<h3 class="stock-actual">2</h3>
+</div>
+
+<div>
+<span>Stock Mínimo</span>
+<h3>10</h3>
+</div>
+
+</div>
+
+<span class="stock-alerta">
+<i class="fa-solid fa-triangle-exclamation"></i>
+Stock Bajo - Requiere reposición
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="form-group">
+
+<label>Cantidad a Ingresar *</label>
+<input type="number" value="0">
+
+<label class="mt">Motivo de Entrada / Observación</label>
+<textarea placeholder="Ej: Reposición mensual, Pedido especial, etc."></textarea>
+
+</div>
+
+</div>
+
+<button class="btn-registrar">
+<i class="fa-solid fa-arrow-trend-up"></i>
+Registrar Entrada
+</button>
+
+</div>
+
+<div class="historial-card">
+
+<div class="historial-header">
+
+<h3>
+<i class="fa-solid fa-file-lines"></i>
+Historial de Entradas
+</h3>
+
+<span class="badge">5 registros</span>
+
+</div>
+
+
+<div class="filtros-fecha">
+
+<div class="fecha">
+<label>Desde</label>
+<input type="date">
+</div>
+
+<div class="fecha">
+<label>Hasta</label>
+<input type="date">
+</div>
+
+</div>
+
+
+<table class="tabla-historial">
+
+<thead>
+<tr>
+<th><i class="fa-regular fa-calendar"></i> FECHA</th>
+<th><i class="fa-solid fa-box"></i> PRODUCTO</th>
+<th>CANTIDAD INGRESADA</th>
+<th><i class="fa-regular fa-user"></i> USUARIO</th>
+<th>OBSERVACIÓN</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>
+2026-03-02<br>
+<span class="hora">10:30</span>
+</td>
+
+<td>Laptop Dell XPS 15</td>
+
+<td>
+<span class="cantidad">+20</span>
+</td>
+
+<td>
+Carlos<br>
+<span class="hora">Mendoza</span>
+</td>
+
+<td>Reposición mensual programada</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+</body>
+</html>

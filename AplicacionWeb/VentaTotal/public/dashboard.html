@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - VentaTotal</title>
+<link rel="stylesheet" href="css/dashboard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+<aside class="sidebar">
+
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+<div>
+<h3>Sistema ERP</h3>
+<p>Versión 1.0</p>
+</div>
+</div>
+
+<nav>
+
+<a class="menu active">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu" href="ventas.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu" href="usuarios.html">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<main class="main">
+
+<header class="topbar">
+
+<h1>VentaTotal</h1>
+
+<div class="search">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar...">
+</div>
+
+<div class="top-right">
+
+<div class="notification">
+<i class="fa-regular fa-bell"></i>
+<span class="dot"></span>
+</div>
+
+<div class="profile">
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+<div>
+<h4>Admin</h4>
+<p>Administrador</p>
+</div>
+</div>
+
+</div>
+
+</header>
+
+
+<section class="cards">
+
+<div class="card">
+<div>
+<p>Total Productos</p>
+<h2>1,248</h2>
+<span class="up">↑ +12.5%</span>
+</div>
+<div class="icon blue">
+<i class="fa-solid fa-box"></i>
+</div>
+</div>
+
+
+<div class="card">
+<div>
+<p>Stock Bajo</p>
+<h2>23</h2>
+<span class="down">↓ 5 productos</span>
+</div>
+<div class="icon red">
+<i class="fa-solid fa-arrow-trend-down"></i>
+</div>
+</div>
+
+
+<div class="card">
+<div>
+<p>Ventas Hoy</p>
+<h2>156</h2>
+<span class="up">↑ +8.3%</span>
+</div>
+<div class="icon green">
+<i class="fa-solid fa-cart-shopping"></i>
+</div>
+</div>
+
+
+<div class="card">
+<div>
+<p>Ingresos del Día</p>
+<h2>$18,459</h2>
+<span class="up">↑ +15.2%</span>
+</div>
+<div class="icon purple">
+<i class="fa-solid fa-dollar-sign"></i>
+</div>
+</div>
+
+</section>
+
+<section class="productos">
+<div class="productos-card">
+
+<div class="productos-header">
+
+<h2>Productos</h2>
+
+
+</div>
+
+
+<div class="filtros">
+
+<input type="text" placeholder="Buscar por nombre o código...">
+
+<select>
+<option>Todas las Categorías</option>
+</select>
+
+<select>
+<option>Todos los Estados</option>
+</select>
+
+</div>
+
+
+<table class="tabla-productos">
+
+<thead>
+<tr>
+<th>CÓDIGO</th>
+<th>NOMBRE</th>
+<th>CATEGORÍA</th>
+<th>PRECIO</th>
+<th>STOCK</th>
+<th>ACCIONES</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>PROD001</td>
+<td>Laptop Dell XPS 15</td>
+<td><span class="categoria">Electrónica</span></td>
+<td>$1299.99</td>
+<td>15</td>
+<td class="acciones">
+<i class="fa-solid fa-pen editar"></i>
+<i class="fa-solid fa-trash eliminar"></i>
+</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+</section>
+
+<section class="graficas">
+
+<div class="grafica-card">
+
+<h3>Productos Más Vendidos</h3>
+
+<canvas id="ventasChart"></canvas>
+
+</div>
+
+
+<div class="grafica-card">
+
+<h3>Inventario por Categoría</h3>
+
+<canvas id="inventarioChart"></canvas>
+
+</div>
+
+</section>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ventas = document.getElementById('ventasChart');
+
+new Chart(ventas, {
+type: 'bar',
+data: {
+labels: [
+'Laptop Dell XPS',
+'Mouse Logitech',
+'Teclado RGB',
+'Monitor Samsung',
+'Auriculares Sony',
+'Webcam Logitech'
+],
+datasets: [{
+data: [45,120,75,35,90,55],
+backgroundColor:'#4f7dd6',
+borderRadius:8
+}]
+},
+options:{
+plugins:{legend:{display:false}},
+scales:{
+y:{beginAtZero:true}
+}
+}
+});
+
+
+const inventario = document.getElementById('inventarioChart');
+
+new Chart(inventario, {
+type:'pie',
+data:{
+labels:[
+'Electrónica',
+'Accesorios',
+'Audio',
+'Almacenamiento',
+'Redes'
+],
+datasets:[{
+data:[34,28,15,10,13],
+backgroundColor:[
+'#4f7dd6',
+'#3aa675',
+'#e39d3a',
+'#7a5de8',
+'#e04c3f'
+]
+}]
+},
+options:{
+plugins:{
+legend:{
+position:'bottom'
+}
+}
+}
+});
+
+</script>
+
+</main>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios</title>
+
+<link rel="stylesheet" href="css/usuarios.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usuarios</title>
+
+<link rel="stylesheet" href="css/usuarios.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+
+<div>
+<h3>Sistema ERP</h3>
+<p>Versión 1.0</p>
+</div>
+</div>
+
+<nav>
+
+<a class="menu" href="dashboard.html">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu" href="entradas.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu" href="ventas.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu active">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+<header class="topbar">
+
+<h1>VentaTotal</h1>
+
+<div class="profile">
+
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h4>Admin</h4>
+<p>Administrador</p>
+</div>
+
+</div>
+
+</header>
+
+
+<div class="content">
+
+<h2>Gestión de Usuarios</h2>
+<p>Administra los usuarios del sistema</p>
+
+<!-- USUARIO ACTIVO -->
+<div class="usuario-activo">
+
+<div class="avatar-grande">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h3>Usuario en sesión</h3>
+<p><strong>Admin</strong></p>
+<span>admin@sistema.com</span>
+</div>
+
+</div>
+
+
+<!-- TABLA USUARIOS -->
+
+<div class="tabla-card">
+
+<div class="tabla-header">
+
+<h3>Usuarios Registrados</h3>
+
+<button class="btn-nuevo" id="btnNuevoUsuario">
+<i class="fa-solid fa-user-plus"></i>
+Nuevo Usuario
+</button>
+
+</div>
+
+<table class="tabla-usuarios">
+
+<thead>
+<tr>
+<th>NOMBRE</th>
+<th>EMAIL</th>
+<th>ROL</th>
+<th>ESTADO</th>
+<th>ACCIONES</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>Carlos Mendoza</td>
+<td>carlos@sistema.com</td>
+<td><span class="rol admin">Administrador</span></td>
+<td><span class="estado activo">Activo</span></td>
+<td class="acciones">
+<i class="fa-solid fa-pen editar"></i>
+<i class="fa-solid fa-trash eliminar"></i>
+</td>
+</tr>
+
+<tr>
+<td>Ana Torres</td>
+<td>ana@sistema.com</td>
+<td><span class="rol">Empleado</span></td>
+<td><span class="estado activo">Activo</span></td>
+<td class="acciones">
+<i class="fa-solid fa-pen editar"></i>
+<i class="fa-solid fa-trash eliminar"></i>
+</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+
+<!-- MODAL NUEVO USUARIO -->
+
+<div class="modal" id="modalUsuario">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h3>Nuevo Usuario</h3>
+
+<span class="cerrar" id="cerrarUsuario">&times;</span>
+
+</div>
+
+<form>
+
+<label>Nombre Completo *</label>
+<input type="text" placeholder="Ej: Juan Pérez">
+
+<label>Correo Electrónico *</label>
+<input type="email" placeholder="Ej: usuario@sistema.com">
+
+<label>Contraseña *</label>
+<input type="password" placeholder="********">
+
+<label>Rol *</label>
+<select>
+<option>Administrador</option>
+<option>Empleado</option>
+</select>
+
+<label>Estado</label>
+<select>
+<option>Activo</option>
+<option>Inactivo</option>
+</select>
+
+<div class="modal-botones">
+
+<button type="button" class="btn-cancelar" id="cancelarUsuario">Cancelar</button>
+
+<button class="btn-guardar">
+<i class="fa-solid fa-floppy-disk"></i>
+Guardar Usuario
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+
+<script>
+
+const btnNuevoUsuario = document.getElementById("btnNuevoUsuario");
+const modalUsuario = document.getElementById("modalUsuario");
+const cerrarUsuario = document.getElementById("cerrarUsuario");
+const cancelarUsuario = document.getElementById("cancelarUsuario");
+
+btnNuevoUsuario.onclick = () =>{
+modalUsuario.style.display="flex";
+}
+
+cerrarUsuario.onclick = () =>{
+modalUsuario.style.display="none";
+}
+
+cancelarUsuario.onclick = () =>{
+modalUsuario.style.display="none";
+}
+
+window.onclick = function(e){
+if(e.target == modalUsuario){
+modalUsuario.style.display = "none";
+}
+}
+
+</script>
+
+</body>
+</html>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+
+<div>
+<h3>Sistema ERP</h3>
+<p>Versión 1.0</p>
+</div>
+</div>
+
+<nav>
+
+<a class="menu" href="dashboard.html">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu" href="entradas.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu" href="ventas.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu active">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+<header class="topbar">
+
+<h1>VentaTotal</h1>
+
+<div class="profile">
+
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h4>Admin</h4>
+<p>Administrador</p>
+</div>
+
+</div>
+
+</header>
+
+
+<div class="content">
+
+<h2>Gestión de Usuarios</h2>
+<p>Administra los usuarios del sistema</p>
+
+<!-- USUARIO ACTIVO -->
+<div class="usuario-activo">
+
+<div class="avatar-grande">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h3>Usuario en sesión</h3>
+<p><strong>Admin</strong></p>
+<span>admin@sistema.com</span>
+</div>
+
+</div>
+
+
+<!-- TABLA USUARIOS -->
+
+<div class="tabla-card">
+
+<div class="tabla-header">
+
+<h3>Usuarios Registrados</h3>
+
+<button class="btn-nuevo">
+<i class="fa-solid fa-user-plus"></i>
+Nuevo Usuario
+</button>
+
+</div>
+
+<table class="tabla-usuarios">
+
+<thead>
+<tr>
+<th>NOMBRE</th>
+<th>EMAIL</th>
+<th>ROL</th>
+<th>ESTADO</th>
+<th>ACCIONES</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>Carlos Mendoza</td>
+<td>carlos@sistema.com</td>
+<td><span class="rol admin">Administrador</span></td>
+<td><span class="estado activo">Activo</span></td>
+<td class="acciones">
+<i class="fa-solid fa-pen editar"></i>
+<i class="fa-solid fa-trash eliminar"></i>
+</td>
+</tr>
+
+<tr>
+<td>Ana Torres</td>
+<td>ana@sistema.com</td>
+<td><span class="rol">Empleado</span></td>
+<td><span class="estado activo">Activo</span></td>
+<td class="acciones">
+<i class="fa-solid fa-pen editar"></i>
+<i class="fa-solid fa-trash eliminar"></i>
+</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+</body>
+</html>
