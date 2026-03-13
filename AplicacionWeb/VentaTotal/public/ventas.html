@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Punto de Venta</title>
+
+<link rel="stylesheet" href="css/ventas.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+
+<div>
+<h3>Sistema ERP</h3>
+<p>Versión 1.0</p>
+</div>
+</div>
+
+<nav>
+
+<a class="menu" href="dashboard.html">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu" href="entradas.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu active" href="ventas.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu" href="usuarios.html">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+<header class="topbar">
+
+<h1>VentaTotal</h1>
+
+<div class="search">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar...">
+</div>
+
+<div class="profile">
+
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h4>Admin</h4>
+<p>Administrador</p>
+</div>
+
+</div>
+
+</header>
+
+
+<div class="content">
+
+<div class="page-header">
+<h2>Punto de Venta</h2>
+<p>Registra tus ventas de forma rápida y eficiente</p>
+</div>
+
+
+<div class="ventas-layout">
+
+<!-- PRODUCTOS -->
+<div class="productos">
+
+<div class="filtros">
+
+<div class="buscar">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar producto por nombre o código...">
+</div>
+
+<select>
+<option>Todas las Categorías</option>
+</select>
+
+</div>
+
+
+<div class="productos-grid">
+
+<!-- SOLO UN PRODUCTO EJEMPLO -->
+
+<div class="producto-card">
+
+<img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8" alt="Laptop">
+
+<h4>Laptop Dell XPS 15</h4>
+
+<span class="categoria">Electrónica</span>
+
+<div class="precio-stock">
+
+<span class="precio">$1299.99</span>
+<span class="stock">Stock: 15</span>
+
+</div>
+
+<button class="btn-agregar">
+<i class="fa-solid fa-cart-plus"></i>
+Agregar
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- CARRITO -->
+<div class="carrito">
+
+<div class="carrito-header">
+<h3><i class="fa-solid fa-cart-shopping"></i> Carrito de Compra</h3>
+<span class="badge">0</span>
+</div>
+
+<div class="carrito-vacio">
+
+<i class="fa-solid fa-cart-shopping"></i>
+<p>El carrito está vacío</p>
+
+</div>
+
+
+<div class="totales">
+
+<div>
+<span>Subtotal:</span>
+<span>$0.00</span>
+</div>
+
+<div>
+<span>IVA (16%):</span>
+<span>$0.00</span>
+</div>
+
+<hr>
+
+<div class="total">
+<span>Total:</span>
+<span>$0.00</span>
+</div>
+
+</div>
+
+<div class="pago">
+
+<label>Método de Pago</label>
+
+<select class="metodo">
+<option>💵 Efectivo</option>
+<option>💳 Tarjeta</option>
+<option>🏦 Transferencia</option>
+</select>
+
+<button class="btn-confirmar">
+<i class="fa-solid fa-dollar-sign"></i>
+Confirmar Venta
+</button>
+
+<button class="btn-cancelar">
+Cancelar
+</button>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+</body>
+</html>

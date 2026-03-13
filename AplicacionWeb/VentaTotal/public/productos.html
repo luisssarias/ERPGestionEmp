@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Productos - Sistema ERP</title>
+
+<link rel="stylesheet" href="css/productos.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+
+<div>
+<h3>Sistema ERP</h3>
+<p>Versión 1.0</p>
+</div>
+</div>
+
+
+<nav>
+
+<a class="menu" href="dashboard.html">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu active" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu" href="entradas.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu" href="ventas.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu" href="usuarios.html">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+
+</nav>
+
+</aside>
+
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- TOPBAR -->
+<header class="topbar">
+
+<h1>VentaTotal</h1>
+
+<div class="search">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar...">
+</div>
+
+<div class="top-right">
+
+<div class="notification">
+<i class="fa-regular fa-bell"></i>
+<span class="dot"></span>
+</div>
+
+<div class="profile">
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h4>Admin</h4>
+<p>Administrador</p>
+</div>
+</div>
+
+</div>
+
+</header>
+
+
+<!-- CONTENIDO -->
+<div class="content">
+
+<div class="page-header">
+
+<div>
+<h2>Gestión de Productos</h2>
+<p>Administra tu inventario de productos</p>
+</div>
+
+<button class="btn-nuevo" id="btnNuevoProducto">
+<i class="fa-solid fa-plus"></i>
+Nuevo Producto
+</button>
+
+<button class="btn-categoria" id="btnCategoria">
+<i class="fa-solid fa-tags"></i>
+Nueva Categoría
+</button>
+
+</div>
+
+
+<!-- TARJETAS -->
+<div class="stats">
+
+<div class="stat-card">
+
+<div>
+<p>Total de Productos</p>
+<h2>9</h2>
+<span class="up">↑ En catálogo</span>
+</div>
+
+<div class="icon blue">
+<i class="fa-solid fa-box"></i>
+</div>
+
+</div>
+
+
+<div class="stat-card">
+
+<div>
+<p>Productos con Stock Bajo</p>
+<h2>2</h2>
+<span class="down">↓ Requieren atención</span>
+</div>
+
+<div class="icon red">
+<i class="fa-solid fa-arrow-trend-down"></i>
+</div>
+
+</div>
+
+</div>
+
+
+<!-- TARJETA PRODUCTOS -->
+<div class="productos-card">
+
+<div class="filtros">
+
+<div class="buscar">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar por nombre o código...">
+</div>
+
+<select>
+<option>Todas las Categorías</option>
+</select>
+
+<select>
+<option>Todos los Estados</option>
+</select>
+
+</div>
+
+
+<table class="tabla">
+
+<thead>
+
+<tr>
+<th>IMAGEN</th>
+<th>CÓDIGO</th>
+<th>NOMBRE</th>
+<th>CATEGORÍA</th>
+<th>PRECIO</th>
+<th>STOCK</th>
+<th>ESTADO</th>
+<th>ACCIONES</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>
+<img src="">
+</td>
+
+<td>PROD001</td>
+
+<td>Laptop Dell XPS 15</td>
+
+<td>
+<span class="categoria">Electrónica</span>
+</td>
+
+<td>$1299.99</td>
+
+<td>
+<span class="stock">15</span>
+</td>
+
+<td>
+<span class="estado activo">Activo</span>
+</td>
+
+<td class="acciones">
+<i class="fa-solid fa-pen editar"></i>
+<i class="fa-solid fa-trash eliminar"></i>
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+<div class="modal" id="modalProducto">
+
+<div class="modal-content">
+
+<div class="modal-header">
+
+<h3>Nuevo Producto</h3>
+
+<span class="cerrar" id="cerrarModal">&times;</span>
+
+</div>
+
+<form>
+
+<label>Imagen del Producto</label>
+
+<div class="subir-imagen">
+<i class="fa-solid fa-upload"></i>
+<p>Subir imagen</p>
+<input type="file">
+</div>
+
+
+<label>Nombre del Producto *</label>
+<input type="text" placeholder="Ej: Laptop Dell XPS 15">
+
+
+<label>Código de Barras *</label>
+<input type="text" placeholder="Ej: PROD001">
+
+
+<label>Categoría *</label>
+<input type="text">
+
+
+<div class="grid-2">
+
+<div>
+<label>Precio ($) *</label>
+<input type="number" placeholder="0.00">
+</div>
+
+<div>
+<label>Stock Inicial *</label>
+<input type="number" placeholder="0">
+</div>
+
+</div>
+
+
+<div class="modal-botones">
+
+<button type="button" class="btn-cancelar">Cancelar</button>
+
+<button class="btn-guardar">
+<i class="fa-solid fa-floppy-disk"></i>
+Guardar Producto
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="modal" id="modalCategoria">
+
+<div class="modal-content">
+
+<div class="modal-header">
+<h3>Nueva Categoría</h3>
+<span class="cerrar" id="cerrarCategoria">&times;</span>
+</div>
+
+<label>Nombre de Categoría</label>
+<input type="text" placeholder="Ej: Electrónica">
+
+<label>Descripción</label>
+<textarea placeholder="Descripción de la categoría"></textarea>
+
+<div class="modal-botones">
+
+<button class="btn-cancelar">Cancelar</button>
+
+<button class="btn-guardar">
+<i class="fa-solid fa-floppy-disk"></i>
+Guardar Categoría
+</button>
+
+</div>
+
+</div>
+
+</div>
+<script>
+
+// MODAL PRODUCTO
+const btnNuevoProducto = document.getElementById("btnNuevoProducto");
+const modalProducto = document.getElementById("modalProducto");
+const cerrarModal = document.getElementById("cerrarModal");
+
+btnNuevoProducto.onclick = () =>{
+modalProducto.style.display="flex";
+}
+
+cerrarModal.onclick = () =>{
+modalProducto.style.display="none";
+}
+
+
+// MODAL CATEGORIA
+const btnCategoria = document.getElementById("btnCategoria");
+const modalCategoria = document.getElementById("modalCategoria");
+const cerrarCategoria = document.getElementById("cerrarCategoria");
+
+btnCategoria.onclick = () =>{
+modalCategoria.style.display="flex";
+}
+
+cerrarCategoria.onclick = () =>{
+modalCategoria.style.display="none";
+}
+
+</script>
+
+</body>
+</html>

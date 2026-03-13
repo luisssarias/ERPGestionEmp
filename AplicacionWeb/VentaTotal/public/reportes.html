@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reportes</title>
+
+<link rel="stylesheet" href="css/reportes.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+
+<div>
+<h3>Sistema ERP</h3>
+<p>Versión 1.0</p>
+</div>
+</div>
+
+<nav>
+
+<a class="menu" href="dashboard.html">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu" href="entradas.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu" href="ventas.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu active">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu" href="usuarios.html">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+
+</nav>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<header class="topbar">
+
+<h1>VentaTotal</h1>
+
+<div class="search">
+<i class="fa-solid fa-magnifying-glass"></i>
+<input type="text" placeholder="Buscar...">
+</div>
+
+<div class="profile">
+
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+
+<div>
+<h4>Admin</h4>
+<p>Administrador</p>
+</div>
+
+</div>
+
+</header>
+
+
+<div class="content">
+
+<div class="page-header">
+<h2>Reportes y Análisis de Ventas</h2>
+<p>Dashboard ejecutivo con indicadores clave de rendimiento</p>
+</div>
+
+<!-- FILTROS -->
+<div class="filtros-card">
+
+<h3><i class="fa-solid fa-calendar"></i> Filtros de Reporte</h3>
+
+<div class="filtros-grid">
+
+<div>
+<label>Fecha Desde</label>
+<input type="date">
+</div>
+
+<div>
+<label>Fecha Hasta</label>
+<input type="date">
+</div>
+
+<div>
+<label>Mes</label>
+<select>
+<option>Marzo</option>
+</select>
+</div>
+
+<div>
+<label>Categoría</label>
+<select>
+<option>Todas</option>
+</select>
+</div>
+
+<button class="btn-reporte">
+Generar Reporte
+</button>
+
+</div>
+
+</div>
+
+
+<!-- KPI -->
+<div class="kpi-grid">
+
+<div class="kpi-card">
+<div>
+<p>Total de Ventas</p>
+<h2>1,289</h2>
+<span class="up">↑ +18.2%</span>
+</div>
+<div class="icon blue">
+<i class="fa-solid fa-cart-shopping"></i>
+</div>
+</div>
+
+<div class="kpi-card">
+<div>
+<p>Ingresos Totales</p>
+<h2>$341,298</h2>
+<span class="up">↑ +24.5%</span>
+</div>
+<div class="icon green">
+<i class="fa-solid fa-dollar-sign"></i>
+</div>
+</div>
+
+<div class="kpi-card">
+<div>
+<p>Producto Destacado</p>
+<h2>Mouse Logitech</h2>
+<span>320 unidades vendidas</span>
+</div>
+<div class="icon purple">
+<i class="fa-solid fa-award"></i>
+</div>
+</div>
+
+<div class="kpi-card">
+<div>
+<p>Stock Bajo</p>
+<h2>23</h2>
+<span class="down">↓ -5 productos</span>
+</div>
+<div class="icon red">
+<i class="fa-solid fa-circle-exclamation"></i>
+</div>
+</div>
+
+<div class="kpi-card">
+<div>
+<p>Promedio Diario</p>
+<h2>$11,376</h2>
+<span class="up">↑ +12.8%</span>
+</div>
+<div class="icon blue">
+<i class="fa-solid fa-chart-line"></i>
+</div>
+</div>
+
+</div>
+
+
+<!-- GRAFICAS 1 -->
+<div class="graficas-grid">
+
+<div class="grafica-card">
+<h3>Productos Más Vendidos</h3>
+<canvas id="ventasChart"></canvas>
+</div>
+
+<div class="grafica-card">
+<h3>Ventas por Categoría</h3>
+<canvas id="categoriaChart"></canvas>
+</div>
+
+</div>
+
+
+<!-- GRAFICAS 2 -->
+<div class="graficas-grid">
+
+<div class="grafica-card">
+<h3>Tendencia de Ventas Mensuales</h3>
+<canvas id="tendenciaVentas"></canvas>
+</div>
+
+<div class="grafica-card">
+
+<div class="grafica-header">
+
+<h3>Ventas vs Entradas (Gastos)</h3>
+
+<div class="ganancia">
+<p>Ganancia Neta</p>
+<h4>$352,000</h4>
+</div>
+
+</div>
+
+<canvas id="ventasEntradas"></canvas>
+
+</div>
+
+</div>
+
+
+<!-- TABLA DETALLE -->
+<div class="tabla-card">
+
+<div class="tabla-header">
+
+<div>
+<h3>Detalle de Ventas Diarias</h3>
+<p>Resumen de transacciones por día</p>
+</div>
+
+<div class="tabla-botones">
+
+<button class="btn-pdf">
+<i class="fa-solid fa-download"></i>
+Exportar PDF
+</button>
+
+<button class="btn-excel">
+<i class="fa-solid fa-file-excel"></i>
+Exportar Excel
+</button>
+
+</div>
+
+</div>
+
+
+<table class="tabla-reportes">
+
+<thead>
+<tr>
+<th>FECHA</th>
+<th>N° DE VENTAS</th>
+<th>TOTAL DIARIO</th>
+<th>MÉTODO DE PAGO PREDOMINANTE</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td>2026-03-03</td>
+<td><span class="badge-num">45</span></td>
+<td class="dinero">$12,489.5</td>
+<td><span class="badge-pago">💳 Tarjeta</span></td>
+</tr>
+
+<tr>
+<td>2026-03-02</td>
+<td><span class="badge-num">52</span></td>
+<td class="dinero">$15,234.8</td>
+<td><span class="badge-pago">🏦 Transferencia</span></td>
+</tr>
+
+
+<tr class="fila-total-final">
+
+<td class="label-total">TOTAL</td>
+
+<td>
+<span class="badge-total">97</span>
+</td>
+
+<td class="total-dinero">
+$27,724.3
+</td>
+
+<td></td>
+
+</tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+new Chart(document.getElementById('ventasChart'),{
+type:'bar',
+data:{
+labels:['Laptop Dell XPS','Mouse Logitech','Monitor Samsung','Teclado RGB','Auriculares Sony','Webcam Logitech'],
+datasets:[{
+data:[150,320,95,180,200,160],
+backgroundColor:'#4f7dd6',
+borderRadius:8
+}]
+},
+options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('categoriaChart'),{
+type:'pie',
+data:{
+labels:['Electrónica','Accesorios','Audio','Almacenamiento','Redes'],
+datasets:[{
+data:[42,23,16,11,8],
+backgroundColor:['#4f7dd6','#3aa675','#e39d3a','#7a5de8','#e04c3f']
+}]
+},
+options:{plugins:{legend:{position:'bottom'}}}
+});
+
+new Chart(document.getElementById('tendenciaVentas'),{
+type:'line',
+data:{
+labels:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+datasets:[{
+label:'Ventas',
+data:[45000,52000,61000,48000,70000,67000,75000,82000,77000,85000,92000,105000],
+borderColor:'#4aa874',
+backgroundColor:'transparent',
+tension:0.4,
+pointRadius:5
+}]
+},
+options:{scales:{y:{beginAtZero:true}}}
+});
+
+new Chart(document.getElementById('ventasEntradas'),{
+type:'bar',
+data:{
+labels:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
+datasets:[
+{label:'Ventas',data:[45000,52000,60000,47000,70000,68000,75000,82000,77000,85000,92000,105000],backgroundColor:'#4aa874'},
+{label:'Entradas',data:[28000,31000,35000,30000,42000,38000,45000,48000,46000,50000,55000,61000],backgroundColor:'#d94b45'}
+]
+},
+options:{scales:{y:{beginAtZero:true}}}
+});
+
+</script>
+
+</body>
+</html>
