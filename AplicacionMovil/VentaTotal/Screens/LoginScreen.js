@@ -1,126 +1,246 @@
 import { SafeAreaView } from "react-native-safe-area-context";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { 
+  View, Text, TextInput, TouchableOpacity, 
+  StyleSheet, KeyboardAvoidingView, Platform, ScrollView 
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
 
-export default function LoginScreen({navigation}) {
+export default function LoginScreen({ navigation }) {
 
-const [show,setShow]=useState(false);
+  const [show, setShow] = useState(false);
+  const [correo, setCorreo] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [mensaje, setMensaje] = useState("");
 
-return(
+  const login = async () => {
+    try {
+      const response = await fetch("http://192.168.1.77:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ correo, contrasena })
+      });
 
-<SafeAreaView style={styles.container}>
+      const text = await response.text();
 
-<View style={styles.header}>
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setMensaje("Error en servidor");
+        return;
+      }
 
-<View style={styles.logo}>
-<Ionicons name="document-text-outline" size={40} color="#2c4da7"/>
-</View>
+      if (response.ok) {
+        navigation.replace("Main");
+      } else {
+        setMensaje("Credenciales incorrectas");
+      }
 
-<Text style={styles.logoText}>VentaTotal</Text>
+    } catch (error) {
+      setMensaje("Error conexión");
+    }
+  };
 
-</View>
+  return (
 
-<View style={styles.card}>
+    <LinearGradient
+      colors={["#1e3a8a", "#1e293b"]}
+      style={{ flex: 1 }}
+    >
 
-<Text style={styles.title}>Iniciar sesión</Text>
-<Text style={styles.subtitle}>Accede al sistema de gestión comercial</Text>
+      <SafeAreaView style={{ flex: 1 }}>
 
-<Text style={styles.label}>Correo electrónico</Text>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
+        >
 
-<View style={styles.input}>
-<Ionicons name="mail-outline" size={20} color="#888"/>
-<TextInput placeholder="usuario@empresa.com" style={styles.inputText}/>
-</View>
+          <ScrollView contentContainerStyle={styles.scroll}>
 
-<Text style={styles.label}>Contraseña</Text>
+            <View style={styles.card}>
 
-<View style={styles.input}>
-<Ionicons name="lock-closed-outline" size={20} color="#888"/>
-<TextInput secureTextEntry={!show} style={styles.inputText} placeholder="********"/>
+              <View style={styles.logoContainer}>
+                <Ionicons name="log-in-outline" size={40} color="#3b82f6" />
+              </View>
 
-<TouchableOpacity onPress={()=>setShow(!show)}>
-<Ionicons name="eye-outline" size={20} color="#888"/>
-</TouchableOpacity>
+              <Text style={styles.title}>VentaTotal</Text>
 
-</View>
+              <Text style={styles.label}>Correo Electrónico</Text>
 
-<TouchableOpacity
-style={styles.button}
-onPress={()=>navigation.replace("Main")}
->
+              <View style={styles.input}>
+                <Ionicons name="mail-outline" size={20} color="#888" />
+                <TextInput
+                  placeholder="juan@example.com"
+                  style={styles.inputText}
+                  value={correo}
+                  onChangeText={setCorreo}
+                  keyboardType="email-address"
+                />
+              </View>
 
-<Text style={styles.buttonText}>Ingresar al sistema</Text>
+              <Text style={styles.label}>Contraseña</Text>
 
-</TouchableOpacity>
+              <View style={styles.input}>
+                <Ionicons name="lock-closed-outline" size={20} color="#888" />
 
-<Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+                <TextInput
+                  secureTextEntry={!show}
+                  style={styles.inputText}
+                  value={contrasena}
+                  onChangeText={setContrasena}
+                  placeholder="********"
+                />
 
-</View>
+                <TouchableOpacity
+                  onPress={() => setShow(prev => !prev)}
+                  style={styles.eyeButton}
+                >
+                  <Ionicons 
+                    name={show ? "eye-off-outline" : "eye-outline"} 
+                    size={20} 
+                    color="#888" 
+                  />
+                </TouchableOpacity>
 
-<Text style={styles.footer}>© 2026 Sistema Gestión Comercial</Text>
+              </View>
 
-</SafeAreaView>
+              <TouchableOpacity style={styles.button} onPress={login}>
+                <Text style={styles.buttonText}>Ingresar</Text>
+              </TouchableOpacity>
 
-)
+              {mensaje !== "" && (
+                <Text style={styles.error}>{mensaje}</Text>
+              )}
 
+              <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
+
+              <View style={styles.registerLink}>
+                <Text style={styles.texto}>¿No tienes cuenta? </Text>
+                <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+                  <Text style={styles.link}>Crea una aquí</Text>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+
+          </ScrollView>
+
+        </KeyboardAvoidingView>
+
+      </SafeAreaView>
+
+    </LinearGradient>
+  );
 }
 
-const styles=StyleSheet.create({
+const styles = StyleSheet.create({
 
-container:{flex:1,backgroundColor:"#2c4da7",alignItems:"center"},
+  scroll: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20
+  },
 
-header:{marginTop:40,alignItems:"center"},
+  card: {
+    width: "100%",
+    backgroundColor: "#ffffff",
+    padding: 25,
+    borderRadius: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 8
+  },
 
-logo:{
-backgroundColor:"white",
-padding:16,
-borderRadius:16
-},
+  logoContainer: {
+    backgroundColor: "#e0e7ff",
+    alignSelf: "center",
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 10
+  },
 
-logoText:{
-color:"white",
-fontSize:22,
-marginTop:10,
-fontWeight:"600"
-},
+  title: {
+    fontSize: 26,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 20
+  },
 
-card:{
-width:"90%",
-backgroundColor:"#f1f5f9",
-padding:22,
-borderRadius:22,
-marginTop:25
-},
+  label: {
+    marginTop: 10,
+    marginBottom: 5,
+    color: "#555"
+  },
 
-title:{fontSize:22,fontWeight:"bold",textAlign:"center"},
+  input: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f1f5f9",
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 10,
+    position: "relative"
+  },
 
-subtitle:{textAlign:"center",color:"#666",marginBottom:20},
+  inputText: {
+    flex: 1,
+    marginLeft: 10,
+    paddingRight: 40
+  },
 
-label:{marginTop:10,marginBottom:5},
+  button: {
+    backgroundColor: "#3b82f6",
+    padding: 15,
+    borderRadius: 12,
+    alignItems: "center",
+    marginTop: 15
+  },
 
-input:{
-flexDirection:"row",
-alignItems:"center",
-backgroundColor:"#e5e7eb",
-padding:12,
-borderRadius:10
-},
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16
+  },
 
-inputText:{flex:1,marginLeft:10},
+  error: {
+    textAlign: "center",
+    marginTop: 10,
+    color: "red"
+  },
 
-button:{
-backgroundColor:"#2c4da7",
-padding:15,
-borderRadius:12,
-alignItems:"center",
-marginTop:20
-},
+  link: {
+    textAlign: "center",
+    marginTop: 15,
+    color: "#3b82f6"
+  },
 
-buttonText:{color:"white",fontWeight:"bold"},
+  eyeButton: {
+    position: "absolute",
+    right: 12,
+    top: "50%",
+    transform: [{ translateY: -10 }],
+    padding: 4
+  },
 
-link:{textAlign:"center",marginTop:15,color:"#2c4da7"},
+  registerLink: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 15,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb"
+  },
 
-footer:{color:"white",marginTop:20}
+  texto: {
+    color: "#666",
+    fontSize: 14
+  }
 
-})
+});

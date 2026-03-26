@@ -22,8 +22,13 @@ class Usuarios extends Authenticatable
 
     protected $hidden = ['contrasena'];
 
+    public function getAuthPassword()
+    {
+        return $this->contrasena;
+    }
+
     public function rol()
     {
-        return $this->belongsTo(Roles::class, 'id_rol', 'id');
+        return $this->belongsTo(Roles::class, 'id_rol', 'id_rol');
     }
 }
