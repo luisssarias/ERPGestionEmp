@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { saveSession } from "../utils/authStorage";
+import { apiRequest } from "../config/api";
 
 export default function LoginScreen({ navigation }) {
 
@@ -16,45 +17,51 @@ export default function LoginScreen({ navigation }) {
   const [mensaje, setMensaje] = useState("");
 
   const login = async () => {
-  try {
-    const response = await fetch("http://192.168.1.77:8000/api/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({ correo, contrasena })
-    });
-
-    const text = await response.text();
-
-    let data;
     try {
-      data = JSON.parse(text);
-    } catch {
-      setMensaje("Error en servidor");
-      return;
-    }
+      console.log("Intentando conectar...");
 
-    console.log("DATA:", data); // 👈 debug
+      const response = await apiRequest("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ correo, contrasena })
+      });
 
-    if (response.ok) {
-      if (data?.token) {
-        await saveSession({
-          token: data.token,
-          usuario: data.usuario
-        });
+      console.log("RESPUESTA:", response.status);
+
+      const text = await response.text();
+      console.log("TEXT:", text);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setMensaje("Error en servidor");
+        return;
       }
-      navigation.replace("Main");
-    } else {
-      setMensaje("Credenciales incorrectas");
-    }
 
-  } catch (error) {
-    console.log(error);
-    setMensaje("Error conexión");
-  }
-};
+      console.log("DATA:", data);
+
+      if (response.ok) {
+        if (data?.token) {
+          await saveSession({
+            token: data.token,
+            usuario: data.usuario
+          });
+        }
+        navigation.replace("Main");
+      } else {
+        setMensaje("Credenciales incorrectas");
+      }
+
+    } catch (error) {
+      console.log("ERROR REAL:", error);
+      setMensaje("Error de conexión");
+    }
+  };
+
   return (
 
     <LinearGradient
