@@ -11,7 +11,7 @@ background:#f1f5f9;
 
 .layout{
 display:flex;
-height:100vh;
+min-height:100vh;
 }
 
 /* SIDEBAR */
@@ -158,6 +158,7 @@ box-shadow:0 5px 20px rgba(0,0,0,0.05);
 display:flex;
 gap:15px;
 margin-bottom:20px;
+flex-wrap:wrap;
 }
 
 .buscar{
@@ -177,10 +178,19 @@ outline:none;
 width:100%;
 }
 
+#filtroCategoria{
+padding:12px;
+border:1px solid #e2e8f0;
+border-radius:12px;
+background:#f8fafc;
+min-width:220px;
+}
+
 .productos-grid{
 display:grid;
-grid-template-columns:repeat(4,1fr);
+grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
 gap:20px;
+min-height:120px;
 }
 
 .producto-card{
@@ -188,12 +198,20 @@ background:#f8fafc;
 border-radius:15px;
 padding:15px;
 text-align:center;
+border:1px solid #e2e8f0;
 }
 
 .producto-card img{
 width:100%;
+height:130px;
+object-fit:cover;
 border-radius:10px;
 margin-bottom:10px;
+}
+
+.producto-card h4{
+font-size:16px;
+min-height:42px;
 }
 
 .categoria{
@@ -221,6 +239,17 @@ color:white;
 border:none;
 border-radius:10px;
 cursor:pointer;
+font-weight:600;
+}
+
+.btn-agregar:disabled{
+background:#94a3b8;
+cursor:not-allowed;
+}
+
+.estado{
+padding:20px;
+color:#64748b;
 }
 
 /* CARRITO */
@@ -258,10 +287,80 @@ font-size:40px;
 margin-bottom:10px;
 }
 
+.carrito-items{
+display:flex;
+flex-direction:column;
+gap:10px;
+max-height:290px;
+overflow:auto;
+padding-right:4px;
+}
+
+.item-carrito{
+border:1px solid #e2e8f0;
+border-radius:12px;
+padding:10px;
+display:grid;
+gap:8px;
+background:#f8fafc;
+}
+
+.item-head{
+display:flex;
+justify-content:space-between;
+align-items:flex-start;
+gap:10px;
+}
+
+.item-nombre{
+font-size:14px;
+font-weight:600;
+color:#0f172a;
+}
+
+.item-precio{
+font-size:13px;
+color:#475569;
+}
+
+.item-acciones{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:8px;
+}
+
+.cantidad{
+display:flex;
+align-items:center;
+gap:8px;
+}
+
+.cantidad button{
+width:26px;
+height:26px;
+border:1px solid #cbd5e1;
+border-radius:8px;
+background:white;
+cursor:pointer;
+}
+
+.eliminar-item{
+border:none;
+background:none;
+color:#dc2626;
+font-size:13px;
+cursor:pointer;
+}
+
 .totales div{
 display:flex;
 justify-content:space-between;
 margin-bottom:10px;
+}
+
+.totales{
+margin-top:18px;
 }
 
 .total{
@@ -269,6 +368,7 @@ font-size:22px;
 font-weight:700;
 color:#16a34a;
 }
+
 .pago{
 margin-top:20px;
 }
@@ -284,14 +384,25 @@ width:100%;
 padding:12px;
 border-radius:12px;
 border:1px solid #e2e8f0;
-margin-bottom:15px;
+margin-bottom:12px;
 background:#f8fafc;
+}
+
+.pago input,
+.pago textarea{
+width:100%;
+padding:12px;
+border-radius:12px;
+border:1px solid #e2e8f0;
+margin-bottom:12px;
+background:#f8fafc;
+outline:none;
 }
 
 .btn-confirmar{
 width:100%;
 padding:14px;
-background:#8fbf94;
+background:#16a34a;
 border:none;
 border-radius:14px;
 color:white;
@@ -310,4 +421,36 @@ background:white;
 font-size:16px;
 cursor:pointer;
 color:#64748b;
+}
+
+.mensaje{
+margin-top:10px;
+font-size:13px;
+color:#0f766e;
+min-height:18px;
+}
+
+@media (max-width:1200px){
+.ventas-layout{
+grid-template-columns:1fr;
+}
+}
+
+@media (max-width:900px){
+.sidebar{
+display:none;
+}
+
+.topbar,
+.content{
+padding:16px;
+}
+
+.page-header h2{
+font-size:26px;
+}
+
+#filtroCategoria{
+min-width:100%;
+}
 }

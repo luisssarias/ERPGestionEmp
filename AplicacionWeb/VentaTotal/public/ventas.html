@@ -81,8 +81,8 @@
 </div>
 
 <div>
-<h4>Admin</h4>
-<p>Administrador</p>
+<h4 id="topbarUsuarioNombre">Cargando...</h4>
+<p id="topbarUsuarioRol">Administrador</p>
 </div>
 
 </div>
@@ -107,42 +107,18 @@
 
 <div class="buscar">
 <i class="fa-solid fa-magnifying-glass"></i>
-<input type="text" placeholder="Buscar producto por nombre o código...">
+<input type="text" id="buscarProducto" placeholder="Buscar producto por nombre o código...">
 </div>
 
-<select>
-<option>Todas las Categorías</option>
+<select id="filtroCategoria">
+<option value="">Todas las Categorías</option>
 </select>
 
 </div>
 
 
-<div class="productos-grid">
-
-<!-- SOLO UN PRODUCTO EJEMPLO -->
-
-<div class="producto-card">
-
-<img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8" alt="Laptop">
-
-<h4>Laptop Dell XPS 15</h4>
-
-<span class="categoria">Electrónica</span>
-
-<div class="precio-stock">
-
-<span class="precio">$1299.99</span>
-<span class="stock">Stock: 15</span>
-
-</div>
-
-<button class="btn-agregar">
-<i class="fa-solid fa-cart-plus"></i>
-Agregar
-</button>
-
-</div>
-
+<div class="productos-grid" id="productosGrid">
+<p class="estado" id="estadoProductos">Cargando productos...</p>
 </div>
 
 </div>
@@ -153,14 +129,14 @@ Agregar
 
 <div class="carrito-header">
 <h3><i class="fa-solid fa-cart-shopping"></i> Carrito de Compra</h3>
-<span class="badge">0</span>
+<span class="badge" id="badgeCantidad">0</span>
 </div>
 
+<div class="carrito-items" id="carritoItems">
 <div class="carrito-vacio">
-
 <i class="fa-solid fa-cart-shopping"></i>
 <p>El carrito está vacío</p>
-
+</div>
 </div>
 
 
@@ -168,19 +144,19 @@ Agregar
 
 <div>
 <span>Subtotal:</span>
-<span>$0.00</span>
+<span id="subtotal">$0.00</span>
 </div>
 
 <div>
 <span>IVA (16%):</span>
-<span>$0.00</span>
+<span id="iva">$0.00</span>
 </div>
 
 <hr>
 
 <div class="total">
 <span>Total:</span>
-<span>$0.00</span>
+<span id="total">$0.00</span>
 </div>
 
 </div>
@@ -189,20 +165,28 @@ Agregar
 
 <label>Método de Pago</label>
 
-<select class="metodo">
-<option>💵 Efectivo</option>
-<option>💳 Tarjeta</option>
-<option>🏦 Transferencia</option>
+<select class="metodo" id="metodoPago">
+<option value="efectivo">💵 Efectivo</option>
+<option value="tarjeta">💳 Tarjeta</option>
+<option value="transferencia">🏦 Transferencia</option>
 </select>
 
-<button class="btn-confirmar">
+<label>Cliente (opcional)</label>
+<input type="text" id="clienteVenta" placeholder="Nombre del cliente">
+
+<label>Observaciones</label>
+<textarea id="observacionesVenta" rows="3" placeholder="Notas de la venta"></textarea>
+
+<button class="btn-confirmar" id="btnConfirmarVenta">
 <i class="fa-solid fa-dollar-sign"></i>
 Confirmar Venta
 </button>
 
-<button class="btn-cancelar">
+<button class="btn-cancelar" id="btnCancelarVenta">
 Cancelar
 </button>
+
+<p class="mensaje" id="mensajeVenta"></p>
 
 </div>
 
@@ -217,5 +201,6 @@ Cancelar
 
 </div>
 
+<script src="js/ventas.js"></script>
 </body>
 </html>
