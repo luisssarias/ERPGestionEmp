@@ -11,7 +11,7 @@ background:#f1f5f9;
 
 .layout{
 display:flex;
-height:100vh;
+min-height:100vh;
 }
 
 .sidebar{
@@ -21,6 +21,11 @@ color:white;
 display:flex;
 flex-direction:column;
 padding:20px;
+position:sticky;
+top:0;
+height:100vh;
+overflow-y:auto;
+flex-shrink:0;
 }
 
 .logo{
@@ -182,13 +187,6 @@ border-radius:20px;
 .rol.admin{
 background:#dbeafe;
 color:#2563eb;
-}
-
-.estado.activo{
-background:#dcfce7;
-color:#16a34a;
-padding:6px 12px;
-border-radius:20px;
 }
 
 .acciones{

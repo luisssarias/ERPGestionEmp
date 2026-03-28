@@ -65,7 +65,7 @@ function limpiarFormulario() {
 }
 
 function marcarCargandoTabla(mensaje) {
-    tbody.innerHTML = `<tr><td colspan="5" id="estadoTabla">${escapeHtml(mensaje)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" id="estadoTabla">${escapeHtml(mensaje)}</td></tr>`;
 }
 
 function renderUsuarios() {
@@ -83,7 +83,6 @@ function renderUsuarios() {
                 <td>${escapeHtml(usuario.nombre)}</td>
                 <td>${escapeHtml(usuario.correo)}</td>
                 <td><span class="${claseRol}">${escapeHtml(nombreRol)}</span></td>
-                <td><span class="estado activo">Activo</span></td>
                 <td class="acciones">
                     <i class="fa-solid fa-pen editar" title="Editar" data-id="${usuario.id_usuario}"></i>
                     <i class="fa-solid fa-trash eliminar" title="Eliminar" data-id="${usuario.id_usuario}"></i>
