@@ -10,7 +10,10 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up()
+    
+    
 {
+    if (!Schema::hasTable('usuarios')) {
     Schema::create('usuarios', function (Blueprint $table) {
         $table->id('id_usuario');
         $table->string('nombre');
@@ -20,6 +23,7 @@ return new class extends Migration
         $table->unsignedBigInteger('id_rol');
         $table->timestamps();
     });
+    }
 }
 
     /**

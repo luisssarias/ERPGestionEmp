@@ -26,8 +26,16 @@ class UsuarioController extends Controller
             'telefono' => 'nullable|string|max:20',
             'correo' => 'required|email|unique:usuarios,correo',
             'contrasena' => 'required|string|min:6',
-            'id_rol' => 'required|exists:roles,id_rol',
+            'id_rol' => 'nullable|exists:roles,id',
         ]);
+
+        if (!array_key_exists('telefono', $data) || $data['telefono'] === null) {
+            $data['telefono'] = '';
+        }
+
+        if (!array_key_exists('id_rol', $data) || empty($data['id_rol'])) {
+            $data['id_rol'] = 1;
+        }
 
         $data['contrasena'] = Hash::make($data['contrasena']);
 
@@ -53,8 +61,16 @@ class UsuarioController extends Controller
             'telefono' => 'nullable|string|max:20',
             'correo' => 'sometimes|required|email|unique:usuarios,correo,' . $id . ',id_usuario',
             'contrasena' => 'nullable|string|min:6',
-            'id_rol' => 'required|exists:roles,id_rol'
+            'id_rol' => 'sometimes|nullable|exists:roles,id'
         ]);
+
+        if (array_key_exists('telefono', $data) && $data['telefono'] === null) {
+            $data['telefono'] = '';
+        }
+
+        if (array_key_exists('id_rol', $data) && empty($data['id_rol'])) {
+            unset($data['id_rol']);
+        }
 
         if (isset($data['contrasena'])) {
             $data['contrasena'] = Hash::make($data['contrasena']);

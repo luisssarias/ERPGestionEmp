@@ -79,8 +79,8 @@
 </div>
 
 <div>
-<h4>Admin</h4>
-<p>Administrador</p>
+<h4 id="topbarUsuarioNombre">Cargando...</h4>
+<p id="topbarUsuarioRol">Administrador</p>
 </div>
 
 </div>
@@ -102,8 +102,8 @@
 
 <div>
 <h3>Usuario en sesión</h3>
-<p><strong>Admin</strong></p>
-<span>admin@sistema.com</span>
+<p><strong id="usuarioSesionNombre">Cargando...</strong></p>
+<span id="usuarioSesionCorreo">-</span>
 </div>
 
 </div>
@@ -137,29 +137,9 @@ Nuevo Usuario
 </thead>
 
 <tbody>
-
 <tr>
-<td>Carlos Mendoza</td>
-<td>carlos@sistema.com</td>
-<td><span class="rol admin">Administrador</span></td>
-<td><span class="estado activo">Activo</span></td>
-<td class="acciones">
-<i class="fa-solid fa-pen editar"></i>
-<i class="fa-solid fa-trash eliminar"></i>
-</td>
+<td colspan="5" id="estadoTabla">Cargando usuarios...</td>
 </tr>
-
-<tr>
-<td>Ana Torres</td>
-<td>ana@sistema.com</td>
-<td><span class="rol">Empleado</span></td>
-<td><span class="estado activo">Activo</span></td>
-<td class="acciones">
-<i class="fa-solid fa-pen editar"></i>
-<i class="fa-solid fa-trash eliminar"></i>
-</td>
-</tr>
-
 </tbody>
 
 </table>
@@ -187,34 +167,30 @@ Nuevo Usuario
 
 </div>
 
-<form>
+<form id="formUsuario">
+
+<input type="hidden" id="idUsuario" value="">
 
 <label>Nombre Completo *</label>
-<input type="text" placeholder="Ej: Juan Pérez">
+<input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
 
 <label>Correo Electrónico *</label>
-<input type="email" placeholder="Ej: usuario@sistema.com">
+<input type="email" id="correo" placeholder="Ej: usuario@sistema.com" required>
 
 <label>Contraseña *</label>
-<input type="password" placeholder="********">
+<input type="password" id="contrasena" placeholder="********">
 
-<label>Rol *</label>
-<select>
-<option>Administrador</option>
-<option>Empleado</option>
-</select>
+<input type="hidden" id="idRol" value="1">
 
-<label>Estado</label>
-<select>
-<option>Activo</option>
-<option>Inactivo</option>
-</select>
+<p id="ayudaPassword" style="margin-top:8px;font-size:12px;color:#64748b;">La contraseña es obligatoria al crear y opcional al editar.</p>
+
+<p id="mensajeFormulario" style="margin-top:10px;font-size:13px;color:#dc2626;"></p>
 
 <div class="modal-botones">
 
 <button type="button" class="btn-cancelar" id="cancelarUsuario">Cancelar</button>
 
-<button class="btn-guardar">
+<button type="submit" class="btn-guardar" id="btnGuardarUsuario">
 <i class="fa-solid fa-floppy-disk"></i>
 Guardar Usuario
 </button>
@@ -228,32 +204,7 @@ Guardar Usuario
 </div>
 
 
-<script>
-
-const btnNuevoUsuario = document.getElementById("btnNuevoUsuario");
-const modalUsuario = document.getElementById("modalUsuario");
-const cerrarUsuario = document.getElementById("cerrarUsuario");
-const cancelarUsuario = document.getElementById("cancelarUsuario");
-
-btnNuevoUsuario.onclick = () =>{
-modalUsuario.style.display="flex";
-}
-
-cerrarUsuario.onclick = () =>{
-modalUsuario.style.display="none";
-}
-
-cancelarUsuario.onclick = () =>{
-modalUsuario.style.display="none";
-}
-
-window.onclick = function(e){
-if(e.target == modalUsuario){
-modalUsuario.style.display = "none";
-}
-}
-
-</script>
+<script src="js/usuarios.js"></script>
 
 </body>
 </html> 
