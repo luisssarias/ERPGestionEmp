@@ -21,6 +21,7 @@ const topbarUsuarioRol = document.getElementById("topbarUsuarioRol");
 
 const idProductoInput = document.getElementById("idProducto");
 const nombreProductoInput = document.getElementById("nombreProducto");
+const descripcionProductoInput = document.getElementById("descripcionProducto");
 const imagenProductoInput = document.getElementById("imagenProducto");
 const previewImagenProducto = document.getElementById("previewImagenProducto");
 const categoriaProductoInput = document.getElementById("categoriaProducto");
@@ -372,6 +373,7 @@ function abrirModalEditar(idProducto) {
     limpiarFormulario();
     idProductoInput.value = String(producto.id_producto);
     nombreProductoInput.value = producto.nombre || "";
+    descripcionProductoInput.value = producto.descripcion || "";
     categoriaProductoInput.value = String(producto.id_categoria || "");
     precioProductoInput.value = String(producto.precio || 0);
     stockProductoInput.value = String(producto.stock || 0);
@@ -386,6 +388,7 @@ function construirFormDataProducto(payload, esEdicion) {
     const formData = new FormData();
 
     formData.append("nombre", payload.nombre);
+    formData.append("descripcion", payload.descripcion || "");
     formData.append("precio", String(payload.precio));
     formData.append("stock", String(payload.stock));
     formData.append("id_categoria", String(payload.id_categoria));
@@ -476,6 +479,7 @@ formProducto.addEventListener("submit", async (event) => {
     const idProducto = idProductoInput.value.trim();
     const payload = {
         nombre: nombreProductoInput.value.trim(),
+        descripcion: descripcionProductoInput.value.trim(),
         precio: Number(precioProductoInput.value),
         stock: Number(stockProductoInput.value),
         id_categoria: categoriaProductoInput.value ? Number(categoriaProductoInput.value) : null,
