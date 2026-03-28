@@ -89,8 +89,8 @@
 </div>
 
 <div>
-<h4>Admin</h4>
-<p>Administrador</p>
+<h4 id="topbarUsuarioNombre">Cargando...</h4>
+<p id="topbarUsuarioRol">Administrador</p>
 </div>
 </div>
 
@@ -129,7 +129,7 @@ Nueva Categoría
 
 <div>
 <p>Total de Productos</p>
-<h2>9</h2>
+<h2 id="statTotalProductos">0</h2>
 <span class="up">↑ En catálogo</span>
 </div>
 
@@ -144,7 +144,7 @@ Nueva Categoría
 
 <div>
 <p>Productos con Stock Bajo</p>
-<h2>2</h2>
+<h2 id="statStockBajo">0</h2>
 <span class="down">↓ Requieren atención</span>
 </div>
 
@@ -164,15 +164,18 @@ Nueva Categoría
 
 <div class="buscar">
 <i class="fa-solid fa-magnifying-glass"></i>
-<input type="text" placeholder="Buscar por nombre o código...">
+<input id="buscarProducto" type="text" placeholder="Buscar por nombre o código...">
 </div>
 
-<select>
-<option>Todas las Categorías</option>
+<select id="filtroCategoria">
+<option value="">Todas las Categorías</option>
 </select>
 
-<select>
-<option>Todos los Estados</option>
+<select id="filtroEstado">
+<option value="">Todos los Estados</option>
+<option value="activo">Activo</option>
+<option value="stock_bajo">Stock bajo</option>
+<option value="sin_stock">Sin stock</option>
 </select>
 
 </div>
@@ -195,39 +198,8 @@ Nueva Categoría
 
 </thead>
 
-<tbody>
-
-<tr>
-
-<td>
-<img src="">
-</td>
-
-<td>PROD001</td>
-
-<td>Laptop Dell XPS 15</td>
-
-<td>
-<span class="categoria">Electrónica</span>
-</td>
-
-<td>$1299.99</td>
-
-<td>
-<span class="stock">15</span>
-</td>
-
-<td>
-<span class="estado activo">Activo</span>
-</td>
-
-<td class="acciones">
-<i class="fa-solid fa-pen editar"></i>
-<i class="fa-solid fa-trash eliminar"></i>
-</td>
-
-</tr>
-
+<tbody id="tablaProductosBody">
+<tr><td colspan="8">Cargando productos...</td></tr>
 </tbody>
 
 </table>
@@ -335,36 +307,7 @@ Guardar Categoría
 </div>
 
 </div>
-<script>
-
-// MODAL PRODUCTO
-const btnNuevoProducto = document.getElementById("btnNuevoProducto");
-const modalProducto = document.getElementById("modalProducto");
-const cerrarModal = document.getElementById("cerrarModal");
-
-btnNuevoProducto.onclick = () =>{
-modalProducto.style.display="flex";
-}
-
-cerrarModal.onclick = () =>{
-modalProducto.style.display="none";
-}
-
-
-// MODAL CATEGORIA
-const btnCategoria = document.getElementById("btnCategoria");
-const modalCategoria = document.getElementById("modalCategoria");
-const cerrarCategoria = document.getElementById("cerrarCategoria");
-
-btnCategoria.onclick = () =>{
-modalCategoria.style.display="flex";
-}
-
-cerrarCategoria.onclick = () =>{
-modalCategoria.style.display="none";
-}
-
-</script>
+<script src="js/productos.js"></script>
 
 </body>
 </html>

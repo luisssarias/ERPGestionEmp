@@ -1,3 +1,10 @@
+// Helper para obtener URL de API
+const getApiBaseUrl = () => {
+    const protocol = window.location.protocol;
+    const host = window.location.host.split(':')[0];
+    return `${protocol}//${host}:8000/api`;
+};
+
 // Mostrar/ocultar contraseñas
 document.querySelectorAll(".toggle-password").forEach(button => {
     button.addEventListener("click", function(e) {
@@ -61,7 +68,7 @@ document.getElementById("registerForm").addEventListener("submit", async functio
         boton.classList.add("loading");
         boton.disabled = true;
 
-        const response = await fetch("http://127.0.0.1:8000/api/register", {
+        const response = await fetch(`${getApiBaseUrl()}/register`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

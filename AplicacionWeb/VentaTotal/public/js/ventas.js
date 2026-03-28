@@ -1,4 +1,10 @@
-const API_BASE = "http://127.0.0.1:8000/api";
+const getApiBaseUrl = () => {
+    const protocol = window.location.protocol;
+    const host = window.location.host.split(':')[0];
+    return `${protocol}//${host}:8000/api`;
+};
+
+const API_BASE = getApiBaseUrl();
 const IVA_PORCENTAJE = 0.16;
 
 const token = localStorage.getItem("token");
@@ -33,6 +39,7 @@ if (!token) {
 
 function getHeaders() {
     return {
+        "Accept": "application/json",
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
     };
@@ -90,61 +97,13 @@ async function cargarUsuarioSesion() {
     }
 }
 
-function buildProductosDemo() {
-    return [
-        {
-            id_producto: 1,
-            codigo: "PROD-001",
-            nombre: "Laptop Dell XPS 15",
-            categoria: "Electrónica",
-            precio: 25999.99,
-            stock: 8,
-            imagen: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600"
-        },
-        {
-            id_producto: 2,
-            codigo: "PROD-002",
-            nombre: "Mouse Inalámbrico Logitech",
-            categoria: "Accesorios",
-            precio: 499.0,
-            stock: 30,
-            imagen: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600"
-        },
-        {
-            id_producto: 3,
-            codigo: "PROD-003",
-            nombre: "Teclado Mecánico RGB",
-            categoria: "Accesorios",
-            precio: 1299.5,
-            stock: 18,
-            imagen: "https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?w=600"
-        },
-        {
-            id_producto: 4,
-            codigo: "PROD-004",
-            nombre: "Monitor 27 Pulgadas",
-            categoria: "Electrónica",
-            precio: 4899.0,
-            stock: 12,
-            imagen: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=600"
-        },
-        {
-            id_producto: 5,
-            codigo: "PROD-005",
-            nombre: "Silla Ergonómica Oficina",
-            categoria: "Mobiliario",
-            precio: 3299.0,
-            stock: 5,
-            imagen: "https://images.unsplash.com/photo-1505843490701-5be5d32fc99b?w=600"
-        }
-    ];
-}
 
 function normalizarProductos(lista) {
     return (lista || []).map((item, index) => ({
         id_producto: Number(item.id_producto || item.id || index + 1),
         codigo: item.codigo || `PROD-${String(index + 1).padStart(3, "0")}`,
         nombre: item.nombre || "Producto",
+        descripcion: item.descripcion || item.detalle || "",
         categoria: item.categoria || item.nombre_categoria || "Sin categoría",
         precio: Number(item.precio || 0),
         stock: Number(item.stock || 0),
@@ -164,18 +123,21 @@ async function cargarProductos() {
         });
 
         if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+                return;
+            }
+
             throw new Error("No se pudo cargar productos desde API");
         }
 
         const data = await response.json();
         productos = normalizarProductos(data);
-
-        if (!productos.length) {
-            productos = buildProductosDemo();
-        }
     } catch (error) {
-        console.warn("Usando catálogo de ejemplo:", error.message);
-        productos = buildProductosDemo();
+        console.error("Error cargando productos:", error.message);
+        productos = [];
+        showMensaje("No se pudieron cargar productos del servidor.", true);
     }
 
     renderCategorias();
@@ -313,6 +275,7 @@ function agregarAlCarrito(idProducto) {
             id_producto: producto.id_producto,
             codigo: producto.codigo,
             nombre: producto.nombre,
+            descripcion: producto.descripcion || producto.categoria || "",
             precio: producto.precio,
             cantidad: 1
         });
@@ -374,6 +337,8 @@ function buildPayloadVenta() {
         detalle: carrito.map((item) => ({
             id_producto: item.id_producto,
             codigo: item.codigo,
+            nombre: item.nombre,
+            descripcion: item.descripcion || "",
             cantidad: item.cantidad,
             precio_unitario: Number(item.precio.toFixed(2)),
             subtotal: Number((item.cantidad * item.precio).toFixed(2))
@@ -384,9 +349,14 @@ function buildPayloadVenta() {
 function guardarVentaPendiente(payload) {
     const key = "ventas_pendientes";
     const existentes = JSON.parse(localStorage.getItem(key) || "[]");
+    const consecutivo = existentes.length + 1;
+    const timestamp = Date.now();
 
     existentes.push({
         ...payload,
+        id_local: `local-${timestamp}-${consecutivo}`,
+        folio_local: `VTA-LOC-${String(consecutivo).padStart(4, "0")}`,
+        estado: "pendiente",
         fecha_local: new Date().toISOString()
     });
 

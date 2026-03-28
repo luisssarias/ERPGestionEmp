@@ -139,6 +139,19 @@ color:#64748b;
 margin-bottom:25px;
 }
 
+.btn-listado{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:10px 14px;
+background:#0f172a;
+color:white;
+text-decoration:none;
+border-radius:10px;
+font-size:14px;
+font-weight:600;
+}
+
 /* VENTAS */
 
 .ventas-layout{

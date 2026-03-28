@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listado de Ventas</title>
+
+<link rel="stylesheet" href="css/ventas-lista.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+<div class="layout">
+
+<aside class="sidebar">
+<div class="logo">
+<div class="logo-icon">
+<i class="fa-solid fa-table-cells-large"></i>
+</div>
+<div>
+<h3>Sistema ERP</h3>
+<p>Version 1.0</p>
+</div>
+</div>
+
+<nav>
+<a class="menu" href="dashboard.html">
+<i class="fa-solid fa-table-cells-large"></i>
+<span>Dashboard</span>
+</a>
+
+<a class="menu" href="productos.html">
+<i class="fa-solid fa-box"></i>
+<span>Productos</span>
+</a>
+
+<a class="menu" href="entradas.html">
+<i class="fa-solid fa-arrow-down"></i>
+<span>Entradas</span>
+</a>
+
+<a class="menu active" href="ventas-lista.html">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Ventas</span>
+</a>
+
+<a class="menu" href="reportes.html">
+<i class="fa-solid fa-chart-column"></i>
+<span>Reportes</span>
+</a>
+
+<a class="menu" href="usuarios.html">
+<i class="fa-solid fa-users"></i>
+<span>Usuarios</span>
+</a>
+</nav>
+</aside>
+
+<main class="main">
+<header class="topbar">
+<h1>VentaTotal</h1>
+
+<div class="profile">
+<div class="avatar">
+<i class="fa-regular fa-user"></i>
+</div>
+<div>
+<h4 id="topbarUsuarioNombre">Cargando...</h4>
+<p id="topbarUsuarioRol">Administrador</p>
+</div>
+</div>
+</header>
+
+<section class="content">
+<div class="page-header">
+<div>
+<h2>Gestion de Ventas</h2>
+<p>Consulta, edita y elimina ventas registradas.</p>
+</div>
+<div class="header-actions">
+<a class="btn-back" href="ventas.html"><i class="fa-solid fa-arrow-left"></i>Volver al punto de venta</a>
+<a class="btn-secondary" href="ventas.html"><i class="fa-solid fa-plus"></i>Nueva venta</a>
+</div>
+</div>
+
+<div class="filters-card">
+<div class="filter-item">
+<label for="buscarVenta">Buscar</label>
+<input id="buscarVenta" type="text" placeholder="Folio, cliente o metodo de pago">
+</div>
+<div class="filter-item">
+<label for="estadoVenta">Estado</label>
+<select id="estadoVenta">
+<option value="">Todos</option>
+<option value="completada">Completada</option>
+<option value="pendiente">Pendiente</option>
+<option value="cancelada">Cancelada</option>
+</select>
+</div>
+</div>
+
+<div class="table-card">
+<div class="table-head">
+<h3>Listado de ventas</h3>
+<span id="resumenVentas">0 registros</span>
+</div>
+
+<div class="table-wrapper">
+<table class="tabla-ventas">
+<thead>
+<tr>
+<th>Folio</th>
+<th>Fecha</th>
+<th>Cliente</th>
+<th>Metodo</th>
+<th>Estado</th>
+<th>Total</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody id="tablaVentasBody">
+<tr>
+<td colspan="7" class="estado">Cargando ventas...</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="paginacion">
+<div class="paginacion-left">
+<label for="filasPorPagina">Filas por pagina</label>
+<select id="filasPorPagina">
+<option value="5">5</option>
+<option value="10" selected>10</option>
+<option value="20">20</option>
+<option value="50">50</option>
+</select>
+<span id="paginacionInfo">Mostrando 0 - 0 de 0</span>
+</div>
+
+<div class="paginacion-right">
+<button id="btnPrevPage" class="btn-page" type="button"><i class="fa-solid fa-chevron-left"></i></button>
+<div id="paginacionNumeros" class="paginacion-numeros"></div>
+<button id="btnNextPage" class="btn-page" type="button"><i class="fa-solid fa-chevron-right"></i></button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+
+<div class="modal" id="modalDetalleVenta">
+<div class="modal-content modal-wide">
+<div class="modal-header">
+<h3>Detalle de Venta</h3>
+<button type="button" class="cerrar" data-close="detalle">&times;</button>
+</div>
+<div id="detalleVentaContent"></div>
+<div class="modal-actions end">
+<button type="button" class="btn-export pdf" id="btnDetalleExportPdf"><i class="fa-solid fa-file-pdf"></i>PDF</button>
+<button type="button" class="btn-light" data-close="detalle">Cerrar</button>
+</div>
+</div>
+</div>
+
+<div class="modal" id="modalEditarVenta">
+<div class="modal-content">
+<div class="modal-header">
+<h3>Editar Venta</h3>
+<button type="button" class="cerrar" data-close="editar">&times;</button>
+</div>
+
+<form id="formEditarVenta">
+<input type="hidden" id="editVentaId">
+
+<label for="editCliente">Cliente</label>
+<input id="editCliente" type="text" placeholder="Nombre del cliente">
+
+<label for="editMetodoPago">Metodo de pago</label>
+<select id="editMetodoPago" required>
+<option value="efectivo">Efectivo</option>
+<option value="tarjeta">Tarjeta</option>
+<option value="transferencia">Transferencia</option>
+</select>
+
+<label for="editEstado">Estado</label>
+<select id="editEstado" required>
+<option value="completada">Completada</option>
+<option value="pendiente">Pendiente</option>
+<option value="cancelada">Cancelada</option>
+</select>
+
+<label for="editObservaciones">Observaciones</label>
+<textarea id="editObservaciones" rows="3"></textarea>
+
+<div class="edit-detalle-box">
+<h4>Productos de la venta</h4>
+<div class="edit-detalle-wrapper">
+<table class="edit-detalle-tabla">
+<thead>
+<tr>
+<th>Producto</th>
+<th>Descripcion</th>
+<th>Cant.</th>
+<th>P. Unitario</th>
+</tr>
+</thead>
+<tbody id="editDetalleVenta">
+<tr>
+<td colspan="4">Sin productos para mostrar.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<p id="mensajeEdicion" class="mensaje"></p>
+
+<div class="modal-actions">
+<button type="button" class="btn-light" data-close="editar">Cancelar</button>
+<button type="submit" class="btn-primary">Guardar cambios</button>
+</div>
+</form>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="js/ventas-lista.js"></script>
+</body>
+</html>

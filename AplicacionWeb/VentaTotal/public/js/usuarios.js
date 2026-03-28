@@ -1,4 +1,10 @@
-const API_BASE = "http://127.0.0.1:8000/api";
+const getApiBaseUrl = () => {
+    const protocol = window.location.protocol;
+    const host = window.location.host.split(':')[0];
+    return `${protocol}//${host}:8000/api`;
+};
+
+const API_BASE = getApiBaseUrl();
 
 const token = localStorage.getItem("token");
 
@@ -30,6 +36,7 @@ if (!token) {
 
 function getHeaders() {
     return {
+        "Accept": "application/json",
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
     };
