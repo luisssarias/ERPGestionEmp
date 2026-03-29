@@ -79,8 +79,8 @@
 </div>
 
 <div>
-<h4>Admin</h4>
-<p>Administrador</p>
+<h4 id="topbarUsuarioNombre">Admin</h4>
+<p id="topbarUsuarioRol">Administrador</p>
 </div>
 
 </div>
@@ -92,8 +92,33 @@
 
 <div class="page-header">
 <h2>Registro de Entradas de Inventario</h2>
-<p>Gestiona las entradas de productos y mantén actualizado tu inventario</p>
+<p>Registra proveedores, define que productos te venden y documenta cada entrada</p>
 </div>
+
+<section class="kpi-row">
+
+<article class="kpi-card">
+<p>Proveedores activos</p>
+<h3 id="kpiProveedores">0</h3>
+<span>Con catalogo asignado</span>
+</article>
+
+<article
+class="kpi-card accent"
+title="Cobertura del catálogo = porcentaje de productos de tu catálogo que ya tienen al menos un proveedor asignado."
+>
+<p>Cobertura del catalogo</p>
+<h3 id="kpiCobertura">0%</h3>
+<span id="kpiCoberturaTexto">0 de 0 productos cubiertos</span>
+</article>
+
+<article class="kpi-card success">
+<p>Entradas registradas</p>
+<h3 id="kpiEntradas">0</h3>
+<span>En este modulo</span>
+</article>
+
+</section>
 
 
 <div class="entrada-card">
@@ -104,15 +129,19 @@
 
 <div class="form-group">
 
-<label>Buscar Producto *</label>
+<label for="buscarProducto">Buscar Producto *</label>
 
 <div class="buscar">
 <i class="fa-solid fa-magnifying-glass"></i>
-<input type="text" placeholder="Buscar por nombre o código...">
+<input id="buscarProducto" type="text" placeholder="Buscar por nombre o codigo..." autocomplete="off">
+</div>
+
+<div id="resultadosProducto" class="resultados-producto">
+<p class="vacio">Escribe para buscar productos</p>
 </div>
 
 
-<div class="producto-info">
+<div class="producto-info" id="productoInfo">
 
 <div class="producto-icon">
 <i class="fa-solid fa-box"></i>
@@ -120,26 +149,27 @@
 
 <div>
 
-<h4>SSD Samsung 1TB</h4>
-<p>Código: PROD007</p>
+<h4 id="infoNombre">Ningun producto seleccionado</h4>
+<p id="infoCodigo">Codigo: -</p>
+<p id="infoPrecioCompra">Precio proveedor: -</p>
 
 <div class="stock-info">
 
 <div>
 <span>Stock Actual</span>
-<h3 class="stock-actual">2</h3>
+<h3 class="stock-actual" id="infoStockActual">0</h3>
 </div>
 
 <div>
 <span>Stock Mínimo</span>
-<h3>10</h3>
+<h3 id="infoStockMinimo">10</h3>
 </div>
 
 </div>
 
-<span class="stock-alerta">
+<span class="stock-alerta" id="infoAlertaStock">
 <i class="fa-solid fa-triangle-exclamation"></i>
-Stock Bajo - Requiere reposición
+Selecciona un producto para ver estado de stock
 </span>
 
 </div>
@@ -151,22 +181,117 @@ Stock Bajo - Requiere reposición
 
 <div class="form-group">
 
-<label>Cantidad a Ingresar *</label>
-<input type="number" value="0">
+<label for="cantidadEntrada">Cantidad a Ingresar *</label>
+<input id="cantidadEntrada" type="number" value="1" min="1">
 
-<label class="mt">Motivo de Entrada / Observación</label>
-<textarea placeholder="Ej: Reposición mensual, Pedido especial, etc."></textarea>
+<label for="proveedorEntrada">Proveedor para esta entrada *</label>
+<select id="proveedorEntrada">
+<option value="">Selecciona un producto primero</option>
+</select>
+
+<label for="productoEntrada">Producto a comprar a este proveedor *</label>
+<select id="productoEntrada" disabled>
+<option value="">Selecciona un proveedor primero</option>
+</select>
+
+<div class="total-compra" id="totalCompraPreview">
+<strong>Total estimado:</strong>
+<span id="totalEntrada">$0.00</span>
+</div>
+
+<label class="mt" for="observacionEntrada">Motivo de Entrada / Observacion</label>
+<textarea id="observacionEntrada" placeholder="Ej: Reposicion mensual, Pedido especial, etc."></textarea>
+
+<p id="mensajeEntrada" class="mensaje"></p>
 
 </div>
 
 </div>
 
-<button class="btn-registrar">
+<button class="btn-registrar" id="btnRegistrarEntrada">
 <i class="fa-solid fa-arrow-trend-up"></i>
 Registrar Entrada
 </button>
 
 </div>
+
+<section class="proveedores-card">
+
+<div class="section-head">
+<h3><i class="fa-solid fa-truck-field"></i> Proveedores y Productos que Venden</h3>
+<p>Registra proveedores y asigna que productos te pueden suministrar</p>
+</div>
+
+<div class="proveedores-layout">
+
+<form id="formProveedor" class="proveedor-form">
+<h4>Nuevo proveedor</h4>
+<input id="idProveedor" type="hidden">
+
+<label for="proveedorNombre">Nombre contacto *</label>
+<input id="proveedorNombre" type="text" placeholder="Ej: Maria Lopez" required>
+
+<label for="proveedorEmpresa">Empresa *</label>
+<input id="proveedorEmpresa" type="text" placeholder="Ej: Distribuidora Andina" required>
+
+<div class="grid-2">
+<div>
+<label for="proveedorTelefono">Telefono</label>
+<input id="proveedorTelefono" type="tel" placeholder="555 333 2211">
+</div>
+<div>
+<label for="proveedorCorreo">Correo</label>
+<input id="proveedorCorreo" type="email" placeholder="contacto@empresa.com">
+</div>
+</div>
+
+<div class="grid-2">
+<div>
+<label for="proveedorRfc">RFC</label>
+<input id="proveedorRfc" type="text" placeholder="XAXX010101000">
+</div>
+<div>
+<label for="proveedorEstado">Estado</label>
+<select id="proveedorEstado">
+<option value="Activo" selected>Activo</option>
+<option value="Inactivo">Inactivo</option>
+</select>
+</div>
+</div>
+
+<label for="proveedorDireccion">Direccion</label>
+<textarea id="proveedorDireccion" rows="2" placeholder="Calle, numero, colonia, ciudad"></textarea>
+
+<label>Productos que vende *</label>
+<div id="checkProductos" class="check-productos">
+<p class="vacio">Cargando productos...</p>
+</div>
+
+<label for="proveedorNotas">Notas</label>
+<textarea id="proveedorNotas" rows="3" placeholder="Condiciones, tiempos de entrega, credito, etc."></textarea>
+
+<p id="mensajeProveedor" class="mensaje"></p>
+
+<button type="submit" class="btn-save" id="btnGuardarProveedor">
+<i class="fa-solid fa-floppy-disk"></i>
+Registrar proveedor
+</button>
+</form>
+
+<div class="proveedor-listado">
+<div class="listado-head">
+<h4>Proveedores registrados</h4>
+<span id="contadorProveedores" class="badge">0</span>
+</div>
+
+<div id="listaProveedores" class="lista-proveedores">
+<p class="vacio">Aun no hay proveedores registrados.</p>
+</div>
+</div>
+
+</div>
+
+</section>
 
 <div class="historial-card">
 
@@ -177,7 +302,7 @@ Registrar Entrada
 Historial de Entradas
 </h3>
 
-<span class="badge">5 registros</span>
+<span class="badge" id="badgeHistorial">0 registros</span>
 
 </div>
 
@@ -186,12 +311,26 @@ Historial de Entradas
 
 <div class="fecha">
 <label>Desde</label>
-<input type="date">
+<input id="filtroDesde" type="date">
 </div>
 
 <div class="fecha">
 <label>Hasta</label>
-<input type="date">
+<input id="filtroHasta" type="date">
+</div>
+
+<div class="fecha">
+<label>Proveedor</label>
+<select id="filtroProveedorHistorial">
+<option value="">Todos los proveedores</option>
+</select>
+</div>
+
+<div class="fecha">
+<label>Producto</label>
+<select id="filtroProductoHistorial">
+<option value="">Todos los productos</option>
+</select>
 </div>
 
 </div>
@@ -203,37 +342,16 @@ Historial de Entradas
 <tr>
 <th><i class="fa-regular fa-calendar"></i> FECHA</th>
 <th><i class="fa-solid fa-box"></i> PRODUCTO</th>
+<th><i class="fa-solid fa-truck"></i> PROVEEDOR</th>
 <th>CANTIDAD INGRESADA</th>
+<th>PRECIO UNITARIO</th>
+<th>TOTAL</th>
 <th><i class="fa-regular fa-user"></i> USUARIO</th>
 <th>OBSERVACIÓN</th>
 </tr>
 </thead>
 
-<tbody>
-
-<tr>
-
-<td>
-2026-03-02<br>
-<span class="hora">10:30</span>
-</td>
-
-<td>Laptop Dell XPS 15</td>
-
-<td>
-<span class="cantidad">+20</span>
-</td>
-
-<td>
-Carlos<br>
-<span class="hora">Mendoza</span>
-</td>
-
-<td>Reposición mensual programada</td>
-
-</tr>
-
-</tbody>
+<tbody id="tablaHistorialBody"></tbody>
 
 </table>
 
@@ -244,6 +362,8 @@ Carlos<br>
 </main>
 
 </div>
+
+<script src="js/entradas.js"></script>
 
 </body>
 </html>
