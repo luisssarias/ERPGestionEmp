@@ -125,11 +125,11 @@ Nueva Categoría
 <!-- TARJETAS -->
 <div class="stats">
 
-<div class="stat-card">
+<div class="stat-card" id="cardTotalProductos">
 
 <div>
 <p>Total de Productos</p>
-<h2 id="statTotalProductos">0</h2>
+<h2 id="totalProductos">0</h2>
 <span class="up">↑ En catálogo</span>
 </div>
 
@@ -140,11 +140,11 @@ Nueva Categoría
 </div>
 
 
-<div class="stat-card">
+<div class="stat-card" id="cardStockBajo">
 
 <div>
 <p>Productos con Stock Bajo</p>
-<h2 id="statStockBajo">0</h2>
+<h2 id="stockBajo">0</h2>
 <span class="down">↓ Requieren atención</span>
 </div>
 
@@ -164,7 +164,7 @@ Nueva Categoría
 
 <div class="buscar">
 <i class="fa-solid fa-magnifying-glass"></i>
-<input id="buscarProducto" type="text" placeholder="Buscar por nombre o código...">
+<input type="text" id="buscarProducto" placeholder="Buscar por nombre o código...">
 </div>
 
 <select id="filtroCategoria">
@@ -173,9 +173,6 @@ Nueva Categoría
 
 <select id="filtroEstado">
 <option value="">Todos los Estados</option>
-<option value="activo">Activo</option>
-<option value="stock_bajo">Stock bajo</option>
-<option value="sin_stock">Sin stock</option>
 </select>
 
 </div>
@@ -198,8 +195,13 @@ Nueva Categoría
 
 </thead>
 
-<tbody id="tablaProductosBody">
-<tr><td colspan="8">Cargando productos...</td></tr>
+<tbody>
+
+<tr>
+<td colspan="8" id="estadoTabla">Cargando productos...</td>
+
+</tr>
+
 </tbody>
 
 </table>
@@ -223,49 +225,55 @@ Nueva Categoría
 
 </div>
 
-<form>
+<form id="formProducto">
 
-<label>Imagen del Producto</label>
-
-<div class="subir-imagen">
-<i class="fa-solid fa-upload"></i>
-<p>Subir imagen</p>
-<input type="file">
-</div>
+<input type="hidden" id="idProducto" value="">
 
 
 <label>Nombre del Producto *</label>
-<input type="text" placeholder="Ej: Laptop Dell XPS 15">
+<input type="text" id="nombreProducto" placeholder="Ej: Laptop Dell XPS 15" required>
 
+<label>Descripción</label>
+<textarea id="descripcionProducto" placeholder="Descripción del producto"></textarea>
 
-<label>Código de Barras *</label>
-<input type="text" placeholder="Ej: PROD001">
+<label>Imagen del producto</label>
+<input type="file" id="imagenProducto" accept="image/*">
+<img id="previewImagenProducto" class="preview-imagen" alt="Vista previa" style="display:none;">
+<p class="imagen-ayuda">Formatos permitidos: JPG, PNG, WEBP (max 2MB)</p>
+
+<p style="margin-top:8px;margin-bottom:14px;font-size:13px;color:#475569;">Código automático: se genera como PROD001, PROD002, ...</p>
 
 
 <label>Categoría *</label>
-<input type="text">
+<select id="categoriaProducto" required>
+<option value="">Selecciona una categoría</option>
+</select>
 
 
 <div class="grid-2">
 
 <div>
 <label>Precio ($) *</label>
-<input type="number" placeholder="0.00">
+<input type="number" id="precioProducto" min="0" step="0.01" placeholder="0.00" required>
 </div>
 
 <div>
 <label>Stock Inicial *</label>
-<input type="number" placeholder="0">
+<input type="number" id="stockProducto" min="0" step="1" placeholder="0" required>
 </div>
 
 </div>
+
+<p style="margin-top:8px;font-size:13px;color:#475569;">Estado del producto: Activo.</p>
+
+<p id="mensajeProducto" style="margin-top:10px;font-size:13px;color:#dc2626;"></p>
 
 
 <div class="modal-botones">
 
-<button type="button" class="btn-cancelar">Cancelar</button>
+<button type="button" class="btn-cancelar" id="cancelarProducto">Cancelar</button>
 
-<button class="btn-guardar">
+<button type="submit" class="btn-guardar" id="btnGuardarProducto">
 <i class="fa-solid fa-floppy-disk"></i>
 Guardar Producto
 </button>
@@ -287,22 +295,26 @@ Guardar Producto
 <span class="cerrar" id="cerrarCategoria">&times;</span>
 </div>
 
+<form id="formCategoria">
 <label>Nombre de Categoría</label>
-<input type="text" placeholder="Ej: Electrónica">
+<input type="text" id="nombreCategoria" placeholder="Ej: Electrónica" required>
 
 <label>Descripción</label>
-<textarea placeholder="Descripción de la categoría"></textarea>
+<textarea id="descripcionCategoria" placeholder="Descripción de la categoría"></textarea>
+
+<p id="mensajeCategoria" style="margin-top:10px;font-size:13px;color:#dc2626;"></p>
 
 <div class="modal-botones">
 
-<button class="btn-cancelar">Cancelar</button>
+<button type="button" class="btn-cancelar" id="cancelarCategoria">Cancelar</button>
 
-<button class="btn-guardar">
+<button type="submit" class="btn-guardar" id="btnGuardarCategoria">
 <i class="fa-solid fa-floppy-disk"></i>
 Guardar Categoría
 </button>
 
 </div>
+</form>
 
 </div>
 
