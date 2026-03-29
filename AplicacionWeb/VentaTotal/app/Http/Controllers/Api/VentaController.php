@@ -12,7 +12,7 @@ class VentaController extends Controller
 {
     public function index()
     {
-        $ventas = Venta::with(['detalles'])
+        $ventas = Venta::with(['detalles', 'factura'])
             ->orderByDesc('id_venta')
             ->get();
 
@@ -96,7 +96,7 @@ class VentaController extends Controller
 
     public function show($id)
     {
-        $venta = Venta::with(['detalles'])->findOrFail($id);
+        $venta = Venta::with(['detalles', 'factura'])->findOrFail($id);
         return response()->json($this->transformVenta($venta));
     }
 
@@ -191,6 +191,13 @@ class VentaController extends Controller
             'impuesto' => (float) $venta->impuesto,
             'total' => (float) $venta->total,
             'observaciones' => $venta->observaciones,
+            'facturada' => (bool) $venta->factura,
+            'factura' => $venta->factura ? [
+                'id_factura' => $venta->factura->id_factura,
+                'folio_factura' => $venta->factura->folio_factura,
+                'estado' => $venta->factura->estado,
+                'pdf_path' => $venta->factura->pdf_path,
+            ] : null,
             'detalle' => $venta->detalles->map(function ($item) {
                 return [
                     'id_producto' => $item->id_producto,

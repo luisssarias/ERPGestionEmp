@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facturacion - Lista de Ventas</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #0f766e;
+    --primary-dark: #0b5e58;
+    --border: #e5e7eb;
+    --danger: #b91c1c;
+    --warning: #b45309;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: linear-gradient(140deg, #eef2ff 0%, #f8fafc 45%, #ecfeff 100%);
+    color: var(--text);
+}
+.page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 18px 40px;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 1.7rem;
+}
+.header p {
+    margin: 6px 0 0;
+    color: var(--muted);
+}
+.nav-actions {
+    display: flex;
+    gap: 10px;
+}
+.btn {
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn.back {
+    background: #e2e8f0;
+    color: #111827;
+}
+.btn.primary {
+    background: var(--primary);
+    color: #fff;
+}
+.btn.primary:hover { background: var(--primary-dark); }
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+.toolbar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.field label {
+    display: block;
+    font-size: 0.88rem;
+    margin-bottom: 5px;
+    color: var(--muted);
+}
+.field input, .field select {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.95rem;
+}
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+thead th {
+    text-align: left;
+    background: #f8fafc;
+    color: #334155;
+    border-bottom: 1px solid var(--border);
+    padding: 11px;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+tbody td {
+    padding: 11px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.93rem;
+}
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.badge.completada { background: #dcfce7; color: #166534; }
+.badge.pendiente { background: #fef3c7; color: var(--warning); }
+.badge.cancelada { background: #fee2e2; color: var(--danger); }
+.btn-facturar {
+    border: none;
+    border-radius: 9px;
+    background: #0ea5e9;
+    color: white;
+    padding: 8px 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-facturar:hover { background: #0284c7; }
+.btn-secondary-action {
+    border: 1px solid #93c5fd;
+    border-radius: 9px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    padding: 8px 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.acciones {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.estado {
+    text-align: center;
+    color: var(--muted);
+    padding: 18px;
+}
+.footer-note {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+@media (max-width: 720px) {
+    .header h1 { font-size: 1.4rem; }
+    .btn { width: 100%; justify-content: center; }
+    .nav-actions { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <div>
+            <h1>Interfaz de Facturacion</h1>
+            <p>Selecciona una venta para llenar sus datos de facturacion.</p>
+        </div>
+        <div class="nav-actions">
+            <a class="btn back" href="ventas-lista.html"><i class="fa-solid fa-arrow-left"></i>Volver a ventas</a>
+            <button id="btnRecargar" class="btn primary" type="button"><i class="fa-solid fa-rotate"></i>Recargar</button>
+        </div>
+    </div>
+
+    <section class="card">
+        <div class="toolbar">
+            <div class="field">
+                <label for="buscarVenta">Buscar venta</label>
+                <input id="buscarVenta" type="text" placeholder="Folio o cliente">
+            </div>
+            <div class="field">
+                <label for="estadoVenta">Estado</label>
+                <select id="estadoVenta">
+                    <option value="">Todos</option>
+                    <option value="completada">Completada</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="cancelada">Cancelada</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Folio</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Metodo</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                        <th>Accion</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaFacturacionBody">
+                    <tr>
+                        <td class="estado" colspan="7">Cargando ventas...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p id="resumen" class="footer-note">0 ventas disponibles para facturacion.</p>
+    </section>
+</div>
+
+<script src="js/facturacion-lista.js"></script>
+</body>
+</html>

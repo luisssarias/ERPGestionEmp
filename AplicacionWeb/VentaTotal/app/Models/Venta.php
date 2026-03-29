@@ -31,4 +31,9 @@ class Venta extends Model
     {
         return $this->hasMany(DetalleVenta::class, 'id_venta', 'id_venta');
     }
+
+    public function factura()
+    {
+        return $this->hasOne(Factura::class, 'id_venta', 'id_venta');
+    }
 }

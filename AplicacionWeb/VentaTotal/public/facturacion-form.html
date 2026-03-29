@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facturacion - Formulario</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+    --bg: #f5f7fb;
+    --card: #ffffff;
+    --border: #e5e7eb;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --primary: #0f766e;
+    --primary-dark: #0b5e58;
+    --ok: #166534;
+    --error: #b91c1c;
+}
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: radial-gradient(circle at top right, #dbeafe 0%, #eef2ff 35%, #f8fafc 100%);
+    color: var(--text);
+}
+.page {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 18px 40px;
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+.header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+}
+.header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+}
+.btn-back {
+    text-decoration: none;
+    background: #e2e8f0;
+    color: #111827;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 14px;
+}
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+.card h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+.info-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 0.94rem;
+}
+.info-line span:first-child { color: var(--muted); }
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.form-field.full {
+    grid-column: 1 / -1;
+}
+.form-field label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.94rem;
+}
+.actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.btn-primary {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: var(--primary);
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-secondary {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: #e2e8f0;
+    color: #111827;
+    font-weight: 700;
+    cursor: pointer;
+}
+.mensaje {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    min-height: 20px;
+}
+.mensaje.ok { color: var(--ok); }
+.mensaje.error { color: var(--error); }
+.preview {
+    margin-top: 12px;
+    border: 1px dashed #bfdbfe;
+    border-radius: 10px;
+    background: #eff6ff;
+    padding: 10px;
+    font-size: 0.86rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+@media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <div>
+            <h1>Formulario de Facturacion</h1>
+            <p>Completa los datos fiscales para generar la factura de la venta.</p>
+        </div>
+        <a class="btn-back" href="facturacion.html"><i class="fa-solid fa-arrow-left"></i>Volver a lista</a>
+    </div>
+
+    <div class="grid">
+        <section class="card">
+            <h3>Venta seleccionada</h3>
+            <div class="info-line"><span>Folio:</span><strong id="ventaFolio">-</strong></div>
+            <div class="info-line"><span>Fecha:</span><strong id="ventaFecha">-</strong></div>
+            <div class="info-line"><span>Cliente:</span><strong id="ventaCliente">-</strong></div>
+            <div class="info-line"><span>Metodo pago:</span><strong id="ventaMetodo">-</strong></div>
+            <div class="info-line"><span>Total:</span><strong id="ventaTotal">-</strong></div>
+            <p id="infoWarning" class="mensaje error"></p>
+        </section>
+
+        <section class="card">
+            <h3>Datos de facturacion</h3>
+            <form id="facturacionForm" novalidate>
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="rfc">RFC</label>
+                        <input id="rfc" name="rfc" type="text" maxlength="13" placeholder="ABC123456XYZ" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="razonSocial">Razon social</label>
+                        <input id="razonSocial" name="razonSocial" type="text" placeholder="Empresa SA de CV" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="regimenFiscal">Regimen fiscal</label>
+                        <select id="regimenFiscal" name="regimenFiscal" required>
+                            <option value="">Selecciona</option>
+                            <option value="601">601 - General de Ley Personas Morales</option>
+                            <option value="612">612 - Personas Fisicas con Actividades Empresariales</option>
+                            <option value="621">621 - Incorporacion Fiscal</option>
+                            <option value="626">626 - Regimen Simplificado de Confianza</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="usoCfdi">Uso CFDI</label>
+                        <select id="usoCfdi" name="usoCfdi" required>
+                            <option value="">Selecciona</option>
+                            <option value="G03">G03 - Gastos en general</option>
+                            <option value="S01">S01 - Sin efectos fiscales</option>
+                            <option value="D01">D01 - Honorarios medicos</option>
+                            <option value="I01">I01 - Construcciones</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label for="email">Email de envio</label>
+                        <input id="email" name="email" type="email" placeholder="cliente@correo.com" required>
+                    </div>
+                    <div class="form-field">
+                        <label for="codigoPostal">Codigo postal</label>
+                        <input id="codigoPostal" name="codigoPostal" type="text" maxlength="5" placeholder="00000" required>
+                    </div>
+                    <div class="form-field full">
+                        <label for="comentarios">Comentarios (opcional)</label>
+                        <textarea id="comentarios" name="comentarios" rows="3" placeholder="Notas para la factura"></textarea>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button class="btn-primary" type="submit"><i class="fa-solid fa-file-invoice"></i>Guardar datos</button>
+                    <button class="btn-secondary" type="button" id="btnLimpiar">Limpiar</button>
+                </div>
+                <p id="mensajeForm" class="mensaje"></p>
+                <div id="previewPayload" class="preview" hidden></div>
+            </form>
+        </section>
+    </div>
+</div>
+
+<script src="js/facturacion-form.js"></script>
+</body>
+</html>
