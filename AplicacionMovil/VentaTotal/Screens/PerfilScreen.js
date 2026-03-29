@@ -451,19 +451,9 @@ export default function PerfilScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.topbar}>
-          <Text style={styles.brand}>VentaTotal</Text>
-
-          <View style={styles.profileMini}>
-            <View style={styles.avatarMini}>
-              <Ionicons name="person-outline" size={18} color="white" />
-            </View>
-
-            <View>
-              <Text style={styles.profileName}>{nombre}</Text>
-              <Text style={styles.profileRole}>{rol}</Text>
-            </View>
-          </View>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Perfil</Text>
+          <Text style={styles.headerSubtitle}>Gestiona tu sesion y usuarios del sistema</Text>
         </View>
 
         <View style={styles.usuarioActivo}>
@@ -742,46 +732,16 @@ const styles = StyleSheet.create({
     paddingBottom: 24
   },
 
-  topbar: {
+  header: {
     backgroundColor: "#2c4da7",
-    paddingVertical: 18,
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between"
+    padding: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20
   },
 
-  brand: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#ffffff"
-  },
+  headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
 
-  profileMini: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10
-  },
-
-  avatarMini: {
-    width: 36,
-    height: 36,
-    backgroundColor: "#3b82f6",
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-
-  profileName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#ffffff"
-  },
-
-  profileRole: {
-    fontSize: 12,
-    color: "#cbd5e1"
-  },
+  headerSubtitle: { color: "#dbeafe", marginTop: 4 },
 
   usuarioActivo: {
     flexDirection: "row",

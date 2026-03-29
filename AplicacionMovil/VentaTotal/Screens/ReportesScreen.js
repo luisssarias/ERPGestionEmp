@@ -38,6 +38,7 @@ return(
 
 <View style={styles.header}>
 <Text style={styles.headerTitle}>Reportes</Text>
+<Text style={styles.headerSubtitle}>Analiza ventas, tendencias y categorias</Text>
 </View>
 
 {/* Card verde */}
@@ -186,6 +187,11 @@ headerTitle:{
 color:"white",
 fontSize:20,
 fontWeight:"bold"
+},
+
+headerSubtitle:{
+color:"#dbeafe",
+marginTop:4
 },
 
 greenCard:{

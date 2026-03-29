@@ -522,17 +522,13 @@ export default function ProductosScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.topbar}>
-          <Text style={styles.topbarTitle}>VentaTotal</Text>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Productos</Text>
+          <Text style={styles.headerSubtitle}>Administra tu inventario y categorias</Text>
         </View>
 
         <View style={styles.body}>
           <View style={styles.pageHeader}>
-            <View>
-              <Text style={styles.pageTitle}>Gestion de Productos</Text>
-              <Text style={styles.pageSubtitle}>Administra tu inventario</Text>
-            </View>
-
             <View style={styles.headerActions}>
               <TouchableOpacity style={styles.btnNuevo} onPress={abrirModalNuevo}>
                 <Ionicons name="add" size={16} color="white" />
@@ -892,19 +888,16 @@ export default function ProductosScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f1f5f9" },
 
-  topbar: {
+  header: {
     backgroundColor: "#2c4da7",
-    paddingHorizontal: 20,
-    paddingVertical: 18,
-    justifyContent: "center",
-    alignItems: "center"
+    padding: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20
   },
 
-  topbarTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "white"
-  },
+  headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
+
+  headerSubtitle: { color: "#dbeafe", marginTop: 4 },
 
   content: {
     paddingBottom: 110
@@ -916,19 +909,6 @@ const styles = StyleSheet.create({
 
   pageHeader: {
     marginBottom: 14
-  },
-
-  pageTitle: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#0f172a"
-  },
-
-  pageSubtitle: {
-    fontSize: 13,
-    color: "#64748b",
-    marginTop: 3,
-    marginBottom: 12
   },
 
   headerActions: {

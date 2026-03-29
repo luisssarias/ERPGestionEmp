@@ -12,8 +12,8 @@ return(
 
 <View style={styles.header}>
 
-<Text style={styles.welcome}>Bienvenido, Felipe</Text>
-<Text style={styles.subtitle}>Gestiona tu negocio de manera eficiente</Text>
+<Text style={styles.headerTitle}>Inicio</Text>
+<Text style={styles.headerSubtitle}>Gestiona tu negocio de manera eficiente</Text>
 
 </View>
 
@@ -69,14 +69,14 @@ container:{flex:1,backgroundColor:"#f1f5f9"},
 
 header:{
 backgroundColor:"#2c4da7",
-padding:25,
-borderBottomLeftRadius:25,
-borderBottomRightRadius:25
+padding:20,
+borderBottomLeftRadius:20,
+borderBottomRightRadius:20
 },
 
-welcome:{color:"white",fontSize:20,fontWeight:"bold"},
+headerTitle:{color:"white",fontSize:20,fontWeight:"bold"},
 
-subtitle:{color:"white",opacity:0.8},
+headerSubtitle:{color:"#dbeafe",marginTop:4},
 
 cards:{
 flexDirection:"row",

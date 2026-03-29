@@ -1,23 +1,6 @@
 const API_BASE = "http://127.0.0.1:8000/api";
 const token = localStorage.getItem("token");
 
-const formProveedor = document.getElementById("formProveedor");
-const idProveedor = document.getElementById("idProveedor");
-const proveedorNombre = document.getElementById("proveedorNombre");
-const proveedorEmpresa = document.getElementById("proveedorEmpresa");
-const proveedorTelefono = document.getElementById("proveedorTelefono");
-const proveedorCorreo = document.getElementById("proveedorCorreo");
-const proveedorRfc = document.getElementById("proveedorRfc");
-const proveedorEstado = document.getElementById("proveedorEstado");
-const proveedorDireccion = document.getElementById("proveedorDireccion");
-const proveedorNotas = document.getElementById("proveedorNotas");
-const mensajeProveedor = document.getElementById("mensajeProveedor");
-const listaProveedores = document.getElementById("listaProveedores");
-const contadorProveedores = document.getElementById("contadorProveedores");
-const selectProveedorEntrada = document.getElementById("proveedorEntrada");
-const kpiProveedores = document.getElementById("kpiProveedores");
-const btnGuardarProveedor = document.getElementById("btnGuardarProveedor");
-const checkProductos = document.getElementById("checkProductos");
 const buscarProducto = document.getElementById("buscarProducto");
 const resultadosProducto = document.getElementById("resultadosProducto");
 const infoNombre = document.getElementById("infoNombre");
@@ -25,9 +8,10 @@ const infoCodigo = document.getElementById("infoCodigo");
 const infoPrecioCompra = document.getElementById("infoPrecioCompra");
 const infoStockActual = document.getElementById("infoStockActual");
 const infoAlertaStock = document.getElementById("infoAlertaStock");
-const cantidadEntrada = document.getElementById("cantidadEntrada");
 const proveedorEntrada = document.getElementById("proveedorEntrada");
 const productoEntrada = document.getElementById("productoEntrada");
+const btnAgregarProductoEntrada = document.getElementById("btnAgregarProductoEntrada");
+const detalleProductosEntrada = document.getElementById("detalleProductosEntrada");
 const totalEntrada = document.getElementById("totalEntrada");
 const observacionEntrada = document.getElementById("observacionEntrada");
 const mensajeEntrada = document.getElementById("mensajeEntrada");
@@ -35,8 +19,10 @@ const btnRegistrarEntrada = document.getElementById("btnRegistrarEntrada");
 const tablaHistorialBody = document.getElementById("tablaHistorialBody");
 const badgeHistorial = document.getElementById("badgeHistorial");
 const kpiEntradas = document.getElementById("kpiEntradas");
-const kpiCobertura = document.getElementById("kpiCobertura");
-const kpiCoberturaTexto = document.getElementById("kpiCoberturaTexto");
+const modalDetalleEntrada = document.getElementById("modalDetalleEntrada");
+const contenidoDetalleEntrada = document.getElementById("contenidoDetalleEntrada");
+const btnCerrarModalDetalle = document.getElementById("btnCerrarModalDetalle");
+const kpiProveedores = document.getElementById("kpiProveedores");
 const filtroDesde = document.getElementById("filtroDesde");
 const filtroHasta = document.getElementById("filtroHasta");
 const filtroProveedorHistorial = document.getElementById("filtroProveedorHistorial");
@@ -48,8 +34,39 @@ let proveedores = [];
 let catalogoProductos = [];
 let selectedProducto = null;
 let selectedPrecioCompra = 0;
+let selectedProductosEntrada = [];
 const productosProveedorPorId = new Map();
 let historialEntradas = [];
+let historialFiltradoActual = [];
+
+function getIdCompra(item) {
+    return Number(item?.id_compra || item?.compra_id || 0);
+}
+
+function getResumenCompras(rows) {
+    const grupos = new Map();
+
+    rows.forEach((row) => {
+        const idCompra = getIdCompra(row);
+        const key = idCompra > 0 ? `c-${idCompra}` : `f-${row.id_detalle || row.fecha || Math.random()}`;
+        const actual = grupos.get(key);
+
+        if (!actual) {
+            grupos.set(key, {
+                ...row,
+                _key: key,
+                _items: [row],
+                _total_compra: getSubtotalLinea(row),
+            });
+            return;
+        }
+
+        actual._items.push(row);
+        actual._total_compra += getSubtotalLinea(row);
+    });
+
+    return Array.from(grupos.values());
+}
 
 if (!token) {
     window.location.href = "login.html";
@@ -78,14 +95,31 @@ function escapeHtml(value) {
         .replaceAll("'", "&#039;");
 }
 
-function getEstadoClass(estado) {
-    if ((estado || "").toLowerCase() === "activo") return "estado activo";
-    return "estado";
-}
-
 function formatMoney(value) {
     const n = Number(value || 0);
     return Number.isFinite(n) ? n.toFixed(2) : "0.00";
+}
+
+function getPrecioUnitario(item) {
+    const precio = Number(item?.precio_compra ?? item?.precio_unitario ?? 0);
+    return Number.isFinite(precio) && precio >= 0 ? precio : 0;
+}
+
+function getCantidadLinea(item) {
+    const cantidad = Number(item?.cantidad ?? 0);
+    return Number.isFinite(cantidad) && cantidad >= 0 ? cantidad : 0;
+}
+
+function getSubtotalLinea(item) {
+    const cantidad = getCantidadLinea(item);
+    const precio = getPrecioUnitario(item);
+
+    if (cantidad > 0) {
+        return cantidad * precio;
+    }
+
+    const subtotalApi = Number(item?.subtotal ?? item?.total ?? 0);
+    return Number.isFinite(subtotalApi) ? subtotalApi : 0;
 }
 
 function formatDateTime(value) {
@@ -114,7 +148,6 @@ function parseDateValue(value) {
     }
 
     const raw = String(value).trim();
-
     const mysqlMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
 
     if (mysqlMatch) {
@@ -133,6 +166,27 @@ function parseDateValue(value) {
     return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function getStockAlertText(stock) {
+    const n = Number(stock || 0);
+
+    if (n <= 5) return { text: "Stock bajo", ok: false };
+    return { text: "Stock estable", ok: true };
+}
+
+function getErrorMessage(errorData) {
+    if (!errorData) return "No se pudo registrar la entrada.";
+
+    if (errorData.errors) {
+        const firstKey = Object.keys(errorData.errors)[0];
+
+        if (firstKey && errorData.errors[firstKey] && errorData.errors[firstKey][0]) {
+            return errorData.errors[firstKey][0];
+        }
+    }
+
+    return errorData.message || "No se pudo registrar la entrada.";
+}
+
 function getHistorialFiltrado() {
     const desdeValue = filtroDesde ? filtroDesde.value : "";
     const hastaValue = filtroHasta ? filtroHasta.value : "";
@@ -145,21 +199,10 @@ function getHistorialFiltrado() {
     return historialEntradas.filter((item) => {
         const fechaItem = parseDateValue(item.fecha);
 
-        if (desde && (!fechaItem || fechaItem < desde)) {
-            return false;
-        }
-
-        if (hasta && (!fechaItem || fechaItem > hasta)) {
-            return false;
-        }
-
-        if (proveedorValue && String(item.id_proveedor || "") !== proveedorValue) {
-            return false;
-        }
-
-        if (productoValue && String(item.id_producto || "") !== productoValue) {
-            return false;
-        }
+        if (desde && (!fechaItem || fechaItem < desde)) return false;
+        if (hasta && (!fechaItem || fechaItem > hasta)) return false;
+        if (proveedorValue && String(item.id_proveedor || "") !== proveedorValue) return false;
+        if (productoValue && String(item.id_producto || "") !== productoValue) return false;
 
         return true;
     });
@@ -183,260 +226,28 @@ function renderHistorialFiltros() {
             ...catalogoProductos.map((p) => `<option value="${p.id_producto}">${escapeHtml(p.nombre)}</option>`),
         ];
 
-        const selectedProducto = filtroProductoHistorial.value;
+        const selectedProductoFiltro = filtroProductoHistorial.value;
         filtroProductoHistorial.innerHTML = productoOptions.join("");
-        filtroProductoHistorial.value = selectedProducto;
+        filtroProductoHistorial.value = selectedProductoFiltro;
     }
-}
-
-function getStockAlertText(stock) {
-    const n = Number(stock || 0);
-
-    if (n <= 5) return { text: "Stock bajo", ok: false };
-    return { text: "Stock estable", ok: true };
-}
-
-function actualizarTotalEntrada() {
-    if (!totalEntrada) return;
-
-    const cantidad = cantidadEntrada ? Number(cantidadEntrada.value || 0) : 0;
-    const total = Number.isFinite(cantidad) && cantidad > 0 ? cantidad * Number(selectedPrecioCompra || 0) : 0;
-
-    totalEntrada.textContent = `$${formatMoney(total)}`;
-}
-
-function getProductosDelProveedorSeleccionado() {
-    const proveedorId = proveedorEntrada ? Number(proveedorEntrada.value || 0) : 0;
-
-    if (!proveedorId) return [];
-
-    return productosProveedorPorId.get(proveedorId) || [];
-}
-
-function renderProductosProveedorEntrada() {
-    if (!productoEntrada) return;
-
-    const proveedorId = proveedorEntrada ? Number(proveedorEntrada.value || 0) : 0;
-
-    if (!proveedorId) {
-        productoEntrada.disabled = true;
-        productoEntrada.innerHTML = '<option value="">Selecciona un proveedor primero</option>';
-        selectedProducto = null;
-        selectedPrecioCompra = 0;
-        renderProductoSeleccionado();
-        actualizarTotalEntrada();
-        return;
-    }
-
-    const lista = getProductosDelProveedorSeleccionado();
-
-    if (!lista.length) {
-        productoEntrada.disabled = true;
-        productoEntrada.innerHTML = '<option value="">Este proveedor no tiene productos asignados</option>';
-        selectedProducto = null;
-        selectedPrecioCompra = 0;
-        renderProductoSeleccionado();
-        actualizarTotalEntrada();
-        return;
-    }
-
-    productoEntrada.disabled = false;
-    productoEntrada.innerHTML = [
-        '<option value="">Selecciona un producto</option>',
-        ...lista.map((item) => {
-            const nombre = item.nombre || "Producto";
-            const precio = formatMoney(item.precio_compra);
-            const idProducto = Number(item.id_producto || 0);
-
-            return `<option value="${idProducto}">${escapeHtml(nombre)} | $${escapeHtml(precio)}</option>`;
-        }),
-    ].join("");
-}
-
-function sincronizarProductoSeleccionadoDesdeSelect() {
-    if (!productoEntrada) return;
-
-    const idProducto = Number(productoEntrada.value || 0);
-
-    if (!idProducto) {
-        selectedProducto = null;
-        selectedPrecioCompra = 0;
-        renderProductoSeleccionado();
-        actualizarTotalEntrada();
-        return;
-    }
-
-    const lista = getProductosDelProveedorSeleccionado();
-    const item = lista.find((p) => Number(p.id_producto) === idProducto);
-    const productoCatalogo = catalogoProductos.find((p) => Number(p.id_producto) === idProducto);
-
-    if (!item || !productoCatalogo) {
-        selectedProducto = null;
-        selectedPrecioCompra = 0;
-        renderProductoSeleccionado();
-        actualizarTotalEntrada();
-        return;
-    }
-
-    selectedProducto = productoCatalogo;
-    selectedPrecioCompra = Number(item.precio_compra || 0);
-    renderProductoSeleccionado();
-    actualizarTotalEntrada();
-}
-
-function mostrarMensaje(texto, ok = false) {
-    if (!mensajeProveedor) return;
-
-    mensajeProveedor.textContent = texto;
-    mensajeProveedor.style.color = ok ? "#1e7e34" : "#b42318";
-}
-
-function isProveedorFormCompleto() {
-    const nombreOk = proveedorNombre && proveedorNombre.value.trim().length > 0;
-    const empresaOk = proveedorEmpresa && proveedorEmpresa.value.trim().length > 0;
-    const seleccion = obtenerProductosSeleccionados();
-
-    return Boolean(nombreOk && empresaOk && !seleccion.error && seleccion.productos.length > 0);
-}
-
-function actualizarEstadoBotonProveedor() {
-    if (!btnGuardarProveedor) return;
-
-    const ready = isProveedorFormCompleto();
-    btnGuardarProveedor.classList.toggle("is-ready", ready);
-}
-
-function resetFormProveedor() {
-    if (!formProveedor) return;
-
-    formProveedor.reset();
-    if (idProveedor) idProveedor.value = "";
-    if (proveedorEstado) proveedorEstado.value = "Activo";
-
-    if (btnGuardarProveedor) {
-        btnGuardarProveedor.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Registrar proveedor';
-    }
-
-    renderCheckProductos();
-
-    actualizarEstadoBotonProveedor();
-}
-
-async function cargarProveedorEnFormulario(proveedor) {
-    if (!proveedor) return;
-
-    if (idProveedor) idProveedor.value = String(proveedor.id_proveedor);
-    proveedorNombre.value = proveedor.nombre || "";
-    proveedorEmpresa.value = proveedor.empresa || "";
-    proveedorTelefono.value = proveedor.telefono || "";
-    proveedorCorreo.value = proveedor.correo || "";
-    if (proveedorRfc) proveedorRfc.value = proveedor.rfc || "";
-    if (proveedorEstado) proveedorEstado.value = proveedor.estado || "Activo";
-    if (proveedorDireccion) proveedorDireccion.value = proveedor.direccion || "";
-    proveedorNotas.value = proveedor.notas || "";
-
-    if (btnGuardarProveedor) {
-        btnGuardarProveedor.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
-    }
-
-    try {
-        const productos = await cargarProductosProveedor(proveedor.id_proveedor);
-        const seleccion = new Map();
-
-        productos.forEach((item) => {
-            if (item.id_producto) {
-                seleccion.set(Number(item.id_producto), formatMoney(item.precio_compra));
-            }
-        });
-
-        renderCheckProductos(seleccion);
-    } catch (error) {
-        console.error(error);
-        mostrarMensaje("No se pudieron cargar los productos del proveedor.");
-    }
-
-    actualizarEstadoBotonProveedor();
-
-    proveedorNombre.focus();
-}
-
-function renderCheckProductos(seleccion = new Map()) {
-    if (!checkProductos) return;
-
-    if (!catalogoProductos.length) {
-        checkProductos.innerHTML = '<p class="vacio">No hay productos disponibles en el catalogo.</p>';
-        return;
-    }
-
-    checkProductos.innerHTML = catalogoProductos
-        .map((producto) => {
-            const productoId = Number(producto.id_producto);
-            const checked = seleccion.has(productoId);
-            const precio = checked ? seleccion.get(productoId) : "";
-
-            return `
-                <div class="check-item check-item-producto">
-                    <label class="check-label-producto">
-                        <input type="checkbox" data-id="${productoId}" ${checked ? "checked" : ""}>
-                        <span>${escapeHtml(producto.nombre)}</span>
-                    </label>
-                    <small class="check-meta">${escapeHtml(producto.codigo || "")}</small>
-                    <input
-                        type="number"
-                        class="input-precio-compra"
-                        data-id="${productoId}"
-                        min="0"
-                        step="0.01"
-                        placeholder="Precio compra"
-                        value="${escapeHtml(precio)}"
-                        ${checked ? "" : "disabled"}
-                    >
-                </div>
-            `;
-        })
-        .join("");
-}
-
-function obtenerProductosSeleccionados() {
-    if (!checkProductos) return { productos: [], error: null };
-
-    const checkboxes = Array.from(checkProductos.querySelectorAll('input[type="checkbox"][data-id]'));
-    const productos = [];
-
-    for (const checkbox of checkboxes) {
-        if (!checkbox.checked) continue;
-
-        const idProducto = Number(checkbox.dataset.id);
-        const precioInput = checkProductos.querySelector(`.input-precio-compra[data-id="${idProducto}"]`);
-        const precio = precioInput ? Number(precioInput.value) : NaN;
-
-        if (!Number.isFinite(precio) || precio <= 0) {
-            return {
-                productos: [],
-                error: "Cada producto seleccionado debe tener precio de compra mayor a 0.",
-            };
-        }
-
-        productos.push({
-            id_producto: idProducto,
-            precio_compra: Number(precio.toFixed(2)),
-        });
-    }
-
-    return { productos, error: null };
 }
 
 function renderProveedorEntradaOptions() {
-    if (!selectProveedorEntrada) return;
+    if (!proveedorEntrada) return;
 
     const options = [
         '<option value="">Selecciona un proveedor</option>',
-        ...proveedores.map((p) => `
-            <option value="${p.id_proveedor}">${escapeHtml(p.nombre)} - ${escapeHtml(p.empresa || "Sin empresa")}</option>
-        `),
+        ...proveedores.map((p) => `<option value="${p.id_proveedor}">${escapeHtml(p.nombre)} - ${escapeHtml(p.empresa || "Sin empresa")}</option>`),
     ];
 
-    selectProveedorEntrada.innerHTML = options.join("");
+    const current = proveedorEntrada.value;
+    proveedorEntrada.innerHTML = options.join("");
+    proveedorEntrada.value = current;
+
+    if (kpiProveedores) {
+        const activos = proveedores.filter((p) => String(p.estado || "").toLowerCase() === "activo").length;
+        kpiProveedores.textContent = String(activos);
+    }
 }
 
 function renderResultadosProducto(lista) {
@@ -470,7 +281,10 @@ function renderProductoSeleccionado() {
         return;
     }
 
-    if (infoNombre) infoNombre.textContent = selectedProducto.nombre || "-";
+    if (infoNombre) {
+        const extra = selectedProductosEntrada.length > 1 ? ` +${selectedProductosEntrada.length - 1} mas` : "";
+        infoNombre.textContent = `${selectedProducto.nombre || "-"}${extra}`;
+    }
     if (infoCodigo) infoCodigo.textContent = `Codigo: ${selectedProducto.codigo || "-"}`;
     if (infoPrecioCompra) infoPrecioCompra.textContent = `Precio proveedor: $${formatMoney(selectedPrecioCompra)}`;
     if (infoStockActual) infoStockActual.textContent = String(selectedProducto.stock || 0);
@@ -480,6 +294,150 @@ function renderProductoSeleccionado() {
         infoAlertaStock.classList.toggle("ok", stockAlert.ok);
         infoAlertaStock.innerHTML = `<i class="fa-solid ${stockAlert.ok ? "fa-circle-check" : "fa-triangle-exclamation"}"></i> ${escapeHtml(stockAlert.text)}`;
     }
+}
+
+function getProductosDelProveedorSeleccionado() {
+    const proveedorId = proveedorEntrada ? Number(proveedorEntrada.value || 0) : 0;
+
+    if (!proveedorId) return [];
+
+    return productosProveedorPorId.get(proveedorId) || [];
+}
+
+function actualizarTotalEntrada() {
+    if (!totalEntrada) return;
+
+    const total = selectedProductosEntrada.reduce((sum, item) => {
+        const cantidad = Number(item.cantidad || 0);
+        const precio = Number(item.precio_compra || 0);
+
+        if (!Number.isFinite(cantidad) || cantidad <= 0) return sum;
+        if (!Number.isFinite(precio) || precio <= 0) return sum;
+
+        return sum + (cantidad * precio);
+    }, 0);
+
+    totalEntrada.textContent = `$${formatMoney(total)}`;
+}
+
+function renderDetalleProductosEntrada() {
+    if (!detalleProductosEntrada) return;
+
+    if (!selectedProductosEntrada.length) {
+        detalleProductosEntrada.innerHTML = '<p class="vacio">Selecciona productos para asignar cantidades.</p>';
+        return;
+    }
+
+    detalleProductosEntrada.innerHTML = selectedProductosEntrada
+        .map((item) => `
+            <div class="detalle-producto-item">
+                <div>
+                    <strong>${escapeHtml(item.producto?.nombre || "Producto")}</strong>
+                    <span class="meta">Precio: $${escapeHtml(formatMoney(item.precio_compra))}</span>
+                    <span class="detalle-subtotal" data-id="${item.id_producto}">Subtotal: $${escapeHtml(formatMoney(Number(item.precio_compra || 0) * Number(item.cantidad || 0)))}</span>
+                    <button type="button" class="btn-remove-item" data-id="${item.id_producto}">Quitar</button>
+                </div>
+                <input
+                    type="number"
+                    class="input-cantidad-item"
+                    data-id="${item.id_producto}"
+                    min="1"
+                    step="1"
+                    value="${escapeHtml(item.cantidad ?? "")}" 
+                >
+            </div>
+        `)
+        .join("");
+}
+
+function renderProductosProveedorEntrada() {
+    if (!productoEntrada) return;
+
+    const proveedorId = proveedorEntrada ? Number(proveedorEntrada.value || 0) : 0;
+
+    if (!proveedorId) {
+        productoEntrada.disabled = true;
+        productoEntrada.innerHTML = '<option value="">Selecciona un proveedor primero</option>';
+        selectedProducto = null;
+        selectedPrecioCompra = 0;
+        selectedProductosEntrada = [];
+        renderProductoSeleccionado();
+        renderDetalleProductosEntrada();
+        actualizarTotalEntrada();
+        return;
+    }
+
+    const lista = getProductosDelProveedorSeleccionado();
+
+    if (!lista.length) {
+        productoEntrada.disabled = true;
+        productoEntrada.innerHTML = '<option value="">Este proveedor no tiene productos asignados</option>';
+        selectedProducto = null;
+        selectedPrecioCompra = 0;
+        selectedProductosEntrada = [];
+        renderProductoSeleccionado();
+        renderDetalleProductosEntrada();
+        actualizarTotalEntrada();
+        return;
+    }
+
+    productoEntrada.disabled = false;
+    productoEntrada.innerHTML = [
+        '<option value="">Selecciona un producto</option>',
+        ...lista.map((item) => {
+            const nombre = item.nombre || "Producto";
+            const precio = formatMoney(item.precio_compra);
+            const idProducto = Number(item.id_producto || 0);
+
+            return `<option value="${idProducto}">${escapeHtml(nombre)} | $${escapeHtml(precio)}</option>`;
+        }),
+    ].join("");
+
+    selectedProductosEntrada = [];
+    renderDetalleProductosEntrada();
+    actualizarTotalEntrada();
+}
+
+function agregarProductoEntradaPorId(idProducto) {
+    const id = Number(idProducto || 0);
+    if (!Number.isFinite(id) || id <= 0) return;
+
+    const proveedorId = proveedorEntrada ? Number(proveedorEntrada.value || 0) : 0;
+    if (!proveedorId) return;
+
+    const lista = getProductosDelProveedorSeleccionado();
+    const itemProveedor = lista.find((p) => Number(p.id_producto) === id);
+    const productoCatalogo = catalogoProductos.find((p) => Number(p.id_producto) === id);
+
+    if (!itemProveedor || !productoCatalogo) return;
+
+    const existe = selectedProductosEntrada.some((item) => Number(item.id_producto) === id);
+    if (existe) {
+        renderDetalleProductosEntrada();
+        actualizarTotalEntrada();
+        return;
+    }
+
+    selectedProductosEntrada.push({
+        id_producto: id,
+        producto: productoCatalogo,
+        precio_compra: Number(itemProveedor.precio_compra || 0),
+        cantidad: "",
+    });
+
+    selectedProducto = selectedProductosEntrada[0].producto;
+    selectedPrecioCompra = Number(selectedProductosEntrada[0].precio_compra || 0);
+
+    renderProductoSeleccionado();
+    renderDetalleProductosEntrada();
+    actualizarTotalEntrada();
+}
+
+function sincronizarProductoSeleccionadoDesdeSelect() {
+    if (!productoEntrada) return;
+    const idProducto = Number(productoEntrada.value || 0);
+    if (!idProducto) return;
+    agregarProductoEntradaPorId(idProducto);
 }
 
 function filtrarProductosBusqueda() {
@@ -500,175 +458,109 @@ function filtrarProductosBusqueda() {
     renderResultadosProducto(filtrados.slice(0, 25));
 }
 
-function updateCoberturaKpi() {
-    if (!kpiCobertura || !kpiCoberturaTexto) return;
-
-    const totalProductos = catalogoProductos.length;
-    const cubiertos = new Set();
-
-    for (const lista of productosProveedorPorId.values()) {
-        lista.forEach((item) => cubiertos.add(Number(item.id_producto)));
-    }
-
-    const totalCubiertos = cubiertos.size;
-    const porcentaje = totalProductos > 0 ? Math.round((totalCubiertos * 100) / totalProductos) : 0;
-
-    kpiCobertura.textContent = `${porcentaje}%`;
-    kpiCoberturaTexto.textContent = `${totalCubiertos} de ${totalProductos} productos cubiertos`;
-}
-
 function renderHistorial() {
     if (!tablaHistorialBody || !badgeHistorial || !kpiEntradas) return;
 
     const historialFiltrado = getHistorialFiltrado();
+    const resumenCompras = getResumenCompras(historialFiltrado);
+    historialFiltradoActual = resumenCompras;
 
-    if (!historialFiltrado.length) {
-        tablaHistorialBody.innerHTML = '<tr><td colspan="8" class="vacio">Sin entradas registradas para los filtros aplicados.</td></tr>';
+    if (!resumenCompras.length) {
+        tablaHistorialBody.innerHTML = '<tr><td colspan="6" class="vacio">Sin entradas registradas para los filtros aplicados.</td></tr>';
     } else {
-        tablaHistorialBody.innerHTML = historialFiltrado
-            .map((item) => `
+        tablaHistorialBody.innerHTML = resumenCompras
+            .map((item, index) => `
                 <tr>
                     <td>${escapeHtml(formatDateTime(item.fecha))}</td>
-                    <td>${escapeHtml(item.producto || "-")}</td>
+                    <td>${escapeHtml(item._items?.length > 1 ? `${item.producto || "-"} +${item._items.length - 1} mas` : (item.producto || "-"))}</td>
                     <td>${escapeHtml(item.proveedor || item.proveedor_nombre || "-")}</td>
-                    <td><span class="cantidad">${escapeHtml(item.cantidad || "-")}</span></td>
-                    <td>$${escapeHtml(formatMoney(item.precio_compra || item.precio_unitario || 0))}</td>
-                    <td>$${escapeHtml(formatMoney(item.total || 0))}</td>
-                    <td>${escapeHtml(item.usuario || "Admin")}</td>
-                    <td>${escapeHtml(item.observacion || "-")}</td>
+                    <td><span class="cantidad">${escapeHtml(item._items?.reduce((sum, row) => sum + Number(row.cantidad || 0), 0) || "-")}</span></td>
+                    <td>$${escapeHtml(formatMoney(item._total_compra || 0))}</td>
+                    <td>
+                        <button type="button" class="btn-ver-detalle" data-index="${index}">Ver</button>
+                    </td>
                 </tr>
             `)
             .join("");
     }
 
-    badgeHistorial.textContent = `${historialFiltrado.length} registros`;
-    kpiEntradas.textContent = String(historialFiltrado.length);
+    badgeHistorial.textContent = `${resumenCompras.length} registros`;
+    kpiEntradas.textContent = String(resumenCompras.length);
 }
 
-function renderProveedores() {
-    if (!listaProveedores) return;
+function getItemsDetalleEntrada(item) {
+    if (!item) return [];
 
-    if (!proveedores.length) {
-        listaProveedores.innerHTML = '<p class="vacio">Aun no hay proveedores registrados.</p>';
-    } else {
-        listaProveedores.innerHTML = proveedores
-            .map((proveedor) => `
-                <article class="proveedor-item">
-                    <h5>${escapeHtml(proveedor.nombre)}</h5>
-                    <p><strong>Empresa:</strong> ${escapeHtml(proveedor.empresa || "-")}</p>
-                    <p><strong>Telefono:</strong> ${escapeHtml(proveedor.telefono || "-")}</p>
-                    <p><strong>Correo:</strong> ${escapeHtml(proveedor.correo || "-")}</p>
-                    <p><strong>Direccion:</strong> ${escapeHtml(proveedor.direccion || "-")}</p>
-                    <p><strong>RFC:</strong> ${escapeHtml(proveedor.rfc || "-")}</p>
-                    <p><strong>Productos asignados:</strong> ${escapeHtml(proveedor.productos_proveedor_count || 0)}</p>
-                    <span class="${getEstadoClass(proveedor.estado)}">${escapeHtml(proveedor.estado || "Activo")}</span>
-                    <div class="acciones-proveedor">
-                        <button type="button" class="btn-edit-proveedor" data-action="editar" data-id="${proveedor.id_proveedor}">Editar</button>
-                        <button type="button" class="btn-delete-proveedor" data-action="eliminar" data-id="${proveedor.id_proveedor}">Eliminar</button>
-                    </div>
-                </article>
-            `)
-            .join("");
-    }
+    const idCompra = Number(item.id_compra || item.compra_id || 0);
+    if (!idCompra) return [item];
 
-    const total = String(proveedores.length);
-
-    if (contadorProveedores) {
-        contadorProveedores.textContent = total;
-    }
-
-    if (kpiProveedores) {
-        const activos = proveedores.filter((p) => String(p.estado || "").toLowerCase() === "activo").length;
-        kpiProveedores.textContent = String(activos);
-    }
-
-    renderProveedorEntradaOptions();
+    const relacionados = historialEntradas.filter((row) => Number(row.id_compra || row.compra_id || 0) === idCompra);
+    return relacionados.length ? relacionados : [item];
 }
 
-function getErrorMessage(errorData) {
-    if (!errorData) return "Error al guardar proveedor.";
+function abrirModalDetalle(item) {
+    if (!modalDetalleEntrada || !contenidoDetalleEntrada || !item) return;
 
-    if (errorData.errors) {
-        const firstKey = Object.keys(errorData.errors)[0];
+    const items = getItemsDetalleEntrada(item);
+    const totalCompra = items.reduce((sum, row) => sum + getSubtotalLinea(row), 0);
+    const productosDetalle = items
+        .map((row) => `
+            <tr>
+                <td>${escapeHtml(row.producto || "-")}</td>
+                <td>${escapeHtml(row.cantidad ?? "-")}</td>
+                <td>$${escapeHtml(formatMoney(getPrecioUnitario(row)))}</td>
+                <td>$${escapeHtml(formatMoney(getSubtotalLinea(row)))}</td>
+            </tr>
+        `)
+        .join("");
 
-        if (firstKey && errorData.errors[firstKey] && errorData.errors[firstKey][0]) {
-            return errorData.errors[firstKey][0];
-        }
-    }
+    const campos = [
+        { label: "Fecha", value: formatDateTime(item.fecha) },
+        { label: "Proveedor", value: item.proveedor || item.proveedor_nombre || "-" },
+        { label: "Productos en compra", value: String(items.length) },
+        { label: "Total compra", value: `$${formatMoney(totalCompra)}` },
+        { label: "Usuario", value: item.usuario || "Admin" },
+        { label: "Observacion", value: item.observacion || "-" },
+    ];
 
-    return errorData.message || "No se pudo guardar el proveedor.";
+    const resumenHtml = campos
+        .map((campo) => `
+            <div class="detalle-campo">
+                <strong>${escapeHtml(campo.label)}</strong>
+                <span>${escapeHtml(campo.value)}</span>
+            </div>
+        `)
+        .join("");
+
+    const productosHtml = `
+        <div class="detalle-campo detalle-campo-full">
+            <strong>Productos de la compra</strong>
+            <div class="detalle-items-wrap">
+                <table class="detalle-items-tabla">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>PU</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${productosDetalle}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+    contenidoDetalleEntrada.innerHTML = `${resumenHtml}${productosHtml}`;
+
+    modalDetalleEntrada.classList.remove("hidden");
 }
 
-async function cargarProveedores() {
-    try {
-        const response = await fetch(`${API_BASE}/proveedores`, {
-            method: "GET",
-            headers: getHeaders(),
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                localStorage.removeItem("token");
-                window.location.href = "login.html";
-                return;
-            }
-
-            throw new Error("No se pudieron cargar proveedores");
-        }
-
-        proveedores = await response.json();
-        renderProveedores();
-        renderHistorialFiltros();
-
-        const cargasProductos = proveedores.map(async (proveedor) => {
-            try {
-                const lista = await cargarProductosProveedor(proveedor.id_proveedor);
-                productosProveedorPorId.set(Number(proveedor.id_proveedor), lista);
-            } catch (error) {
-                console.error(error);
-                productosProveedorPorId.set(Number(proveedor.id_proveedor), []);
-            }
-        });
-
-        await Promise.all(cargasProductos);
-        updateCoberturaKpi();
-        renderProductosProveedorEntrada();
-        filtrarProductosBusqueda();
-    } catch (error) {
-        console.error(error);
-        if (listaProveedores) {
-            listaProveedores.innerHTML = '<p class="vacio">Error al cargar proveedores.</p>';
-        }
-    }
-}
-
-async function cargarCatalogoProductos() {
-    try {
-        const response = await fetch(`${API_BASE}/productos`, {
-            method: "GET",
-            headers: getHeaders(),
-        });
-
-        if (!response.ok) {
-            if (response.status === 401) {
-                localStorage.removeItem("token");
-                window.location.href = "login.html";
-                return;
-            }
-
-            throw new Error("No se pudieron cargar productos de catalogo");
-        }
-
-        catalogoProductos = await response.json();
-        renderCheckProductos();
-        renderHistorialFiltros();
-        actualizarEstadoBotonProveedor();
-    } catch (error) {
-        console.error(error);
-        if (checkProductos) {
-            checkProductos.innerHTML = '<p class="vacio">Error al cargar productos del catalogo.</p>';
-        }
-    }
+function cerrarModalDetalle() {
+    if (!modalDetalleEntrada) return;
+    modalDetalleEntrada.classList.add("hidden");
 }
 
 async function cargarUsuarioSesion() {
@@ -711,41 +603,9 @@ async function cargarUsuarioSesion() {
     }
 }
 
-async function crearProveedor(payload) {
-    const response = await fetch(`${API_BASE}/proveedores`, {
-        method: "POST",
-        headers: getHeaders(true),
-        body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw data;
-    }
-
-    return data;
-}
-
-async function actualizarProveedor(id, payload) {
-    const response = await fetch(`${API_BASE}/proveedores/${id}`, {
-        method: "PUT",
-        headers: getHeaders(true),
-        body: JSON.stringify(payload),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw data;
-    }
-
-    return data;
-}
-
-async function eliminarProveedor(id) {
-    const response = await fetch(`${API_BASE}/proveedores/${id}`, {
-        method: "DELETE",
+async function cargarProductosProveedor(idProveedorActual) {
+    const response = await fetch(`${API_BASE}/proveedores/${idProveedorActual}/productos`, {
+        method: "GET",
         headers: getHeaders(),
     });
 
@@ -756,6 +616,70 @@ async function eliminarProveedor(id) {
     }
 
     return data;
+}
+
+async function cargarProveedores() {
+    try {
+        const response = await fetch(`${API_BASE}/proveedores`, {
+            method: "GET",
+            headers: getHeaders(),
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+                return;
+            }
+
+            throw new Error("No se pudieron cargar proveedores");
+        }
+
+        proveedores = await response.json();
+        renderProveedorEntradaOptions();
+        renderHistorialFiltros();
+
+        const cargasProductos = proveedores.map(async (proveedor) => {
+            try {
+                const lista = await cargarProductosProveedor(proveedor.id_proveedor);
+                productosProveedorPorId.set(Number(proveedor.id_proveedor), lista);
+            } catch (error) {
+                console.error(error);
+                productosProveedorPorId.set(Number(proveedor.id_proveedor), []);
+            }
+        });
+
+        await Promise.all(cargasProductos);
+        renderProductosProveedorEntrada();
+        filtrarProductosBusqueda();
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+async function cargarCatalogoProductos() {
+    try {
+        const response = await fetch(`${API_BASE}/productos`, {
+            method: "GET",
+            headers: getHeaders(),
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                window.location.href = "login.html";
+                return;
+            }
+
+            throw new Error("No se pudieron cargar productos de catalogo");
+        }
+
+        catalogoProductos = await response.json();
+        renderHistorialFiltros();
+        filtrarProductosBusqueda();
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 async function cargarEntradas() {
@@ -802,165 +726,6 @@ async function registrarEntrada(payload) {
     return data;
 }
 
-async function cargarProductosProveedor(idProveedorActual) {
-    const response = await fetch(`${API_BASE}/proveedores/${idProveedorActual}/productos`, {
-        method: "GET",
-        headers: getHeaders(),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw data;
-    }
-
-    return data;
-}
-
-async function syncProductosProveedor(idProveedorActual, productos) {
-    const response = await fetch(`${API_BASE}/proveedores/${idProveedorActual}/productos`, {
-        method: "POST",
-        headers: getHeaders(true),
-        body: JSON.stringify({ productos }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw data;
-    }
-
-    return data;
-}
-
-if (formProveedor) {
-    [proveedorNombre, proveedorEmpresa].forEach((input) => {
-        if (!input) return;
-
-        input.addEventListener("input", actualizarEstadoBotonProveedor);
-    });
-
-    if (checkProductos) {
-        checkProductos.addEventListener("change", (event) => {
-            const checkbox = event.target.closest('input[type="checkbox"][data-id]');
-
-            if (checkbox) {
-                const idProducto = Number(checkbox.dataset.id);
-                const precioInput = checkProductos.querySelector(`.input-precio-compra[data-id="${idProducto}"]`);
-
-                if (precioInput) {
-                    precioInput.disabled = !checkbox.checked;
-                    if (!checkbox.checked) {
-                        precioInput.value = "";
-                    } else if (!precioInput.value) {
-                        precioInput.value = "0.01";
-                    }
-                }
-            }
-
-            actualizarEstadoBotonProveedor();
-        });
-
-        checkProductos.addEventListener("input", (event) => {
-            if (event.target.closest(".input-precio-compra")) {
-                actualizarEstadoBotonProveedor();
-            }
-        });
-    }
-
-    formProveedor.addEventListener("submit", async (event) => {
-        event.preventDefault();
-
-        const proveedorId = idProveedor ? idProveedor.value.trim() : "";
-
-        const payload = {
-            nombre: proveedorNombre.value.trim(),
-            empresa: proveedorEmpresa.value.trim(),
-            telefono: proveedorTelefono.value.trim() || null,
-            correo: proveedorCorreo.value.trim() || null,
-            direccion: proveedorDireccion ? proveedorDireccion.value.trim() || null : null,
-            rfc: proveedorRfc ? proveedorRfc.value.trim() || null : null,
-            estado: proveedorEstado ? proveedorEstado.value : "Activo",
-        };
-
-        if (!payload.nombre || !payload.empresa) {
-            mostrarMensaje("Nombre y empresa son obligatorios.");
-            return;
-        }
-
-        const seleccion = obtenerProductosSeleccionados();
-
-        if (seleccion.error) {
-            mostrarMensaje(seleccion.error);
-            return;
-        }
-
-        if (!seleccion.productos.length) {
-            mostrarMensaje("Selecciona al menos un producto del catalogo para el proveedor.");
-            return;
-        }
-
-        try {
-            mostrarMensaje(proveedorId ? "Actualizando proveedor..." : "Guardando proveedor...");
-
-            let proveedorGuardadoId = Number(proveedorId);
-
-            if (proveedorId) {
-                await actualizarProveedor(proveedorId, payload);
-            } else {
-                const nuevoProveedor = await crearProveedor(payload);
-                proveedorGuardadoId = Number(nuevoProveedor.id_proveedor);
-            }
-
-            await syncProductosProveedor(proveedorGuardadoId, seleccion.productos);
-            mostrarMensaje(proveedorId ? "Proveedor actualizado correctamente." : "Proveedor registrado correctamente.", true);
-
-            resetFormProveedor();
-            await cargarProveedores();
-        } catch (errorData) {
-            mostrarMensaje(getErrorMessage(errorData));
-        }
-    });
-}
-
-if (listaProveedores) {
-    listaProveedores.addEventListener("click", async (event) => {
-        const button = event.target.closest("button[data-action]");
-
-        if (!button) return;
-
-        const action = button.dataset.action;
-        const id = Number(button.dataset.id);
-        const proveedor = proveedores.find((item) => Number(item.id_proveedor) === id);
-
-        if (!proveedor) {
-            mostrarMensaje("No se encontro el proveedor seleccionado.");
-            return;
-        }
-
-        if (action === "editar") {
-            await cargarProveedorEnFormulario(proveedor);
-            mostrarMensaje("Edita los datos y guarda cambios.", true);
-            return;
-        }
-
-        if (action === "eliminar") {
-            const confirmar = confirm(`¿Eliminar proveedor ${proveedor.nombre}?`);
-
-            if (!confirmar) return;
-
-            try {
-                await eliminarProveedor(id);
-                mostrarMensaje("Proveedor eliminado correctamente.", true);
-                resetFormProveedor();
-                await cargarProveedores();
-            } catch (errorData) {
-                mostrarMensaje(getErrorMessage(errorData));
-            }
-        }
-    });
-}
-
 if (buscarProducto) {
     buscarProducto.addEventListener("input", filtrarProductosBusqueda);
 }
@@ -973,7 +738,6 @@ if (proveedorEntrada) {
             try {
                 const lista = await cargarProductosProveedor(proveedorId);
                 productosProveedorPorId.set(proveedorId, lista);
-                updateCoberturaKpi();
             } catch (error) {
                 console.error(error);
             }
@@ -995,15 +759,83 @@ if (proveedorEntrada) {
     });
 }
 
-if (productoEntrada) {
-    productoEntrada.addEventListener("change", () => {
+if (btnAgregarProductoEntrada) {
+    btnAgregarProductoEntrada.addEventListener("click", () => {
         sincronizarProductoSeleccionadoDesdeSelect();
     });
 }
 
-if (cantidadEntrada) {
-    cantidadEntrada.addEventListener("input", () => {
+if (detalleProductosEntrada) {
+    detalleProductosEntrada.addEventListener("click", (event) => {
+        const button = event.target.closest("button.btn-remove-item[data-id]");
+        if (!button) return;
+
+        const idProducto = Number(button.dataset.id || 0);
+        selectedProductosEntrada = selectedProductosEntrada.filter((item) => Number(item.id_producto) !== idProducto);
+
+        if (!selectedProductosEntrada.length) {
+            selectedProducto = null;
+            selectedPrecioCompra = 0;
+        } else {
+            selectedProducto = selectedProductosEntrada[0].producto;
+            selectedPrecioCompra = Number(selectedProductosEntrada[0].precio_compra || 0);
+        }
+
+        renderProductoSeleccionado();
+        renderDetalleProductosEntrada();
         actualizarTotalEntrada();
+    });
+
+    detalleProductosEntrada.addEventListener("input", (event) => {
+        const input = event.target.closest("input.input-cantidad-item[data-id]");
+        if (!input) return;
+
+        const idProducto = Number(input.dataset.id || 0);
+        const texto = String(input.value ?? "");
+        const cantidad = Number(texto);
+
+        selectedProductosEntrada = selectedProductosEntrada.map((item) => {
+            if (Number(item.id_producto) !== idProducto) return item;
+            return {
+                ...item,
+                cantidad: texto === "" ? "" : (Number.isFinite(cantidad) && cantidad > 0 ? Math.floor(cantidad) : 0),
+            };
+        });
+
+        const itemActual = selectedProductosEntrada.find((item) => Number(item.id_producto) === idProducto);
+        const subtotalNode = detalleProductosEntrada.querySelector(`.detalle-subtotal[data-id="${idProducto}"]`);
+
+        if (itemActual && subtotalNode) {
+            const subtotal = Number(itemActual.precio_compra || 0) * Number(itemActual.cantidad || 0);
+            subtotalNode.textContent = `Subtotal: $${formatMoney(subtotal)}`;
+        }
+
+        actualizarTotalEntrada();
+    });
+}
+
+if (tablaHistorialBody) {
+    tablaHistorialBody.addEventListener("click", (event) => {
+        const button = event.target.closest("button.btn-ver-detalle[data-index]");
+        if (!button) return;
+
+        const idx = Number(button.dataset.index || -1);
+        const item = idx >= 0 ? historialFiltradoActual[idx] : null;
+        if (!item) return;
+
+        abrirModalDetalle(item);
+    });
+}
+
+if (btnCerrarModalDetalle) {
+    btnCerrarModalDetalle.addEventListener("click", cerrarModalDetalle);
+}
+
+if (modalDetalleEntrada) {
+    modalDetalleEntrada.addEventListener("click", (event) => {
+        if (event.target === modalDetalleEntrada) {
+            cerrarModalDetalle();
+        }
     });
 }
 
@@ -1018,12 +850,7 @@ if (resultadosProducto) {
 
         if (!producto) return;
 
-        selectedProducto = producto;
-        if (productoEntrada) {
-            productoEntrada.value = String(id);
-        }
-        sincronizarProductoSeleccionadoDesdeSelect();
-        renderProductoSeleccionado();
+        agregarProductoEntradaPorId(id);
     });
 }
 
@@ -1032,47 +859,83 @@ if (btnRegistrarEntrada) {
         if (!mensajeEntrada) return;
 
         const proveedorId = proveedorEntrada ? Number(proveedorEntrada.value || 0) : 0;
-        const cantidad = cantidadEntrada ? Number(cantidadEntrada.value || 0) : 0;
         const observacion = observacionEntrada ? observacionEntrada.value.trim() : "";
 
-        if (!selectedProducto) {
-            mensajeEntrada.textContent = "Selecciona un producto para registrar la entrada.";
+        if (!selectedProductosEntrada.length) {
+            mensajeEntrada.textContent = "Selecciona al menos un producto para registrar la entrada.";
+            mensajeEntrada.style.color = "#b42318";
             return;
         }
 
         if (!proveedorId) {
             mensajeEntrada.textContent = "Selecciona un proveedor.";
+            mensajeEntrada.style.color = "#b42318";
             return;
         }
 
-        if (!Number.isFinite(cantidad) || cantidad <= 0) {
-            mensajeEntrada.textContent = "Ingresa una cantidad valida mayor a 0.";
+        const cantidadInvalida = selectedProductosEntrada.some((item) => {
+            const cantidad = Number(item.cantidad || 0);
+            return !Number.isFinite(cantidad) || cantidad <= 0;
+        });
+
+        if (cantidadInvalida) {
+            mensajeEntrada.textContent = "Cada producto debe tener cantidad valida mayor a 0.";
+            mensajeEntrada.style.color = "#b42318";
             return;
         }
 
         try {
             mensajeEntrada.textContent = "Registrando entrada...";
+            mensajeEntrada.style.color = "#64748b";
 
             const entrada = await registrarEntrada({
                 id_proveedor: proveedorId,
-                id_producto: selectedProducto.id_producto,
-                cantidad,
+                items: selectedProductosEntrada.map((item) => ({
+                    id_producto: item.id_producto,
+                    cantidad: Number(item.cantidad),
+                })),
                 observacion: observacion || null,
             });
 
-            selectedProducto.stock = entrada.stock_nuevo;
-            renderProductoSeleccionado();
-            mensajeEntrada.textContent = "Entrada registrada correctamente.";
-            mensajeEntrada.style.color = "#1e7e34";
-
-            historialEntradas.unshift({
-                ...entrada,
-                usuario: "Admin",
+            const actualizados = Array.isArray(entrada.items) ? entrada.items : [];
+            actualizados.forEach((item) => {
+                const producto = catalogoProductos.find((p) => Number(p.id_producto) === Number(item.id_producto));
+                if (producto) {
+                    producto.stock = item.stock_nuevo;
+                }
             });
+
+            if (actualizados.length) {
+                actualizados.forEach((item) => {
+                    historialEntradas.unshift({
+                        ...entrada,
+                        id_producto: item.id_producto,
+                        producto: item.producto,
+                        cantidad: item.cantidad,
+                        precio_compra: item.precio_compra,
+                        total: item.subtotal,
+                        usuario: "Admin",
+                    });
+                });
+            } else {
+                historialEntradas.unshift({
+                    ...entrada,
+                    usuario: "Admin",
+                });
+            }
+
             renderHistorialFiltros();
             renderHistorial();
             filtrarProductosBusqueda();
+
+            selectedProductosEntrada = [];
+            if (observacionEntrada) observacionEntrada.value = "";
+            renderDetalleProductosEntrada();
             actualizarTotalEntrada();
+            renderProductoSeleccionado();
+
+            mensajeEntrada.textContent = "Entrada registrada correctamente.";
+            mensajeEntrada.style.color = "#1e7e34";
         } catch (errorData) {
             mensajeEntrada.style.color = "#b42318";
             mensajeEntrada.textContent = getErrorMessage(errorData);
@@ -1096,4 +959,3 @@ void Promise.all([cargarUsuarioSesion(), cargarCatalogoProductos(), cargarProvee
     renderProductoSeleccionado();
     renderHistorial();
 });
-actualizarEstadoBotonProveedor();

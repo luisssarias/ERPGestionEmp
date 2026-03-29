@@ -10,16 +10,17 @@ return(
 
 <View style={styles.header}>
 
-<Text style={styles.title}>Registrar Venta</Text>
-
-<View style={styles.search}>
-<Ionicons name="search-outline" size={20}/>
-<TextInput placeholder="Buscar productos..." style={{flex:1,marginLeft:10}}/>
-</View>
+<Text style={styles.headerTitle}>Ventas</Text>
+<Text style={styles.headerSubtitle}>Registra ventas y agrega productos al carrito</Text>
 
 </View>
 
 <ScrollView style={{padding:20}}>
+
+<View style={styles.search}>
+<Ionicons name="search-outline" size={20} color="#64748b"/>
+<TextInput placeholder="Buscar productos..." style={{flex:1,marginLeft:10}} placeholderTextColor="#94a3b8"/>
+</View>
 
 <Text style={styles.subtitle}>Productos disponibles</Text>
 
@@ -58,14 +59,17 @@ borderBottomLeftRadius:20,
 borderBottomRightRadius:20
 },
 
-title:{color:"white",fontSize:20,fontWeight:"bold",marginBottom:10},
+headerTitle:{color:"white",fontSize:20,fontWeight:"bold"},
+
+headerSubtitle:{color:"#dbeafe",marginTop:4},
 
 search:{
 backgroundColor:"white",
 padding:10,
 borderRadius:10,
 flexDirection:"row",
-alignItems:"center"
+alignItems:"center",
+marginBottom:14
 },
 
 subtitle:{fontSize:18,fontWeight:"bold",marginBottom:10},

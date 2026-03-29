@@ -44,6 +44,11 @@
 <span>Entradas</span>
 </a>
 
+<a class="menu" href="proveedores.html">
+<i class="fa-solid fa-truck-field"></i>
+<span>Proveedores</span>
+</a>
+
 <a class="menu" href="ventas.html">
 <i class="fa-solid fa-cart-shopping"></i>
 <span>Ventas</span>
@@ -97,19 +102,10 @@
 
 <section class="kpi-row">
 
-<article class="kpi-card">
+<article class="kpi-card success">
 <p>Proveedores activos</p>
 <h3 id="kpiProveedores">0</h3>
 <span>Con catalogo asignado</span>
-</article>
-
-<article
-class="kpi-card accent"
-title="Cobertura del catálogo = porcentaje de productos de tu catálogo que ya tienen al menos un proveedor asignado."
->
-<p>Cobertura del catalogo</p>
-<h3 id="kpiCobertura">0%</h3>
-<span id="kpiCoberturaTexto">0 de 0 productos cubiertos</span>
 </article>
 
 <article class="kpi-card success">
@@ -181,18 +177,21 @@ Selecciona un producto para ver estado de stock
 
 <div class="form-group">
 
-<label for="cantidadEntrada">Cantidad a Ingresar *</label>
-<input id="cantidadEntrada" type="number" value="1" min="1">
-
 <label for="proveedorEntrada">Proveedor para esta entrada *</label>
 <select id="proveedorEntrada">
 <option value="">Selecciona un producto primero</option>
 </select>
 
-<label for="productoEntrada">Producto a comprar a este proveedor *</label>
+<label for="productoEntrada">Productos a comprar a este proveedor * (puedes elegir varios)</label>
 <select id="productoEntrada" disabled>
 <option value="">Selecciona un proveedor primero</option>
 </select>
+<button type="button" id="btnAgregarProductoEntrada" class="btn-agregar-producto-entrada">Agregar producto</button>
+
+<label>Cantidades por producto *</label>
+<div id="detalleProductosEntrada" class="detalle-productos-entrada">
+<p class="vacio">Selecciona productos para asignar cantidades.</p>
+</div>
 
 <div class="total-compra" id="totalCompraPreview">
 <strong>Total estimado:</strong>
@@ -214,84 +213,6 @@ Registrar Entrada
 </button>
 
 </div>
-
-<section class="proveedores-card">
-
-<div class="section-head">
-<h3><i class="fa-solid fa-truck-field"></i> Proveedores y Productos que Venden</h3>
-<p>Registra proveedores y asigna que productos te pueden suministrar</p>
-</div>
-
-<div class="proveedores-layout">
-
-<form id="formProveedor" class="proveedor-form">
-<h4>Nuevo proveedor</h4>
-<input id="idProveedor" type="hidden">
-
-<label for="proveedorNombre">Nombre contacto *</label>
-<input id="proveedorNombre" type="text" placeholder="Ej: Maria Lopez" required>
-
-<label for="proveedorEmpresa">Empresa *</label>
-<input id="proveedorEmpresa" type="text" placeholder="Ej: Distribuidora Andina" required>
-
-<div class="grid-2">
-<div>
-<label for="proveedorTelefono">Telefono</label>
-<input id="proveedorTelefono" type="tel" placeholder="555 333 2211">
-</div>
-<div>
-<label for="proveedorCorreo">Correo</label>
-<input id="proveedorCorreo" type="email" placeholder="contacto@empresa.com">
-</div>
-</div>
-
-<div class="grid-2">
-<div>
-<label for="proveedorRfc">RFC</label>
-<input id="proveedorRfc" type="text" placeholder="XAXX010101000">
-</div>
-<div>
-<label for="proveedorEstado">Estado</label>
-<select id="proveedorEstado">
-<option value="Activo" selected>Activo</option>
-<option value="Inactivo">Inactivo</option>
-</select>
-</div>
-</div>
-
-<label for="proveedorDireccion">Direccion</label>
-<textarea id="proveedorDireccion" rows="2" placeholder="Calle, numero, colonia, ciudad"></textarea>
-
-<label>Productos que vende *</label>
-<div id="checkProductos" class="check-productos">
-<p class="vacio">Cargando productos...</p>
-</div>
-
-<label for="proveedorNotas">Notas</label>
-<textarea id="proveedorNotas" rows="3" placeholder="Condiciones, tiempos de entrega, credito, etc."></textarea>
-
-<p id="mensajeProveedor" class="mensaje"></p>
-
-<button type="submit" class="btn-save" id="btnGuardarProveedor">
-<i class="fa-solid fa-floppy-disk"></i>
-Registrar proveedor
-</button>
-</form>
-
-<div class="proveedor-listado">
-<div class="listado-head">
-<h4>Proveedores registrados</h4>
-<span id="contadorProveedores" class="badge">0</span>
-</div>
-
-<div id="listaProveedores" class="lista-proveedores">
-<p class="vacio">Aun no hay proveedores registrados.</p>
-</div>
-</div>
-
-</div>
-
-</section>
 
 <div class="historial-card">
 
@@ -344,16 +265,26 @@ Historial de Entradas
 <th><i class="fa-solid fa-box"></i> PRODUCTO</th>
 <th><i class="fa-solid fa-truck"></i> PROVEEDOR</th>
 <th>CANTIDAD INGRESADA</th>
-<th>PRECIO UNITARIO</th>
 <th>TOTAL</th>
-<th><i class="fa-regular fa-user"></i> USUARIO</th>
-<th>OBSERVACIÓN</th>
+<th>DETALLE</th>
 </tr>
 </thead>
 
 <tbody id="tablaHistorialBody"></tbody>
 
 </table>
+
+<div id="modalDetalleEntrada" class="modal-detalle hidden" role="dialog" aria-modal="true" aria-labelledby="modalDetalleTitulo">
+<div class="modal-detalle-card">
+<div class="modal-detalle-head">
+<h4 id="modalDetalleTitulo">Detalle de entrada</h4>
+<button type="button" id="btnCerrarModalDetalle" class="btn-cerrar-modal" aria-label="Cerrar detalle">
+<i class="fa-solid fa-xmark"></i>
+</button>
+</div>
+<div id="contenidoDetalleEntrada" class="modal-detalle-body"></div>
+</div>
+</div>
 
 </div>
 
