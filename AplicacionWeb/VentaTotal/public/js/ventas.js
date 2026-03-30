@@ -328,12 +328,15 @@ function abrirModalFacturacion(idVentaForzada = null, desdeVentaExitosa = false)
             : "Completa los datos para generar la factura.";
     }
 
+    modalFacturacion.classList.toggle("success-mode", Boolean(desdeVentaExitosa));
+
     modalFacturacion.classList.add("active");
 }
 
 function cerrarModalFacturacion() {
     if (!modalFacturacion) return;
     modalFacturacion.classList.remove("active");
+    modalFacturacion.classList.remove("success-mode");
 }
 
 async function guardarFacturacionDesdeModal(event) {

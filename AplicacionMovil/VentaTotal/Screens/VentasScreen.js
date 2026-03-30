@@ -26,8 +26,7 @@ function crearFormularioFacturacionInicial() {
 		correo: "",
 		telefono: "",
 		rfc: "XAXX010101000",
-		razon_social: "Publico General",
-		uso_cfdi: "G03"
+		razon_social: "Publico General"
 	};
 }
 
@@ -567,7 +566,7 @@ export default function VentasScreen({ navigation }) {
 				telefono: String(formFacturacion.telefono || "").trim() || null,
 				rfc: String(formFacturacion.rfc || "").trim().toUpperCase(),
 				razon_social: String(formFacturacion.razon_social || "").trim(),
-				uso_cfdi: String(formFacturacion.uso_cfdi || "G03").trim().toUpperCase(),
+				uso_cfdi: "G03",
 				...FACTURACION_DEFAULTS
 			};
 
@@ -853,60 +852,68 @@ export default function VentasScreen({ navigation }) {
 						</TouchableOpacity>
 					</View>
 
-					{cargandoHistorial ? (
-						<View style={styles.estadoBloque}>
-							<ActivityIndicator size="small" color="#2563eb" />
-							<Text style={styles.estadoTexto}>Cargando historial...</Text>
-						</View>
-					) : null}
+					<View style={styles.historialVentasBox}>
+						<ScrollView
+							nestedScrollEnabled
+							showsVerticalScrollIndicator
+							contentContainerStyle={styles.historialVentasContent}
+						>
+							{cargandoHistorial ? (
+								<View style={styles.estadoBloque}>
+									<ActivityIndicator size="small" color="#2563eb" />
+									<Text style={styles.estadoTexto}>Cargando historial...</Text>
+								</View>
+							) : null}
 
-					{!cargandoHistorial && errorHistorial ? (
-						<View style={styles.estadoBloque}>
-							<Text style={styles.estadoTexto}>{errorHistorial}</Text>
-						</View>
-					) : null}
+							{!cargandoHistorial && errorHistorial ? (
+								<View style={styles.estadoBloque}>
+									<Text style={styles.estadoTexto}>{errorHistorial}</Text>
+								</View>
+							) : null}
 
-					{!cargandoHistorial && !errorHistorial && !ventasAgrupadas.length ? (
-						<View style={styles.estadoBloque}>
-							<Text style={styles.estadoTexto}>Aun no hay ventas registradas.</Text>
-						</View>
-					) : null}
+							{!cargandoHistorial && !errorHistorial && !ventasAgrupadas.length ? (
+								<View style={styles.estadoBloque}>
+									<Text style={styles.estadoTexto}>Aun no hay ventas registradas.</Text>
+								</View>
+							) : null}
 
-					{!cargandoHistorial && !errorHistorial && ventasAgrupadas.map((venta) => (
-						<View key={venta.key} style={styles.ventaCard}>
-							<View style={styles.ventaTopRow}>
-								<Text style={styles.ventaId}>Venta #{venta.id_venta || "-"}</Text>
-								<Text style={styles.ventaTotal}>${Number(venta.total || 0).toFixed(2)}</Text>
-							</View>
-							<Text style={styles.ventaMeta}>{formatearFecha(venta.fecha)} | {venta.metodo_pago}</Text>
-							<Text style={styles.ventaMeta}>Cliente: {venta.cliente}</Text>
-							<Text style={styles.ventaMeta}>Articulos: {Number(venta.totalArticulos || 0)}</Text>
+							{!cargandoHistorial && !errorHistorial && ventasAgrupadas.map((venta) => (
+								<View key={venta.key} style={styles.ventaCard}>
+									<View style={styles.ventaTopRow}>
+										<Text style={styles.ventaId}>Venta #{venta.id_venta || "-"}</Text>
+										<Text style={styles.ventaTotal}>${Number(venta.total || 0).toFixed(2)}</Text>
+									</View>
+									<Text style={styles.ventaMeta}>{formatearFecha(venta.fecha)} | {venta.metodo_pago}</Text>
+									<Text style={styles.ventaMeta}>Cliente: {venta.cliente}</Text>
+									<Text style={styles.ventaMeta}>Articulos: {Number(venta.totalArticulos || 0)}</Text>
 
-							<View style={styles.ventaAccionesRow}>
-								<TouchableOpacity style={styles.verDetalleBtn} onPress={() => abrirDetalleVenta(venta.id_venta)}>
-									<Text style={styles.verDetalleBtnText}>Ver</Text>
-								</TouchableOpacity>
+									<View style={styles.ventaAccionesRow}>
+										<TouchableOpacity style={styles.verDetalleBtn} onPress={() => abrirDetalleVenta(venta.id_venta)}>
+											<Text style={styles.verDetalleBtnText}>Ver</Text>
+										</TouchableOpacity>
 
-								{venta.esta_facturada ? (
-									<TouchableOpacity
-										style={[styles.accionVentaBtn, styles.btnDescargarFactura]}
-										onPress={() => descargarFacturaVenta(venta.id_venta)}
-										disabled={procesandoAccionVenta}
-									>
-										<Text style={styles.accionVentaBtnText}>Descargar</Text>
-									</TouchableOpacity>
-								) : (
-									<TouchableOpacity
-										style={[styles.accionVentaBtn, styles.btnFacturarVenta]}
-										onPress={() => facturarVenta(venta.id_venta)}
-										disabled={procesandoAccionVenta}
-									>
-										<Text style={styles.accionVentaBtnText}>Facturar</Text>
-									</TouchableOpacity>
-								)}
-							</View>
-						</View>
-					))}
+										{venta.esta_facturada ? (
+											<TouchableOpacity
+												style={[styles.accionVentaBtn, styles.btnDescargarFactura]}
+												onPress={() => descargarFacturaVenta(venta.id_venta)}
+												disabled={procesandoAccionVenta}
+											>
+												<Text style={styles.accionVentaBtnText}>Descargar</Text>
+											</TouchableOpacity>
+										) : (
+											<TouchableOpacity
+												style={[styles.accionVentaBtn, styles.btnFacturarVenta]}
+												onPress={() => facturarVenta(venta.id_venta)}
+												disabled={procesandoAccionVenta}
+											>
+												<Text style={styles.accionVentaBtnText}>Facturar</Text>
+											</TouchableOpacity>
+										)}
+									</View>
+								</View>
+							))}
+						</ScrollView>
+					</View>
 				</View>
 			</ScrollView>
 
@@ -1004,15 +1011,6 @@ export default function VentasScreen({ navigation }) {
 								value={formFacturacion.razon_social}
 								onChangeText={(text) => actualizarCampoFacturacion("razon_social", text)}
 								placeholder="Razon social"
-							/>
-
-							<Text style={styles.factLabel}>Uso CFDI</Text>
-							<TextInput
-								style={styles.factInput}
-								value={formFacturacion.uso_cfdi}
-								onChangeText={(text) => actualizarCampoFacturacion("uso_cfdi", text)}
-								autoCapitalize="characters"
-								placeholder="G03"
 							/>
 
 							<Text style={styles.factLabel}>Correo (opcional)</Text>
@@ -1258,6 +1256,19 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		justifyContent: "center",
 		backgroundColor: "#eef2ff"
+	},
+	historialVentasBox: {
+		marginTop: 8,
+		maxHeight: 360,
+		borderWidth: 1,
+		borderColor: "#e2e8f0",
+		borderRadius: 12,
+		backgroundColor: "#f8fafc",
+		overflow: "hidden"
+	},
+	historialVentasContent: {
+		padding: 8,
+		paddingBottom: 12
 	},
 	ventaCard: {
 		backgroundColor: "#f8fafc",

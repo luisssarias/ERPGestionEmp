@@ -139,6 +139,16 @@ export default function EntradasScreen({ navigation }) {
     [proveedores]
   );
 
+  useEffect(() => {
+    if (!proveedorEntradaId) return;
+
+    const sigueActivo = proveedoresActivosLista.some((item) => String(item.id_proveedor) === String(proveedorEntradaId));
+    if (!sigueActivo) {
+      setProveedorEntradaId("");
+      setProductosEntradaSeleccion({});
+    }
+  }, [proveedorEntradaId, proveedoresActivosLista]);
+
   const productosEntradaDisponibles = useMemo(() => {
     if (!proveedorEntradaId) return [];
 
@@ -502,24 +512,32 @@ export default function EntradasScreen({ navigation }) {
         <View style={[styles.card, { marginBottom: 20 }]}>
           <Text style={styles.cardTitle}>Historial de Entradas</Text>
 
-          {!historialCompras.length ? (
-            <Text style={styles.emptyText}>Sin entradas registradas.</Text>
-          ) : historialCompras.map((compra) => (
-            <View key={compra.key} style={styles.providerItem}>
-              <Text style={styles.providerTitle}>
-                {compra.items.length > 1
-                  ? `${compra.items[0]?.producto || "-"} +${compra.items.length - 1} mas`
-                  : (compra.items[0]?.producto || "-")}
-              </Text>
-              <Text style={styles.providerInfo}>Proveedor: {compra.proveedor}</Text>
-              <Text style={styles.providerInfo}>Cantidad total: {compra.cantidadTotal} | Total compra: ${Number(compra.total || 0).toFixed(2)}</Text>
-              <Text style={styles.providerInfo}>Fecha: {formatearFecha(compra.fecha)}</Text>
+          <View style={styles.historialListBox}>
+            <ScrollView
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+              contentContainerStyle={styles.historialListContent}
+            >
+              {!historialCompras.length ? (
+                <Text style={styles.emptyText}>Sin entradas registradas.</Text>
+              ) : historialCompras.map((compra) => (
+                <View key={compra.key} style={styles.providerItem}>
+                  <Text style={styles.providerTitle}>
+                    {compra.items.length > 1
+                      ? `${compra.items[0]?.producto || "-"} +${compra.items.length - 1} mas`
+                      : (compra.items[0]?.producto || "-")}
+                  </Text>
+                  <Text style={styles.providerInfo}>Proveedor: {compra.proveedor}</Text>
+                  <Text style={styles.providerInfo}>Cantidad total: {compra.cantidadTotal} | Total compra: ${Number(compra.total || 0).toFixed(2)}</Text>
+                  <Text style={styles.providerInfo}>Fecha: {formatearFecha(compra.fecha)}</Text>
 
-              <TouchableOpacity style={styles.detailButton} onPress={() => abrirDetalleCompra(compra)}>
-                <Text style={styles.detailButtonText}>Ver detalle</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+                  <TouchableOpacity style={styles.detailButton} onPress={() => abrirDetalleCompra(compra)}>
+                    <Text style={styles.detailButtonText}>Ver detalle</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
         </View>
 
         <Modal
@@ -608,6 +626,8 @@ const styles = StyleSheet.create({
   totalBox: { borderWidth: 1, borderColor: "#bfdbfe", borderRadius: 10, backgroundColor: "#eff6ff", paddingVertical: 12, alignItems: "center" },
   totalText: { color: "#1e40af", fontWeight: "700", fontSize: 18 },
   providerItem: { borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, padding: 10, marginTop: 8 },
+  historialListBox: { maxHeight: 320, borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 12, backgroundColor: "#f8fafc", overflow: "hidden" },
+  historialListContent: { padding: 8, paddingBottom: 10 },
   providerTitle: { fontWeight: "700", color: "#0f172a" },
   providerInfo: { marginTop: 3, color: "#64748b", fontSize: 12 },
   detailButton: { marginTop: 10, alignSelf: "flex-start", backgroundColor: "#dbeafe", borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7 },

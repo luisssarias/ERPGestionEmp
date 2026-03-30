@@ -26,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('usuarios', UsuarioController::class);
     Route::get('/categorias', [ProductoController::class, 'categorias']);
     Route::post('/categorias', [ProductoController::class, 'storeCategoria']);
+    Route::put('/categorias/{id}', [ProductoController::class, 'updateCategoria']);
+    Route::delete('/categorias/{id}', [ProductoController::class, 'destroyCategoria']);
     Route::get('/estados-producto', [ProductoController::class, 'estados']);
     Route::apiResource('productos', ProductoController::class);
     Route::get('/proveedores', [ProveedorController::class, 'index']);

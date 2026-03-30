@@ -38,11 +38,14 @@ const formCategoria = document.getElementById("formCategoria");
 const nombreCategoriaInput = document.getElementById("nombreCategoria");
 const descripcionCategoriaInput = document.getElementById("descripcionCategoria");
 const mensajeCategoria = document.getElementById("mensajeCategoria");
+const listaCategoriasGestion = document.getElementById("listaCategoriasGestion");
+const btnGuardarCategoria = document.getElementById("btnGuardarCategoria");
 
 
 let productos = [];
 let categorias = [];
 let soloStockBajo = false;
+let categoriaEditandoId = null;
 
 if (!token) {
     window.location.href = "login.html";
@@ -129,6 +132,8 @@ function abrirModalCategoria() {
 
 function cerrarModalCategoria() {
     modalCategoria.style.display = "none";
+    categoriaEditandoId = null;
+
     if (formCategoria) {
         formCategoria.reset();
     }
@@ -136,6 +141,25 @@ function cerrarModalCategoria() {
     if (mensajeCategoria) {
         mensajeCategoria.textContent = "";
     }
+
+    if (btnGuardarCategoria) {
+        btnGuardarCategoria.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar Categoría';
+    }
+}
+
+function activarEdicionCategoria(categoria) {
+    if (!categoria) return;
+
+    categoriaEditandoId = Number(categoria.id_categoria);
+    nombreCategoriaInput.value = categoria.nombre || "";
+    descripcionCategoriaInput.value = categoria.descripcion || "";
+    mensajeCategoria.textContent = `Editando categoría: ${categoria.nombre || ""}`;
+
+    if (btnGuardarCategoria) {
+        btnGuardarCategoria.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
+    }
+
+    nombreCategoriaInput.focus();
 }
 
 function limpiarFormulario() {
@@ -255,6 +279,33 @@ function llenarSelect(selectElement, items, placeholder) {
 function renderCatalogos() {
     llenarSelect(filtroCategoria, categorias, "Todas las Categorías");
     llenarSelect(categoriaProductoInput, categorias, "Selecciona una categoría");
+    renderCategoriasGestion();
+}
+
+function renderCategoriasGestion() {
+    if (!listaCategoriasGestion) return;
+
+    if (!Array.isArray(categorias) || !categorias.length) {
+        listaCategoriasGestion.innerHTML = '<p class="categorias-vacio">No hay categorías registradas.</p>';
+        return;
+    }
+
+    listaCategoriasGestion.innerHTML = categorias.map((item) => {
+        const descripcion = item.descripcion ? String(item.descripcion) : "Sin descripción";
+
+        return `
+            <div class="categoria-item">
+                <div class="categoria-info">
+                    <span class="categoria-titulo">${escapeHtml(item.nombre || "Sin nombre")}</span>
+                    <span class="categoria-desc">${escapeHtml(descripcion)}</span>
+                </div>
+                <div class="categoria-acciones">
+                    <button type="button" class="btn-editar-categoria" data-id="${item.id_categoria}">Editar</button>
+                    <button type="button" class="btn-eliminar-categoria" data-id="${item.id_categoria}" data-nombre="${escapeHtml(item.nombre || "categoria")}">Eliminar</button>
+                </div>
+            </div>
+        `;
+    }).join("");
 }
 
 async function cargarUsuarioSesion() {
@@ -306,6 +357,37 @@ async function crearCategoria(payload) {
         method: "POST",
         headers: getJsonHeaders(),
         body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}
+
+async function actualizarCategoria(idCategoria, payload) {
+    const response = await fetch(`${API_BASE}/categorias/${idCategoria}`, {
+        method: "PUT",
+        headers: getJsonHeaders(),
+        body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw data;
+    }
+
+    return data;
+}
+
+async function eliminarCategoria(idCategoria) {
+    const response = await fetch(`${API_BASE}/categorias/${idCategoria}`, {
+        method: "DELETE",
+        headers: getJsonHeaders(),
     });
 
     const data = await response.json();
@@ -608,12 +690,63 @@ if (formCategoria) {
         }
 
         try {
-            await crearCategoria(payload);
+            const enEdicion = Boolean(categoriaEditandoId);
+
+            if (categoriaEditandoId) {
+                await actualizarCategoria(categoriaEditandoId, payload);
+            } else {
+                await crearCategoria(payload);
+            }
+
             await cargarCatalogos();
             cerrarModalCategoria();
+            alert(enEdicion ? "Categoría actualizada correctamente." : "Categoría agregada correctamente.");
         } catch (errorData) {
             console.error(errorData);
             mensajeCategoria.textContent = obtenerErrorValidacion(errorData);
+        }
+    });
+}
+
+if (listaCategoriasGestion) {
+    listaCategoriasGestion.addEventListener("click", async (event) => {
+        const editButton = event.target.closest("button.btn-editar-categoria[data-id]");
+
+        if (editButton) {
+            const idCategoria = Number(editButton.getAttribute("data-id"));
+            const categoria = categorias.find((item) => Number(item.id_categoria) === idCategoria);
+
+            if (!categoria) {
+                alert("No se encontró la categoría seleccionada.");
+                return;
+            }
+
+            activarEdicionCategoria(categoria);
+            return;
+        }
+
+        const deleteButton = event.target.closest("button.btn-eliminar-categoria[data-id]");
+
+        if (!deleteButton) {
+            return;
+        }
+
+        const idCategoria = deleteButton.getAttribute("data-id");
+        const nombreCategoria = deleteButton.getAttribute("data-nombre") || "esta categoría";
+
+        const confirmar = confirm(`¿Seguro que deseas eliminar ${nombreCategoria}?`);
+
+        if (!confirmar) {
+            return;
+        }
+
+        try {
+            const resultado = await eliminarCategoria(idCategoria);
+            await cargarCatalogos();
+            alert(resultado?.message || "Categoría eliminada correctamente.");
+        } catch (errorData) {
+            console.error(errorData);
+            alert(obtenerErrorValidacion(errorData));
         }
     });
 }
@@ -635,8 +768,8 @@ async function init() {
         await cargarCatalogos();
     } catch (error) {
         console.error(error);
-        marcarCargandoTabla("No se pudieron cargar categorías.");
-        return;
+        categorias = [];
+        renderCatalogos();
     }
 
     await cargarProductos();

@@ -35,6 +35,7 @@ if (!token) {
 function getHeaders(json = false) {
     const headers = {
         Authorization: `Bearer ${token}`,
+        Accept: "application/json",
     };
 
     if (json) {
@@ -42,6 +43,34 @@ function getHeaders(json = false) {
     }
 
     return headers;
+}
+
+function normalizarEstado(estado) {
+    const valor = String(estado || "").trim().toLowerCase();
+    return valor === "inactivo" ? "Inactivo" : "Activo";
+}
+
+async function parseApiResponse(response) {
+    const contentType = response.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+        return response.json();
+    }
+
+    const text = await response.text();
+
+    if (response.status === 401) {
+        return { message: "Sesion expirada. Inicia sesion nuevamente." };
+    }
+
+    if (!response.ok) {
+        return {
+            message: "La API devolvio una respuesta no valida. Verifica sesion y logs del servidor.",
+            raw: text,
+        };
+    }
+
+    return { message: text };
 }
 
 function escapeHtml(value) {
@@ -261,7 +290,7 @@ async function cargarProveedorEnFormulario(proveedor) {
     if (proveedorTelefono) proveedorTelefono.value = proveedor.telefono || "";
     if (proveedorCorreo) proveedorCorreo.value = proveedor.correo || "";
     if (proveedorRfc) proveedorRfc.value = proveedor.rfc || "";
-    if (proveedorEstado) proveedorEstado.value = proveedor.estado || "Activo";
+    if (proveedorEstado) proveedorEstado.value = normalizarEstado(proveedor.estado);
     if (proveedorDireccion) proveedorDireccion.value = proveedor.direccion || "";
     if (proveedorNotas) proveedorNotas.value = proveedor.notas || "";
 
@@ -317,7 +346,7 @@ async function crearProveedor(payload) {
         body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const data = await parseApiResponse(response);
 
     if (!response.ok) {
         throw data;
@@ -333,7 +362,7 @@ async function actualizarProveedor(id, payload) {
         body: JSON.stringify(payload),
     });
 
-    const data = await response.json();
+    const data = await parseApiResponse(response);
 
     if (!response.ok) {
         throw data;
@@ -348,7 +377,7 @@ async function eliminarProveedor(id) {
         headers: getHeaders(),
     });
 
-    const data = await response.json();
+    const data = await parseApiResponse(response);
 
     if (!response.ok) {
         throw data;
@@ -363,7 +392,7 @@ async function cargarProductosProveedor(idProveedorActual) {
         headers: getHeaders(),
     });
 
-    const data = await response.json();
+    const data = await parseApiResponse(response);
 
     if (!response.ok) {
         throw data;
@@ -379,7 +408,7 @@ async function syncProductosProveedor(idProveedorActual, productos) {
         body: JSON.stringify({ productos }),
     });
 
-    const data = await response.json();
+    const data = await parseApiResponse(response);
 
     if (!response.ok) {
         throw data;
@@ -543,7 +572,7 @@ if (formProveedor) {
             correo: proveedorCorreo ? proveedorCorreo.value.trim() || null : null,
             direccion: proveedorDireccion ? proveedorDireccion.value.trim() || null : null,
             rfc: proveedorRfc ? proveedorRfc.value.trim() || null : null,
-            estado: proveedorId ? (proveedorEstado ? proveedorEstado.value : "Activo") : "Activo",
+            estado: proveedorId ? normalizarEstado(proveedorEstado ? proveedorEstado.value : "Activo") : "Activo",
             notas: proveedorNotas ? proveedorNotas.value.trim() || null : null,
         };
 

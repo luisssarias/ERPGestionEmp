@@ -97,6 +97,39 @@ class ProductoController extends Controller
         return response()->json($categoria, 201);
     }
 
+    public function updateCategoria(Request $request, $id)
+    {
+        $categoria = Categoria::findOrFail($id);
+
+        $data = $request->validate([
+            'nombre' => 'required|string|max:100|unique:categorias,nombre,' . $categoria->id_categoria . ',id_categoria',
+            'descripcion' => 'nullable|string',
+        ]);
+
+        $categoria->update($data);
+
+        return response()->json($categoria->fresh(), 200);
+    }
+
+    public function destroyCategoria($id)
+    {
+        $categoria = Categoria::findOrFail($id);
+
+        $tieneProductos = Producto::where('id_categoria', $categoria->id_categoria)->exists();
+
+        if ($tieneProductos) {
+            return response()->json([
+                'message' => 'No se puede eliminar la categoria porque tiene productos asociados.',
+            ], 409);
+        }
+
+        $categoria->delete();
+
+        return response()->json([
+            'message' => 'Categoria eliminada correctamente.',
+        ], 200);
+    }
+
     public function estados()
     {
         $this->getOrCreateEstadoActivoId();

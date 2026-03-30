@@ -216,6 +216,28 @@ export default function ProveedoresScreen({ navigation }) {
     setSeleccion(map);
   };
 
+  const verProveedorDetalle = (proveedor) => {
+    if (!proveedor?.id_proveedor) return;
+
+    const lista = productosPorProveedor[String(proveedor.id_proveedor)] || [];
+    const productosTexto = lista.length
+      ? lista.map((item) => `- ${item.nombre || "Producto"} ($${Number(item.precio_compra || 0).toFixed(2)})`).join("\n")
+      : "Sin productos asignados.";
+
+    Alert.alert(
+      `Proveedor: ${proveedor.nombre || "-"}`,
+      [
+        `Empresa: ${proveedor.empresa || "-"}`,
+        `Estado: ${proveedor.estado || "-"}`,
+        `Telefono: ${proveedor.telefono || "-"}`,
+        `Correo: ${proveedor.correo || "-"}`,
+        "",
+        "Productos asignados:",
+        productosTexto
+      ].join("\n")
+    );
+  };
+
   const eliminarProveedor = (proveedor) => {
     if (!proveedor?.id_proveedor) return;
 
@@ -459,24 +481,39 @@ export default function ProveedoresScreen({ navigation }) {
 
         <View style={[styles.card, { marginBottom: 20 }]}> 
           <Text style={styles.cardTitle}>Proveedores registrados</Text>
-          {proveedores.map((prov) => {
-            const count = (productosPorProveedor[String(prov.id_proveedor)] || []).length;
-            return (
-              <View key={prov.id_proveedor} style={styles.providerItem}>
-                <Text style={styles.providerTitle}>{prov.nombre} - {prov.empresa || "Sin empresa"}</Text>
-                <Text style={styles.providerInfo}>Productos asignados: {count}</Text>
+          <View style={styles.providersListBox}>
+            {!proveedores.length ? (
+              <Text style={styles.providersEmpty}>Aun no hay proveedores registrados.</Text>
+            ) : (
+              <ScrollView
+                nestedScrollEnabled
+                showsVerticalScrollIndicator
+                contentContainerStyle={styles.providersListContent}
+              >
+                {proveedores.map((prov) => {
+                  const count = (productosPorProveedor[String(prov.id_proveedor)] || []).length;
+                  return (
+                    <View key={prov.id_proveedor} style={styles.providerItem}>
+                      <Text style={styles.providerTitle}>{prov.nombre} - {prov.empresa || "Sin empresa"}</Text>
+                      <Text style={styles.providerInfo}>Productos asignados: {count}</Text>
 
-                <View style={styles.providerActions}>
-                  <TouchableOpacity style={styles.editBtn} onPress={() => cargarProveedorEnFormulario(prov)}>
-                    <Text style={styles.editBtnText}>Editar</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.deleteBtn} onPress={() => eliminarProveedor(prov)}>
-                    <Text style={styles.deleteBtnText}>Eliminar</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            );
-          })}
+                      <View style={styles.providerActions}>
+                        <TouchableOpacity style={styles.viewBtn} onPress={() => verProveedorDetalle(prov)}>
+                          <Text style={styles.viewBtnText}>Ver</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.editBtn} onPress={() => cargarProveedorEnFormulario(prov)}>
+                          <Text style={styles.editBtnText}>Editar</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.deleteBtn} onPress={() => eliminarProveedor(prov)}>
+                          <Text style={styles.deleteBtnText}>Eliminar</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+            )}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -525,10 +562,28 @@ const styles = StyleSheet.create({
   error: { marginTop: 10, color: "#b91c1c", fontSize: 13, fontWeight: "500" },
   loadingRow: { flexDirection: "row", alignItems: "center", marginTop: 8 },
   loadingText: { marginLeft: 8, color: "#64748b" },
-  providerItem: { borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, padding: 10, marginTop: 8 },
+  providersListBox: {
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 10,
+    backgroundColor: "#f8fafc",
+    maxHeight: 320,
+    minHeight: 80
+  },
+  providersListContent: { padding: 8 },
+  providersEmpty: {
+    color: "#64748b",
+    fontSize: 13,
+    textAlign: "center",
+    paddingVertical: 24,
+    paddingHorizontal: 12
+  },
+  providerItem: { borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, padding: 10, marginBottom: 8, backgroundColor: "white" },
   providerTitle: { fontWeight: "700", color: "#0f172a" },
   providerInfo: { marginTop: 3, color: "#64748b", fontSize: 12 },
   providerActions: { flexDirection: "row", marginTop: 10 },
+  viewBtn: { backgroundColor: "#e2e8f0", borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7, marginRight: 8 },
+  viewBtnText: { color: "#334155", fontWeight: "700", fontSize: 12 },
   editBtn: { backgroundColor: "#dbeafe", borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7, marginRight: 8 },
   editBtnText: { color: "#1d4ed8", fontWeight: "700", fontSize: 12 },
   deleteBtn: { backgroundColor: "#fee2e2", borderRadius: 8, paddingHorizontal: 12, paddingVertical: 7 },

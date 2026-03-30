@@ -236,14 +236,17 @@ function renderHistorialFiltros() {
 function renderProveedorEntradaOptions() {
     if (!proveedorEntrada) return;
 
+    const proveedoresActivos = proveedores.filter((p) => String(p.estado || "").toLowerCase() === "activo");
+
     const options = [
         '<option value="">Selecciona un proveedor</option>',
-        ...proveedores.map((p) => `<option value="${p.id_proveedor}">${escapeHtml(p.nombre)} - ${escapeHtml(p.empresa || "Sin empresa")}</option>`),
+        ...proveedoresActivos.map((p) => `<option value="${p.id_proveedor}">${escapeHtml(p.nombre)} - ${escapeHtml(p.empresa || "Sin empresa")}</option>`),
     ];
 
     const current = proveedorEntrada.value;
     proveedorEntrada.innerHTML = options.join("");
-    proveedorEntrada.value = current;
+    const existeEnActivos = proveedoresActivos.some((p) => String(p.id_proveedor) === String(current));
+    proveedorEntrada.value = existeEnActivos ? current : "";
 
     if (kpiProveedores) {
         const activos = proveedores.filter((p) => String(p.estado || "").toLowerCase() === "activo").length;

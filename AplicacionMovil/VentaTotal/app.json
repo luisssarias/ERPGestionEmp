@@ -15,7 +15,7 @@
       "supportsTablet": true
     },
     "android": {
-    "usesCleartextTraffic": true,
+      "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -26,11 +26,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      "@react-native-community/datetimepicker"
     ]
-
-    
   }
 }

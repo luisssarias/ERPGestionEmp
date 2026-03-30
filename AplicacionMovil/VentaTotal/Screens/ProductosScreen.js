@@ -42,6 +42,7 @@ export default function ProductosScreen({ navigation }) {
   const [descripcionCategoriaNueva, setDescripcionCategoriaNueva] = useState("");
   const [guardandoCategoria, setGuardandoCategoria] = useState(false);
   const [mensajeModalCategoria, setMensajeModalCategoria] = useState("");
+  const [categoriaEditandoId, setCategoriaEditandoId] = useState(null);
   const [soloStockBajo, setSoloStockBajo] = useState(false);
   const [categoriaFiltroId, setCategoriaFiltroId] = useState(null);
 
@@ -84,26 +85,40 @@ export default function ProductosScreen({ navigation }) {
         Authorization: `Bearer ${token}`
       };
 
-      const [productosResponse, categoriasResponse] = await Promise.all([
-        fetch(`${baseUrl}/api/productos`, { method: "GET", headers }),
-        fetch(`${baseUrl}/api/categorias`, { method: "GET", headers })
-      ]);
+      const productosResponse = await fetch(`${baseUrl}/api/productos`, { method: "GET", headers });
 
-      if (productosResponse.status === 401 || categoriasResponse.status === 401) {
+      if (productosResponse.status === 401) {
         await clearSession();
         navigation.replace("Login");
         return;
       }
 
-      if (!productosResponse.ok || !categoriasResponse.ok) {
-        throw new Error("No se pudieron cargar productos/categorias");
+      if (!productosResponse.ok) {
+        throw new Error("No se pudieron cargar productos");
       }
 
       const productosData = await productosResponse.json();
-      const categoriasData = await categoriasResponse.json();
-
       setProductos(Array.isArray(productosData) ? productosData : []);
-      setCategorias(Array.isArray(categoriasData) ? categoriasData : []);
+
+      try {
+        const categoriasResponse = await fetch(`${baseUrl}/api/categorias`, { method: "GET", headers });
+
+        if (categoriasResponse.status === 401) {
+          await clearSession();
+          navigation.replace("Login");
+          return;
+        }
+
+        if (!categoriasResponse.ok) {
+          setCategorias([]);
+        } else {
+          const categoriasData = await categoriasResponse.json();
+          setCategorias(Array.isArray(categoriasData) ? categoriasData : []);
+        }
+      } catch {
+        setCategorias([]);
+      }
+
       setImagenesFallidas({});
     } catch {
       setErrorCarga("No se pudo cargar la informacion. Revisa el backend.");
@@ -241,6 +256,7 @@ export default function ProductosScreen({ navigation }) {
     setNombreCategoriaNueva("");
     setDescripcionCategoriaNueva("");
     setMensajeModalCategoria("");
+    setCategoriaEditandoId(null);
     setModalCategoriaVisible(true);
   };
 
@@ -251,6 +267,18 @@ export default function ProductosScreen({ navigation }) {
 
     setModalCategoriaVisible(false);
     setMensajeModalCategoria("");
+    setCategoriaEditandoId(null);
+  };
+
+  const editarCategoria = (categoria) => {
+    if (!categoria?.id_categoria) {
+      return;
+    }
+
+    setCategoriaEditandoId(categoria.id_categoria);
+    setNombreCategoriaNueva(String(categoria.nombre || ""));
+    setDescripcionCategoriaNueva(String(categoria.descripcion || ""));
+    setMensajeModalCategoria(`Editando categoria: ${categoria.nombre || ""}`);
   };
 
   const guardarCategoria = async () => {
@@ -276,8 +304,13 @@ export default function ProductosScreen({ navigation }) {
       const baseUrl = apiBaseUrl || (await resolverApiBase());
       setApiBaseUrl(baseUrl);
 
-      const response = await fetch(`${baseUrl}/api/categorias`, {
-        method: "POST",
+      const enEdicion = Boolean(categoriaEditandoId);
+      const endpoint = enEdicion
+        ? `${baseUrl}/api/categorias/${categoriaEditandoId}`
+        : `${baseUrl}/api/categorias`;
+
+      const response = await fetch(endpoint, {
+        method: enEdicion ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -304,21 +337,92 @@ export default function ProductosScreen({ navigation }) {
 
       if (!response.ok) {
         const primerError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
-        setMensajeModalCategoria(primerError || data?.message || "No se pudo crear la categoria.");
+        setMensajeModalCategoria(primerError || data?.message || "No se pudo guardar la categoria.");
         return;
       }
 
       setModalCategoriaVisible(false);
       await cargarDatos();
-      if (data?.id_categoria) {
+      if (!enEdicion && data?.id_categoria) {
         setCategoriaNuevaId(data.id_categoria);
       }
-      Alert.alert("Categorias", "Categoria creada correctamente.");
+      setCategoriaEditandoId(null);
+      Alert.alert("Categorias", enEdicion ? "Categoria actualizada correctamente." : "Categoria creada correctamente.");
     } catch {
       setMensajeModalCategoria("Error de conexion al guardar categoria.");
     } finally {
       setGuardandoCategoria(false);
     }
+  };
+
+  const eliminarCategoria = async (categoria) => {
+    if (!categoria?.id_categoria) {
+      return;
+    }
+
+    Alert.alert(
+      "Eliminar categoria",
+      `¿Seguro que deseas eliminar ${categoria.nombre || "esta categoria"}?`,
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const token = await getStoredToken();
+
+              if (!token) {
+                await clearSession();
+                navigation.replace("Login");
+                return;
+              }
+
+              const baseUrl = apiBaseUrl || (await resolverApiBase());
+              setApiBaseUrl(baseUrl);
+
+              const response = await fetch(`${baseUrl}/api/categorias/${categoria.id_categoria}`, {
+                method: "DELETE",
+                headers: {
+                  Accept: "application/json",
+                  Authorization: `Bearer ${token}`
+                }
+              });
+
+              let data = null;
+              try {
+                data = await response.json();
+              } catch {
+                data = null;
+              }
+
+              if (response.status === 401) {
+                await clearSession();
+                navigation.replace("Login");
+                return;
+              }
+
+              if (!response.ok) {
+                Alert.alert("Categorias", data?.message || "No se pudo eliminar la categoria.");
+                return;
+              }
+
+              await cargarDatos();
+              if (Number(categoriaNuevaId) === Number(categoria.id_categoria)) {
+                setCategoriaNuevaId(null);
+              }
+              if (Number(categoriaFiltroId) === Number(categoria.id_categoria)) {
+                setCategoriaFiltroId(null);
+              }
+
+              Alert.alert("Categorias", data?.message || "Categoria eliminada correctamente.");
+            } catch {
+              Alert.alert("Categorias", "Error de conexion al eliminar categoria.");
+            }
+          }
+        }
+      ]
+    );
   };
 
   const eliminarProducto = async (producto) => {
@@ -862,6 +966,43 @@ export default function ProductosScreen({ navigation }) {
               numberOfLines={3}
             />
 
+            <Text style={styles.modalSubTitle}>Categorias registradas</Text>
+
+            {!categorias.length ? (
+              <Text style={styles.modalCategoriasEmpty}>No hay categorias registradas.</Text>
+            ) : (
+              <View style={styles.modalCategoriasList}>
+                {categorias.map((categoria) => (
+                  <View style={styles.modalCategoriaItem} key={categoria.id_categoria}>
+                    <View style={styles.modalCategoriaItemInfo}>
+                      <Text style={styles.modalCategoriaItemTitle}>{categoria.nombre || "Sin nombre"}</Text>
+                      <Text style={styles.modalCategoriaItemDesc}>{categoria.descripcion || "Sin descripcion"}</Text>
+                    </View>
+
+                    <View style={styles.modalCategoriaActions}>
+                      <TouchableOpacity
+                        style={styles.modalCategoriaEditBtn}
+                        onPress={() => editarCategoria(categoria)}
+                        disabled={guardandoCategoria}
+                      >
+                        <Ionicons name="create-outline" size={14} color="#1d4ed8" />
+                        <Text style={styles.modalCategoriaEditText}>Editar</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.modalCategoriaDeleteBtn}
+                        onPress={() => eliminarCategoria(categoria)}
+                        disabled={guardandoCategoria}
+                      >
+                        <Ionicons name="trash-outline" size={14} color="#b91c1c" />
+                        <Text style={styles.modalCategoriaDeleteText}>Eliminar</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
             {mensajeModalCategoria ? <Text style={styles.modalError}>{mensajeModalCategoria}</Text> : null}
 
             <View style={styles.modalActions}>
@@ -881,7 +1022,7 @@ export default function ProductosScreen({ navigation }) {
                 {guardandoCategoria ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (
-                  <Text style={styles.modalBtnSaveText}>Guardar</Text>
+                  <Text style={styles.modalBtnSaveText}>{categoriaEditandoId ? "Guardar cambios" : "Guardar"}</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -1393,5 +1534,94 @@ const styles = StyleSheet.create({
   modalBtnSaveText: {
     color: "white",
     fontWeight: "700"
+  },
+
+  modalSubTitle: {
+    marginTop: 2,
+    marginBottom: 8,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#0f172a"
+  },
+
+  modalCategoriasList: {
+    gap: 8,
+    marginBottom: 10
+  },
+
+  modalCategoriasEmpty: {
+    fontSize: 12,
+    color: "#64748b",
+    marginBottom: 10
+  },
+
+  modalCategoriaItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: "#f8fafc"
+  },
+
+  modalCategoriaItemInfo: {
+    flex: 1,
+    gap: 2
+  },
+
+  modalCategoriaItemTitle: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#0f172a"
+  },
+
+  modalCategoriaItemDesc: {
+    fontSize: 11,
+    color: "#64748b"
+  },
+
+  modalCategoriaActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6
+  },
+
+  modalCategoriaEditBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#dbeafe",
+    borderColor: "#bfdbfe",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8
+  },
+
+  modalCategoriaEditText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#1d4ed8"
+  },
+
+  modalCategoriaDeleteBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#fee2e2",
+    borderColor: "#fecaca",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 8
+  },
+
+  modalCategoriaDeleteText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#b91c1c"
   }
 });

@@ -5,10 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Producto;
 use App\Models\ProductoProveedor;
-use App\Models\ProveedorProductoMap;
 use App\Models\Proveedor;
-use App\Models\Compra;
-use Illuminate\Database\QueryException;
+use App\Models\ProveedorProductoMap;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -62,11 +60,13 @@ class ProveedorController extends Controller
             'correo' => 'nullable|email|max:100',
             'direccion' => 'nullable|string',
             'rfc' => 'nullable|string|max:20',
-            'estado' => 'nullable|in:Activo,Inactivo',
+            'estado' => 'nullable|string|in:Activo,Inactivo,activo,inactivo',
         ]);
 
         if (!array_key_exists('estado', $data) || empty($data['estado'])) {
             $data['estado'] = 'Activo';
+        } else {
+            $data['estado'] = strtolower((string) $data['estado']) === 'inactivo' ? 'Inactivo' : 'Activo';
         }
 
         $proveedor = Proveedor::create($data);
@@ -85,8 +85,12 @@ class ProveedorController extends Controller
             'correo' => 'sometimes|nullable|email|max:100',
             'direccion' => 'sometimes|nullable|string',
             'rfc' => 'sometimes|nullable|string|max:20',
-            'estado' => 'sometimes|nullable|in:Activo,Inactivo',
+            'estado' => 'sometimes|nullable|string|in:Activo,Inactivo,activo,inactivo',
         ]);
+
+        if (array_key_exists('estado', $data) && !empty($data['estado'])) {
+            $data['estado'] = strtolower((string) $data['estado']) === 'inactivo' ? 'Inactivo' : 'Activo';
+        }
 
         $proveedor->update($data);
 
@@ -97,42 +101,16 @@ class ProveedorController extends Controller
     {
         $proveedor = Proveedor::findOrFail($id);
 
-        $tieneCompras = Compra::where('id_proveedor', $proveedor->id_proveedor)->exists();
-
-        if ($tieneCompras) {
+        if (strtolower((string) $proveedor->estado) !== 'inactivo') {
             $proveedor->estado = 'Inactivo';
             $proveedor->save();
-
-            return response()->json([
-                'message' => 'El proveedor tiene entradas/compras registradas y fue cambiado a Inactivo.',
-                'deleted' => false,
-                'deactivated' => true,
-            ], 200);
         }
 
-        try {
-            $idsProductoProveedor = ProductoProveedor::where('id_proveedor', $proveedor->id_proveedor)
-                ->pluck('id_producto_proveedor');
-
-            if ($idsProductoProveedor->isNotEmpty()) {
-                ProveedorProductoMap::whereIn('id_producto_proveedor', $idsProductoProveedor)->delete();
-            }
-
-            ProductoProveedor::where('id_proveedor', $proveedor->id_proveedor)->delete();
-            $proveedor->delete();
-
-            return response()->json([
-                'message' => 'Proveedor eliminado correctamente',
-                'deleted' => true,
-                'deactivated' => false,
-            ], 200);
-        } catch (QueryException $e) {
-            return response()->json([
-                'message' => 'No se puede eliminar el proveedor porque tiene registros relacionados.',
-                'deleted' => false,
-                'deactivated' => false,
-            ], 409);
-        }
+        return response()->json([
+            'message' => 'El proveedor no se elimina fisicamente. Se cambio a Inactivo.',
+            'deleted' => false,
+            'deactivated' => true,
+        ], 200);
     }
 
     public function productos($id)
