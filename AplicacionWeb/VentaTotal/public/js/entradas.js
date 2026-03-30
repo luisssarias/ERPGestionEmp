@@ -19,6 +19,7 @@ const btnRegistrarEntrada = document.getElementById("btnRegistrarEntrada");
 const tablaHistorialBody = document.getElementById("tablaHistorialBody");
 const badgeHistorial = document.getElementById("badgeHistorial");
 const kpiEntradas = document.getElementById("kpiEntradas");
+const kpiTotalGastado = document.getElementById("kpiTotalGastado");
 const modalDetalleEntrada = document.getElementById("modalDetalleEntrada");
 const contenidoDetalleEntrada = document.getElementById("contenidoDetalleEntrada");
 const btnCerrarModalDetalle = document.getElementById("btnCerrarModalDetalle");
@@ -486,6 +487,11 @@ function renderHistorial() {
 
     badgeHistorial.textContent = `${resumenCompras.length} registros`;
     kpiEntradas.textContent = String(resumenCompras.length);
+
+    if (kpiTotalGastado) {
+        const totalGastado = resumenCompras.reduce((sum, item) => sum + Number(item._total_compra || 0), 0);
+        kpiTotalGastado.textContent = `$${formatMoney(totalGastado)}`;
+    }
 }
 
 function getItemsDetalleEntrada(item) {

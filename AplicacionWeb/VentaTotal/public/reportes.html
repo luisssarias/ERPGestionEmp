@@ -80,8 +80,8 @@
 </div>
 
 <div>
-<h4>Admin</h4>
-<p>Administrador</p>
+<h4 id="topbarUsuarioNombre">Usuario</h4>
+<p id="topbarUsuarioRol">Administrador</p>
 </div>
 
 </div>
@@ -105,31 +105,46 @@
 
 <div>
 <label>Fecha Desde</label>
-<input type="date">
+<input id="filtroDesdeReporte" type="date">
 </div>
 
 <div>
 <label>Fecha Hasta</label>
-<input type="date">
+<input id="filtroHastaReporte" type="date">
 </div>
 
 <div>
 <label>Mes</label>
-<select>
-<option>Marzo</option>
+<select id="filtroMesReporte">
+<option value="">Todos</option>
+<option value="1">Enero</option>
+<option value="2">Febrero</option>
+<option value="3">Marzo</option>
+<option value="4">Abril</option>
+<option value="5">Mayo</option>
+<option value="6">Junio</option>
+<option value="7">Julio</option>
+<option value="8">Agosto</option>
+<option value="9">Septiembre</option>
+<option value="10">Octubre</option>
+<option value="11">Noviembre</option>
+<option value="12">Diciembre</option>
 </select>
 </div>
 
 <div>
 <label>Categoría</label>
-<select>
-<option>Todas</option>
+<select id="filtroCategoriaReporte">
+<option value="">Todas</option>
 </select>
 </div>
 
-<button class="btn-reporte">
+<div class="filtros-acciones">
+<label>&nbsp;</label>
+<button class="btn-reporte" id="btnGenerarReporte">
 Generar Reporte
 </button>
+</div>
 
 </div>
 
@@ -142,8 +157,8 @@ Generar Reporte
 <div class="kpi-card">
 <div>
 <p>Total de Ventas</p>
-<h2>1,289</h2>
-<span class="up">↑ +18.2%</span>
+<h2 id="kpiTotalVentas">0</h2>
+<span class="up">Ventas en el periodo</span>
 </div>
 <div class="icon blue">
 <i class="fa-solid fa-cart-shopping"></i>
@@ -153,8 +168,8 @@ Generar Reporte
 <div class="kpi-card">
 <div>
 <p>Ingresos Totales</p>
-<h2>$341,298</h2>
-<span class="up">↑ +24.5%</span>
+<h2 id="kpiIngresosTotales">$0.00</h2>
+<span class="up">Total generado</span>
 </div>
 <div class="icon green">
 <i class="fa-solid fa-dollar-sign"></i>
@@ -164,8 +179,8 @@ Generar Reporte
 <div class="kpi-card">
 <div>
 <p>Producto Destacado</p>
-<h2>Mouse Logitech</h2>
-<span>320 unidades vendidas</span>
+<h2 id="kpiProductoDestacado">-</h2>
+<span id="kpiProductoDestacadoMeta">0 unidades vendidas</span>
 </div>
 <div class="icon purple">
 <i class="fa-solid fa-award"></i>
@@ -175,8 +190,8 @@ Generar Reporte
 <div class="kpi-card">
 <div>
 <p>Stock Bajo</p>
-<h2>23</h2>
-<span class="down">↓ -5 productos</span>
+<h2 id="kpiStockBajo">0</h2>
+<span class="down">Productos por debajo de 5</span>
 </div>
 <div class="icon red">
 <i class="fa-solid fa-circle-exclamation"></i>
@@ -186,8 +201,8 @@ Generar Reporte
 <div class="kpi-card">
 <div>
 <p>Promedio Diario</p>
-<h2>$11,376</h2>
-<span class="up">↑ +12.8%</span>
+<h2 id="kpiPromedioDiario">$0.00</h2>
+<span class="up">Ingreso promedio por día</span>
 </div>
 <div class="icon blue">
 <i class="fa-solid fa-chart-line"></i>
@@ -229,7 +244,7 @@ Generar Reporte
 
 <div class="ganancia">
 <p>Ganancia Neta</p>
-<h4>$352,000</h4>
+<h4 id="kpiGananciaNeta">$0.00</h4>
 </div>
 
 </div>
@@ -251,20 +266,6 @@ Generar Reporte
 <p>Resumen de transacciones por día</p>
 </div>
 
-<div class="tabla-botones">
-
-<button class="btn-pdf">
-<i class="fa-solid fa-download"></i>
-Exportar PDF
-</button>
-
-<button class="btn-excel">
-<i class="fa-solid fa-file-excel"></i>
-Exportar Excel
-</button>
-
-</div>
-
 </div>
 
 
@@ -279,41 +280,13 @@ Exportar Excel
 </tr>
 </thead>
 
-<tbody>
+<tbody id="tablaReportesBody">
 
-<tr>
-<td>2026-03-03</td>
-<td><span class="badge-num">45</span></td>
-<td class="dinero">$12,489.5</td>
-<td><span class="badge-pago">💳 Tarjeta</span></td>
-</tr>
-
-<tr>
-<td>2026-03-02</td>
-<td><span class="badge-num">52</span></td>
-<td class="dinero">$15,234.8</td>
-<td><span class="badge-pago">🏦 Transferencia</span></td>
-</tr>
-
-
-<tr class="fila-total-final">
-
-<td class="label-total">TOTAL</td>
-
-<td>
-<span class="badge-total">97</span>
-</td>
-
-<td class="total-dinero">
-$27,724.3
-</td>
-
-<td></td>
-
-</tr>
 </tbody>
 
 </table>
+
+<p id="estadoTablaReportes" class="estado-reportes">Cargando reporte...</p>
 
 </div>
 
@@ -324,63 +297,10 @@ $27,724.3
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-<script>
-
-new Chart(document.getElementById('ventasChart'),{
-type:'bar',
-data:{
-labels:['Laptop Dell XPS','Mouse Logitech','Monitor Samsung','Teclado RGB','Auriculares Sony','Webcam Logitech'],
-datasets:[{
-data:[150,320,95,180,200,160],
-backgroundColor:'#4f7dd6',
-borderRadius:8
-}]
-},
-options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
-});
-
-new Chart(document.getElementById('categoriaChart'),{
-type:'pie',
-data:{
-labels:['Electrónica','Accesorios','Audio','Almacenamiento','Redes'],
-datasets:[{
-data:[42,23,16,11,8],
-backgroundColor:['#4f7dd6','#3aa675','#e39d3a','#7a5de8','#e04c3f']
-}]
-},
-options:{plugins:{legend:{position:'bottom'}}}
-});
-
-new Chart(document.getElementById('tendenciaVentas'),{
-type:'line',
-data:{
-labels:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-datasets:[{
-label:'Ventas',
-data:[45000,52000,61000,48000,70000,67000,75000,82000,77000,85000,92000,105000],
-borderColor:'#4aa874',
-backgroundColor:'transparent',
-tension:0.4,
-pointRadius:5
-}]
-},
-options:{scales:{y:{beginAtZero:true}}}
-});
-
-new Chart(document.getElementById('ventasEntradas'),{
-type:'bar',
-data:{
-labels:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'],
-datasets:[
-{label:'Ventas',data:[45000,52000,60000,47000,70000,68000,75000,82000,77000,85000,92000,105000],backgroundColor:'#4aa874'},
-{label:'Entradas',data:[28000,31000,35000,30000,42000,38000,45000,48000,46000,50000,55000,61000],backgroundColor:'#d94b45'}
-]
-},
-options:{scales:{y:{beginAtZero:true}}}
-});
-
-</script>
+<script src="js/reportes.js"></script>
 
 </body>
 </html>

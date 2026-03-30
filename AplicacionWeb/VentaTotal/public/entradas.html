@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -75,7 +75,12 @@
 
 <h1>VentaTotal</h1>
 
+<div class="top-right">
 
+<div class="notification">
+<i class="fa-regular fa-bell"></i>
+<span class="dot"></span>
+</div>
 
 <div class="profile">
 
@@ -90,6 +95,8 @@
 
 </div>
 
+</div>
+
 </header>
 
 
@@ -97,21 +104,42 @@
 
 <div class="page-header">
 <h2>Registro de Entradas de Inventario</h2>
-<p>Registra proveedores, define que productos te venden y documenta cada entrada</p>
+<p>Registra proveedores, define qué productos te venden y documenta cada entrada</p>
 </div>
 
-<section class="kpi-row">
+<section class="stats">
 
-<article class="kpi-card success">
+<article class="stat-card">
+<div>
 <p>Proveedores activos</p>
 <h3 id="kpiProveedores">0</h3>
-<span>Con catalogo asignado</span>
+<span class="up">Con catálogo asignado</span>
+</div>
+<div class="icon blue">
+<i class="fa-solid fa-truck-field"></i>
+</div>
 </article>
 
-<article class="kpi-card success">
+<article class="stat-card">
+<div>
 <p>Entradas registradas</p>
 <h3 id="kpiEntradas">0</h3>
-<span>En este modulo</span>
+<span class="up">En este módulo</span>
+</div>
+<div class="icon green">
+<i class="fa-solid fa-arrow-down"></i>
+</div>
+</article>
+
+<article class="stat-card">
+<div>
+<p>Total gastado</p>
+<h3 id="kpiTotalGastado">$0.00</h3>
+<span class="up">Suma de compras (según filtros)</span>
+</div>
+<div class="icon purple">
+<i class="fa-solid fa-dollar-sign"></i>
+</div>
 </article>
 
 </section>
@@ -199,7 +227,7 @@ Selecciona un producto para ver estado de stock
 </div>
 
 <label class="mt" for="observacionEntrada">Motivo de Entrada / Observacion</label>
-<textarea id="observacionEntrada" placeholder="Ej: Reposicion mensual, Pedido especial, etc."></textarea>
+<textarea id="observacionEntrada" placeholder="Ej: Reposición mensual, Pedido especial, etc."></textarea>
 
 <p id="mensajeEntrada" class="mensaje"></p>
 
