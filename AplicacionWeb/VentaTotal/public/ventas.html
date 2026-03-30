@@ -81,8 +81,8 @@
 </div>
 
 <div>
-<h4>Admin</h4>
-<p>Administrador</p>
+<h4 id="topbarUsuarioNombre">Admin</h4>
+<p id="topbarUsuarioRol">Administrador</p>
 </div>
 
 </div>
@@ -107,41 +107,19 @@
 
 <div class="buscar">
 <i class="fa-solid fa-magnifying-glass"></i>
-<input type="text" placeholder="Buscar producto por nombre o código...">
+<input id="buscarProductoVenta" type="text" placeholder="Buscar producto por nombre o código...">
 </div>
 
-<select>
-<option>Todas las Categorías</option>
+<select id="filtroCategoriaVenta">
+<option value="">Todas las Categorías</option>
 </select>
 
 </div>
 
 
-<div class="productos-grid">
+<div class="productos-grid" id="productosGridVenta">
 
-<!-- SOLO UN PRODUCTO EJEMPLO -->
-
-<div class="producto-card">
-
-<img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8" alt="Laptop">
-
-<h4>Laptop Dell XPS 15</h4>
-
-<span class="categoria">Electrónica</span>
-
-<div class="precio-stock">
-
-<span class="precio">$1299.99</span>
-<span class="stock">Stock: 15</span>
-
-</div>
-
-<button class="btn-agregar">
-<i class="fa-solid fa-cart-plus"></i>
-Agregar
-</button>
-
-</div>
+<p id="estadoProductosVenta">Cargando inventario...</p>
 
 </div>
 
@@ -153,34 +131,36 @@ Agregar
 
 <div class="carrito-header">
 <h3><i class="fa-solid fa-cart-shopping"></i> Carrito de Compra</h3>
-<span class="badge">0</span>
+<span class="badge" id="badgeCarrito">0</span>
 </div>
 
-<div class="carrito-vacio">
+<div class="carrito-vacio" id="carritoVacio">
 
 <i class="fa-solid fa-cart-shopping"></i>
 <p>El carrito está vacío</p>
 
 </div>
 
+<div id="carritoItems"></div>
+
 
 <div class="totales">
 
 <div>
 <span>Subtotal:</span>
-<span>$0.00</span>
+<span id="subtotalVenta">$0.00</span>
 </div>
 
 <div>
 <span>IVA (16%):</span>
-<span>$0.00</span>
+<span id="ivaVenta">$0.00</span>
 </div>
 
 <hr>
 
 <div class="total">
 <span>Total:</span>
-<span>$0.00</span>
+<span id="totalVenta">$0.00</span>
 </div>
 
 </div>
@@ -189,18 +169,18 @@ Agregar
 
 <label>Método de Pago</label>
 
-<select class="metodo">
-<option>💵 Efectivo</option>
-<option>💳 Tarjeta</option>
-<option>🏦 Transferencia</option>
+<select class="metodo" id="metodoPagoVenta">
+<option value="Efectivo">💵 Efectivo</option>
+<option value="Tarjeta">💳 Tarjeta</option>
+<option value="Transferencia">🏦 Transferencia</option>
 </select>
 
-<button class="btn-confirmar">
+<button class="btn-confirmar" id="btnConfirmarVenta">
 <i class="fa-solid fa-dollar-sign"></i>
 Confirmar Venta
 </button>
 
-<button class="btn-cancelar">
+<button class="btn-cancelar" id="btnCancelarVenta">
 Cancelar
 </button>
 
@@ -211,11 +191,186 @@ Cancelar
 
 </div>
 
+<section class="detalle-ventas">
+<div class="detalle-header">
+<h3><i class="fa-solid fa-receipt"></i> Detalle de ventas</h3>
+<button type="button" id="btnRecargarDetalleVentas" class="btn-recargar-detalle">Recargar</button>
+</div>
+
+<div id="estadoDetalleVentas" class="estado-detalle-ventas">Cargando detalle de ventas...</div>
+
+<div class="detalle-tabla-wrap">
+<table class="detalle-tabla" id="tablaDetalleVentas">
+<thead>
+<tr>
+<th>Venta</th>
+<th>Fecha</th>
+<th>Cliente</th>
+<th>Articulos</th>
+<th>Total</th>
+<th>Método</th>
+<th>Detalle</th>
+<th>Factura</th>
+</tr>
+</thead>
+<tbody id="detalleVentasBody"></tbody>
+</table>
+</div>
+</section>
+
+<div class="modal-detalle-venta" id="modalDetalleVenta">
+<div class="modal-detalle-venta-card">
+<div class="modal-detalle-header">
+<h3 id="detalleVentaTitulo"><i class="fa-solid fa-receipt"></i> Detalle de venta</h3>
+<button type="button" class="btn-cerrar-modal" id="btnCerrarModalDetalleVenta">&times;</button>
+</div>
+
+<p id="detalleVentaMeta" class="detalle-venta-meta"></p>
+
+<div class="detalle-venta-tabla-wrap">
+<table class="detalle-venta-tabla">
+<thead>
+<tr>
+<th>Producto</th>
+<th>Cantidad</th>
+<th>P. Unitario</th>
+<th>Subtotal</th>
+</tr>
+</thead>
+<tbody id="detalleVentaBody"></tbody>
+</table>
+</div>
+
+<div class="detalle-venta-total" id="detalleVentaTotal"></div>
+</div>
+</div>
+
+<div class="modal-facturacion" id="modalFacturacion">
+<div class="modal-facturacion-card">
+<div class="modal-facturacion-header">
+<h3 id="modalFacturacionTitulo"><i class="fa-solid fa-file-invoice"></i> Generar Facturacion</h3>
+<button type="button" class="btn-cerrar-modal" id="btnCerrarModalFacturacion">&times;</button>
+</div>
+
+<p id="modalFacturacionSubtitulo" class="modal-facturacion-subtitulo">Completa los datos para generar la factura.</p>
+
+<form id="formFacturacion" class="form-facturacion">
+<div class="form-grid">
+<label>
+<span>ID Venta</span>
+<input type="number" id="factIdVenta" min="1" required readonly>
+</label>
+
+<label>
+<span>Nombre Cliente</span>
+<input type="text" id="factNombreCliente" maxlength="150" required>
+</label>
+
+<label>
+<span>Correo</span>
+<input type="email" id="factCorreo" maxlength="100" placeholder="opcional">
+</label>
+
+<label>
+<span>Telefono</span>
+<input type="text" id="factTelefono" maxlength="20" placeholder="opcional">
+</label>
+
+<label>
+<span>RFC</span>
+<input type="text" id="factRfc" maxlength="20" required>
+</label>
+
+<label>
+<span>Razon Social</span>
+<input type="text" id="factRazonSocial" maxlength="150" required>
+</label>
+
+<label>
+<span>Uso CFDI</span>
+<input type="text" id="factUsoCfdi" maxlength="50" value="G03" required>
+</label>
+
+<label>
+<span>Emisor Nombre</span>
+<input type="text" id="factEmisorNombre" maxlength="150" value="VentaTotal SA de CV" required>
+</label>
+
+<label>
+<span>Emisor RFC</span>
+<input type="text" id="factEmisorRfc" maxlength="20" value="AAA010101AAA" required>
+</label>
+
+<label>
+<span>C.P. Emisor</span>
+<input type="text" id="factEmisorCp" maxlength="10" value="64000" required>
+</label>
+
+<label>
+<span>Regimen Fiscal Emisor</span>
+<input type="text" id="factRegimenFiscal" maxlength="120" value="601 General de Ley Personas Morales" required>
+</label>
+
+<label>
+<span>Forma de Pago</span>
+<select id="factFormaPago" required>
+<option value="01 Efectivo">01 Efectivo</option>
+<option value="03 Transferencia electronica">03 Transferencia electronica</option>
+<option value="04 Tarjeta de credito">04 Tarjeta de credito</option>
+<option value="28 Tarjeta de debito">28 Tarjeta de debito</option>
+</select>
+</label>
+
+<label>
+<span>Metodo de Pago</span>
+<select id="factMetodoPagoCfdi" required>
+<option value="PUE Pago en una sola exhibicion">PUE Pago en una sola exhibicion</option>
+<option value="PPD Pago en parcialidades o diferido">PPD Pago en parcialidades o diferido</option>
+</select>
+</label>
+
+<label>
+<span>Moneda</span>
+<input type="text" id="factMoneda" value="MXN" maxlength="3" required>
+</label>
+
+<label>
+<span>Lugar de Expedicion</span>
+<input type="text" id="factLugarExpedicion" maxlength="120" value="Monterrey, Nuevo Leon" required>
+</label>
+
+<label>
+<span>Clave Producto</span>
+<input type="text" id="factClaveProducto" maxlength="20" value="01010101" required>
+</label>
+
+<label>
+<span>Clave Unidad</span>
+<input type="text" id="factClaveUnidad" maxlength="20" value="H87" required>
+</label>
+</div>
+
+<p id="mensajeFacturacion" class="mensaje-facturacion"></p>
+
+<div class="modal-facturacion-actions">
+<button type="button" id="btnCancelarModalFacturacion" class="btn-cancelar">Cancelar</button>
+<button type="submit" id="btnGuardarFacturacion" class="btn-facturar">
+<i class="fa-solid fa-file-invoice"></i>
+Guardar y Generar
+</button>
+</div>
+</form>
+</div>
+</div>
+
 </div>
 
 </main>
 
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/ventas.js"></script>
 
 </body>
 </html>

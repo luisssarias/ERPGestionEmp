@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\ProductoController;
 use App\Http\Controllers\Api\UsuarioController;
 use App\Http\Controllers\Api\ProveedorController;
 use App\Http\Controllers\Api\EntradaController;
+use App\Http\Controllers\Api\VentaController;
 
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -35,5 +36,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/proveedores/{id}/productos', [ProveedorController::class, 'syncProductos']);
     Route::get('/entradas', [EntradaController::class, 'index']);
     Route::post('/entradas', [EntradaController::class, 'store']);
+    Route::get('/ventas', [VentaController::class, 'index']);
+    Route::get('/ventas/{id}/detalle', [VentaController::class, 'detalle']);
+    Route::post('/ventas', [VentaController::class, 'store']);
+    Route::post('/ventas/{id}/facturar', [VentaController::class, 'facturar']);
+    Route::get('/ventas/{id}/factura', [VentaController::class, 'factura']);
 
 });
