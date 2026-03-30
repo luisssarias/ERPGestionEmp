@@ -67,7 +67,7 @@ async function requestJson(path) {
     if (response.status === 401) {
         localStorage.removeItem("token");
         window.location.href = "login.html";
-        throw new Error("Sesion expirada");
+        throw new Error("Sesión expirada");
     }
 
     if (!response.ok) {
@@ -82,11 +82,11 @@ function llenarFiltros() {
 
     productos.forEach((item) => {
         if (item?.categoria?.id_categoria) {
-            categoriasMap.set(String(item.categoria.id_categoria), item.categoria.nombre || "Sin categoria");
+            categoriasMap.set(String(item.categoria.id_categoria), item.categoria.nombre || "Sin categoría");
         }
     });
 
-    const opcionesCategorias = ['<option value="">Todas las Categorias</option>'];
+    const opcionesCategorias = ['<option value="">Todas las Categorías</option>'];
     Array.from(categoriasMap.entries())
         .sort((a, b) => String(a[1]).localeCompare(String(b[1]), "es"))
         .forEach(([id, nombre]) => {
@@ -126,7 +126,7 @@ function renderTabla() {
 
     tablaBody.innerHTML = lista.map((item) => {
         const stock = Number(item?.stock || 0);
-        const categoria = item?.categoria?.nombre || "Sin categoria";
+        const categoria = item?.categoria?.nombre || "Sin categoría";
         const claseStock = stock < 5 ? "stock-bajo" : "";
 
         return `
@@ -212,7 +212,7 @@ function drawGoogleCharts() {
 
     const porCategoria = new Map();
     productos.forEach((item) => {
-        const categoria = String(item?.categoria?.nombre || "Sin categoria");
+        const categoria = String(item?.categoria?.nombre || "Sin categoría");
         const stock = Number(item?.stock || 0);
         porCategoria.set(categoria, Number(porCategoria.get(categoria) || 0) + stock);
     });
@@ -220,7 +220,7 @@ function drawGoogleCharts() {
     const categoriasRows = Array.from(porCategoria.entries()).sort((a, b) => Number(b[1]) - Number(a[1]));
 
     const inventarioData = new google.visualization.DataTable();
-    inventarioData.addColumn("string", "Categoria");
+    inventarioData.addColumn("string", "Categoría");
     inventarioData.addColumn("number", "Stock");
 
     if (categoriasRows.length) {
@@ -248,7 +248,7 @@ async function cargarUsuarioSesion() {
         }
     } catch {
         if (topbarUsuarioNombre) {
-            topbarUsuarioNombre.textContent = "Sin sesion";
+            topbarUsuarioNombre.textContent = "Sin sesión";
         }
     }
 }

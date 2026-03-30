@@ -93,7 +93,7 @@ export default function HomeScreen({ navigation }) {
 	const categorias = useMemo(() => {
 		const values = new Set();
 		productos.forEach((item) => {
-			values.add(String(item?.categoria?.nombre || "Sin categoria"));
+			values.add(String(item?.categoria?.nombre || "Sin categoría"));
 		});
 
 		return ["TODAS", ...Array.from(values).sort((a, b) => a.localeCompare(b, "es"))];
@@ -105,7 +105,7 @@ export default function HomeScreen({ navigation }) {
 		return productos.filter((item) => {
 			const nombre = String(item?.nombre || "").toLowerCase();
 			const codigo = String(item?.codigo || "").toLowerCase();
-			const categoria = String(item?.categoria?.nombre || "Sin categoria");
+			const categoria = String(item?.categoria?.nombre || "Sin categoría");
 
 			const coincideTexto = !texto || nombre.includes(texto) || codigo.includes(texto);
 			const coincideCategoria = categoriaFiltro === "TODAS" || categoria === categoriaFiltro;
@@ -170,7 +170,7 @@ export default function HomeScreen({ navigation }) {
 		const agrupado = new Map();
 
 		productos.forEach((item) => {
-			const categoria = String(item?.categoria?.nombre || "Sin categoria");
+			const categoria = String(item?.categoria?.nombre || "Sin categoría");
 			const stock = Number(item?.stock || 0);
 			agrupado.set(categoria, Number(agrupado.get(categoria) || 0) + stock);
 		});
@@ -274,12 +274,12 @@ export default function HomeScreen({ navigation }) {
 									</View>
 								</View>
 								<Text style={[styles.cardValue, { color: "#2563eb" }]}>${Number(resumenHoy.ingresosHoy || 0).toFixed(2)}</Text>
-								<Text style={styles.cardHint}>Ir a modulo ventas</Text>
+								<Text style={styles.cardHint}>Ir a módulo ventas</Text>
 							</TouchableOpacity>
 						</View>
 
 						<View style={styles.chartCard}>
-							<Text style={styles.chartTitle}>Productos mas vendidos</Text>
+							<Text style={styles.chartTitle}>Productos más vendidos</Text>
 							<BarChart
 								data={chartTopProductos.labels.length ? chartTopProductos : { labels: ["Sin datos"], datasets: [{ data: [0] }] }}
 								width={screenWidth - 48}
@@ -292,7 +292,7 @@ export default function HomeScreen({ navigation }) {
 						</View>
 
 						<View style={styles.chartCard}>
-							<Text style={styles.chartTitle}>Inventario por categoria</Text>
+							<Text style={styles.chartTitle}>Inventario por categoría</Text>
 							{chartInventarioCategoria.length ? (
 								<PieChart
 									data={chartInventarioCategoria}
@@ -319,7 +319,7 @@ export default function HomeScreen({ navigation }) {
 							<View style={styles.searchBox}>
 								<Ionicons name="search-outline" size={18} color="#64748b" />
 								<TextInput
-									placeholder="Buscar por nombre o codigo..."
+									placeholder="Buscar por nombre o código..."
 									style={styles.searchInput}
 									placeholderTextColor="#94a3b8"
 									value={busqueda}
@@ -350,7 +350,7 @@ export default function HomeScreen({ navigation }) {
 									<View key={item.id_producto} style={styles.productRow}>
 										<View style={{ flex: 1 }}>
 											<Text style={styles.productName}>{item.nombre}</Text>
-											<Text style={styles.productMeta}>{item.codigo} | {item?.categoria?.nombre || "Sin categoria"}</Text>
+											<Text style={styles.productMeta}>{item.codigo} | {item?.categoria?.nombre || "Sin categoría"}</Text>
 										</View>
 										<View style={{ alignItems: "flex-end" }}>
 											<Text style={styles.productPrice}>${Number(item?.precio || 0).toFixed(2)}</Text>

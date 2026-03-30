@@ -121,7 +121,7 @@ export default function EntradasScreen({ navigation }) {
       setProductosPorProveedor(map);
       await cargarHistorial(baseUrl, headers);
     } catch {
-      setError("No se pudo cargar el modulo de entradas.");
+      setError("No se pudo cargar el módulo de entradas.");
     }
   }, [apiBaseUrl, cargarHistorial, getHeaders, resolverApiBase]);
 
@@ -306,7 +306,7 @@ export default function EntradasScreen({ navigation }) {
     }
 
     if (!productosEntradaSeleccionados.length) {
-      setMensajeEntrada("Selecciona uno o mas productos del proveedor.");
+      setMensajeEntrada("Selecciona uno o más productos del proveedor.");
       return;
     }
 
@@ -370,7 +370,7 @@ export default function EntradasScreen({ navigation }) {
 
       Alert.alert("Entradas", "Entrada registrada correctamente.");
     } catch {
-      setMensajeEntrada("Error de conexion al registrar entrada.");
+      setMensajeEntrada("Error de conexión al registrar entrada.");
     } finally {
       setGuardandoEntrada(false);
     }
@@ -524,7 +524,7 @@ export default function EntradasScreen({ navigation }) {
                 <View key={compra.key} style={styles.providerItem}>
                   <Text style={styles.providerTitle}>
                     {compra.items.length > 1
-                      ? `${compra.items[0]?.producto || "-"} +${compra.items.length - 1} mas`
+                      ? `${compra.items[0]?.producto || "-"} +${compra.items.length - 1} más`
                       : (compra.items[0]?.producto || "-")}
                   </Text>
                   <Text style={styles.providerInfo}>Proveedor: {compra.proveedor}</Text>

@@ -146,7 +146,7 @@ export default function ReportesScreen({ navigation }) {
 			setVentasRaw(Array.isArray(ventasData) ? ventasData : []);
 			setEntradasRaw(Array.isArray(entradasData) ? entradasData : []);
 		} catch {
-			setErrorCarga("No se pudo cargar el modulo de reportes.");
+			setErrorCarga("No se pudo cargar el módulo de reportes.");
 		} finally {
 			setCargando(false);
 		}
@@ -163,7 +163,7 @@ export default function ReportesScreen({ navigation }) {
 			const idCategoria = String(item?.categoria?.id_categoria || item?.id_categoria || "");
 			if (!idCategoria) return;
 
-			const nombre = String(item?.categoria?.nombre || "Sin categoria");
+			const nombre = String(item?.categoria?.nombre || "Sin categoría");
 			map.set(idCategoria, nombre);
 		});
 
@@ -377,7 +377,7 @@ export default function ReportesScreen({ navigation }) {
 
 		ventasFiltradas.forEach((item) => {
 			const producto = productoById.get(Number(item?.id_producto || 0));
-			const categoria = String(producto?.categoria?.nombre || "Sin categoria");
+			const categoria = String(producto?.categoria?.nombre || "Sin categoría");
 			map.set(categoria, Number(map.get(categoria) || 0) + Number(item?.cantidad || 0));
 		});
 
@@ -456,7 +456,7 @@ export default function ReportesScreen({ navigation }) {
 			const fechaEmision = new Date().toLocaleString("es-MX");
 			const mesTexto = MONTHS.find((m) => m.value === filtroMes)?.label || "Todos";
 			const categoriaTexto = filtroCategoria
-				? (categorias.find((c) => c.id === filtroCategoria)?.nombre || "Categoria")
+				? (categorias.find((c) => c.id === filtroCategoria)?.nombre || "Categoría")
 				: "Todas";
 
 			const rowsHtml = resumen.resumenDiario
@@ -490,7 +490,7 @@ export default function ReportesScreen({ navigation }) {
 				<body>
 					<h1>Reporte Ejecutivo - VentaTotal</h1>
 					<p class="small">Emitido por: ${usuarioNombre} | Fecha: ${fechaEmision}</p>
-					<p class="small">Filtros: Desde ${filtroDesde || "Inicio"} | Hasta ${filtroHasta || "Hoy"} | Mes ${mesTexto} | Categoria ${categoriaTexto}</p>
+					<p class="small">Filtros: Desde ${filtroDesde || "Inicio"} | Hasta ${filtroHasta || "Hoy"} | Mes ${mesTexto} | Categoría ${categoriaTexto}</p>
 
 					<div class="grid">
 						<div class="card"><div class="label">Total de ventas</div><div class="value">${resumen.totalVentas}</div></div>
@@ -507,7 +507,7 @@ export default function ReportesScreen({ navigation }) {
 								<th>Fecha</th>
 								<th>No. Ventas</th>
 								<th>Total Diario</th>
-								<th>Metodo Predominante</th>
+								<th>Método Predominante</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -611,7 +611,7 @@ export default function ReportesScreen({ navigation }) {
 								})}
 							</ScrollView>
 
-							<Text style={styles.filterLabel}>Categoria</Text>
+							<Text style={styles.filterLabel}>Categoría</Text>
 							<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow}>
 								<TouchableOpacity
 									style={[styles.chipSec, !filtroCategoria && styles.chipSecActive]}
@@ -681,7 +681,7 @@ export default function ReportesScreen({ navigation }) {
 						</View>
 
 						<View style={styles.chartCard}>
-							<Text style={styles.cardTitle}>Productos mas vendidos</Text>
+							<Text style={styles.cardTitle}>Productos más vendidos</Text>
 							<BarChart
 								data={chartTopProductos.labels.length ? chartTopProductos : { labels: ["Sin datos"], datasets: [{ data: [0] }] }}
 								width={screenWidth - 44}
@@ -706,7 +706,7 @@ export default function ReportesScreen({ navigation }) {
 						</View>
 
 						<View style={styles.chartCard}>
-							<Text style={styles.cardTitle}>Ventas por categoria</Text>
+							<Text style={styles.cardTitle}>Ventas por categoría</Text>
 							{chartCategorias.length ? (
 								<PieChart
 									data={chartCategorias}

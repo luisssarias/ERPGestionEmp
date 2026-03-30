@@ -278,14 +278,14 @@ export default function ProductosScreen({ navigation }) {
     setCategoriaEditandoId(categoria.id_categoria);
     setNombreCategoriaNueva(String(categoria.nombre || ""));
     setDescripcionCategoriaNueva(String(categoria.descripcion || ""));
-    setMensajeModalCategoria(`Editando categoria: ${categoria.nombre || ""}`);
+    setMensajeModalCategoria(`Editando categoría: ${categoria.nombre || ""}`);
   };
 
   const guardarCategoria = async () => {
     const nombre = nombreCategoriaNueva.trim();
 
     if (!nombre) {
-      setMensajeModalCategoria("El nombre de la categoria es obligatorio.");
+      setMensajeModalCategoria("El nombre de la categoría es obligatorio.");
       return;
     }
 
@@ -337,7 +337,7 @@ export default function ProductosScreen({ navigation }) {
 
       if (!response.ok) {
         const primerError = data?.errors ? Object.values(data.errors)[0]?.[0] : null;
-        setMensajeModalCategoria(primerError || data?.message || "No se pudo guardar la categoria.");
+        setMensajeModalCategoria(primerError || data?.message || "No se pudo guardar la categoría.");
         return;
       }
 
@@ -347,9 +347,9 @@ export default function ProductosScreen({ navigation }) {
         setCategoriaNuevaId(data.id_categoria);
       }
       setCategoriaEditandoId(null);
-      Alert.alert("Categorias", enEdicion ? "Categoria actualizada correctamente." : "Categoria creada correctamente.");
+      Alert.alert("Categorías", enEdicion ? "Categoría actualizada correctamente." : "Categoría creada correctamente.");
     } catch {
-      setMensajeModalCategoria("Error de conexion al guardar categoria.");
+      setMensajeModalCategoria("Error de conexión al guardar categoría.");
     } finally {
       setGuardandoCategoria(false);
     }
@@ -361,8 +361,8 @@ export default function ProductosScreen({ navigation }) {
     }
 
     Alert.alert(
-      "Eliminar categoria",
-      `¿Seguro que deseas eliminar ${categoria.nombre || "esta categoria"}?`,
+      "Eliminar categoría",
+      `¿Seguro que deseas eliminar ${categoria.nombre || "esta categoría"}?`,
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -403,7 +403,7 @@ export default function ProductosScreen({ navigation }) {
               }
 
               if (!response.ok) {
-                Alert.alert("Categorias", data?.message || "No se pudo eliminar la categoria.");
+                Alert.alert("Categorías", data?.message || "No se pudo eliminar la categoría.");
                 return;
               }
 
@@ -415,9 +415,9 @@ export default function ProductosScreen({ navigation }) {
                 setCategoriaFiltroId(null);
               }
 
-              Alert.alert("Categorias", data?.message || "Categoria eliminada correctamente.");
+              Alert.alert("Categorías", data?.message || "Categoría eliminada correctamente.");
             } catch {
-              Alert.alert("Categorias", "Error de conexion al eliminar categoria.");
+              Alert.alert("Categorías", "Error de conexión al eliminar categoría.");
             }
           }
         }
@@ -476,7 +476,7 @@ export default function ProductosScreen({ navigation }) {
               await cargarDatos();
               Alert.alert("Productos", "Producto eliminado correctamente.");
             } catch {
-              Alert.alert("Productos", "Error de conexion al eliminar.");
+              Alert.alert("Productos", "Error de conexión al eliminar.");
             }
           }
         }
@@ -530,17 +530,17 @@ export default function ProductosScreen({ navigation }) {
     }
 
     if (!Number.isFinite(precio) || precio < 0) {
-      setMensajeModalNuevo("Ingresa un precio valido.");
+      setMensajeModalNuevo("Ingresa un precio válido.");
       return;
     }
 
     if (!Number.isInteger(stock) || stock < 0) {
-      setMensajeModalNuevo("Ingresa un stock valido.");
+      setMensajeModalNuevo("Ingresa un stock válido.");
       return;
     }
 
     if (!categoriaNuevaId) {
-      setMensajeModalNuevo("Selecciona una categoria.");
+      setMensajeModalNuevo("Selecciona una categoría.");
       return;
     }
 
@@ -617,7 +617,7 @@ export default function ProductosScreen({ navigation }) {
       await cargarDatos();
       Alert.alert("Productos", modoModalProducto === "editar" ? "Producto actualizado correctamente." : "Producto creado correctamente.");
     } catch {
-      setMensajeModalNuevo("Error de conexion al guardar.");
+      setMensajeModalNuevo("Error de conexión al guardar.");
     } finally {
       setGuardandoNuevo(false);
     }
@@ -648,7 +648,7 @@ export default function ProductosScreen({ navigation }) {
 
               <TouchableOpacity style={styles.btnCategoria} onPress={abrirModalCategoria}>
                 <Ionicons name="pricetags-outline" size={16} color="white" />
-                <Text style={styles.btnNuevoText}>Categoria</Text>
+                <Text style={styles.btnNuevoText}>Categoría</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -662,7 +662,7 @@ export default function ProductosScreen({ navigation }) {
               <View>
                 <Text style={styles.statLabel}>Total de Productos</Text>
                 <Text style={styles.statNumber}>{totalProductos}</Text>
-                <Text style={styles.statHintUp}>En catalogo</Text>
+                <Text style={styles.statHintUp}>En catálogo</Text>
               </View>
 
               <View style={[styles.statIcon, styles.statIconBlue]}>
@@ -691,7 +691,7 @@ export default function ProductosScreen({ navigation }) {
             <View style={styles.search}>
               <Ionicons name="search-outline" size={18} color="#64748b" />
               <TextInput
-                placeholder="Buscar por nombre o codigo..."
+                placeholder="Buscar por nombre o código..."
                 style={styles.searchInput}
                 value={busqueda}
                 onChangeText={setBusqueda}
@@ -756,7 +756,7 @@ export default function ProductosScreen({ navigation }) {
 
           {!cargando && !errorCarga
             ? productosFiltrados.map((item) => {
-                const categoria = item?.categoria?.nombre || "Sin categoria";
+                const categoria = item?.categoria?.nombre || "Sin categoría";
                 const estado = item?.estado?.nombre || "Sin estado";
                 const precio = Number(item?.precio || 0).toFixed(2);
 
@@ -825,10 +825,10 @@ export default function ProductosScreen({ navigation }) {
               onChangeText={setNombreNuevo}
             />
 
-            <Text style={styles.modalLabel}>Descripcion</Text>
+            <Text style={styles.modalLabel}>Descripción</Text>
             <TextInput
               style={[styles.modalInput, styles.modalTextarea]}
-              placeholder="Descripcion del producto"
+              placeholder="Descripción del producto"
               value={descripcionNueva}
               onChangeText={setDescripcionNueva}
               multiline
@@ -849,7 +849,7 @@ export default function ProductosScreen({ navigation }) {
               <Image source={{ uri: imagenActualEdicion }} style={styles.modalPreviewImage} />
             ) : null}
 
-            <Text style={styles.modalLabel}>Categoria</Text>
+            <Text style={styles.modalLabel}>Categoría</Text>
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -942,7 +942,7 @@ export default function ProductosScreen({ navigation }) {
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Nueva Categoria</Text>
+              <Text style={styles.modalTitle}>Nueva Categoría</Text>
               <TouchableOpacity onPress={cerrarModalCategoria} disabled={guardandoCategoria}>
                 <Ionicons name="close" size={20} color="#334155" />
               </TouchableOpacity>
@@ -956,10 +956,10 @@ export default function ProductosScreen({ navigation }) {
               onChangeText={setNombreCategoriaNueva}
             />
 
-            <Text style={styles.modalLabel}>Descripcion</Text>
+            <Text style={styles.modalLabel}>Descripción</Text>
             <TextInput
               style={[styles.modalInput, styles.modalTextarea]}
-              placeholder="Descripcion de la categoria"
+              placeholder="Descripción de la categoría"
               value={descripcionCategoriaNueva}
               onChangeText={setDescripcionCategoriaNueva}
               multiline
@@ -976,7 +976,7 @@ export default function ProductosScreen({ navigation }) {
                   <View style={styles.modalCategoriaItem} key={categoria.id_categoria}>
                     <View style={styles.modalCategoriaItemInfo}>
                       <Text style={styles.modalCategoriaItemTitle}>{categoria.nombre || "Sin nombre"}</Text>
-                      <Text style={styles.modalCategoriaItemDesc}>{categoria.descripcion || "Sin descripcion"}</Text>
+                      <Text style={styles.modalCategoriaItemDesc}>{categoria.descripcion || "Sin descripción"}</Text>
                     </View>
 
                     <View style={styles.modalCategoriaActions}>

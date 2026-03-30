@@ -60,12 +60,12 @@ async function parseApiResponse(response) {
     const text = await response.text();
 
     if (response.status === 401) {
-        return { message: "Sesion expirada. Inicia sesion nuevamente." };
+        return { message: "Sesión expirada. Inicia sesión nuevamente." };
     }
 
     if (!response.ok) {
         return {
-            message: "La API devolvio una respuesta no valida. Verifica sesion y logs del servidor.",
+            message: "La API devolvió una respuesta no válida. Verifica sesión y logs del servidor.",
             raw: text,
         };
     }
@@ -119,7 +119,7 @@ function renderCheckProductos(seleccion = new Map()) {
     if (!checkProductos) return;
 
     if (!catalogoProductos.length) {
-        checkProductos.innerHTML = '<p class="vacio">No hay productos disponibles en el catalogo.</p>';
+        checkProductos.innerHTML = '<p class="vacio">No hay productos disponibles en el catálogo.</p>';
         return;
     }
 
@@ -228,16 +228,16 @@ function renderProveedores() {
     if (!listaProveedores) return;
 
     if (!proveedores.length) {
-        listaProveedores.innerHTML = '<p class="vacio">Aun no hay proveedores registrados.</p>';
+        listaProveedores.innerHTML = '<p class="vacio">Aún no hay proveedores registrados.</p>';
     } else {
         listaProveedores.innerHTML = proveedores
             .map((proveedor) => `
                 <article class="proveedor-item">
                     <h5>${escapeHtml(proveedor.nombre)}</h5>
                     <p><strong>Empresa:</strong> ${escapeHtml(proveedor.empresa || "-")}</p>
-                    <p><strong>Telefono:</strong> ${escapeHtml(proveedor.telefono || "-")}</p>
+                    <p><strong>Teléfono:</strong> ${escapeHtml(proveedor.telefono || "-")}</p>
                     <p><strong>Correo:</strong> ${escapeHtml(proveedor.correo || "-")}</p>
-                    <p><strong>Direccion:</strong> ${escapeHtml(proveedor.direccion || "-")}</p>
+                    <p><strong>Dirección:</strong> ${escapeHtml(proveedor.direccion || "-")}</p>
                     <p><strong>RFC:</strong> ${escapeHtml(proveedor.rfc || "-")}</p>
                     <p><strong>Productos asignados:</strong> ${escapeHtml(proveedor.productos_proveedor_count || 0)}</p>
                     <span class="${getEstadoClass(proveedor.estado)}">${escapeHtml(proveedor.estado || "Activo")}</span>
@@ -471,7 +471,7 @@ async function cargarCatalogoProductos() {
                 return;
             }
 
-            throw new Error("No se pudieron cargar productos de catalogo");
+            throw new Error("No se pudieron cargar productos de catálogo");
         }
 
         catalogoProductos = await response.json();
@@ -480,7 +480,7 @@ async function cargarCatalogoProductos() {
     } catch (error) {
         console.error(error);
         if (checkProductos) {
-            checkProductos.innerHTML = '<p class="vacio">Error al cargar productos del catalogo.</p>';
+            checkProductos.innerHTML = '<p class="vacio">Error al cargar productos del catálogo.</p>';
         }
     }
 }
@@ -499,7 +499,7 @@ async function cargarUsuarioSesion() {
                 return;
             }
 
-            throw new Error("No se pudo obtener la sesion");
+            throw new Error("No se pudo obtener la sesión");
         }
 
         const usuario = await response.json();
@@ -516,7 +516,7 @@ async function cargarUsuarioSesion() {
         console.error(error);
 
         if (topbarUsuarioNombre) {
-            topbarUsuarioNombre.textContent = "Sin sesion";
+            topbarUsuarioNombre.textContent = "Sin sesión";
         }
 
         if (topbarUsuarioRol) {
@@ -589,7 +589,7 @@ if (formProveedor) {
         }
 
         if (!seleccion.productos.length) {
-            mostrarMensaje("Selecciona al menos un producto del catalogo para el proveedor.");
+            mostrarMensaje("Selecciona al menos un producto del catálogo para el proveedor.");
             return;
         }
 
@@ -634,7 +634,7 @@ if (listaProveedores) {
         const proveedor = proveedores.find((item) => Number(item.id_proveedor) === id);
 
         if (!proveedor) {
-            mostrarMensaje("No se encontro el proveedor seleccionado.");
+            mostrarMensaje("No se encontró el proveedor seleccionado.");
             return;
         }
 

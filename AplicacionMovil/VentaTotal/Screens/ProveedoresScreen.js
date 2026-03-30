@@ -107,7 +107,7 @@ export default function ProveedoresScreen({ navigation }) {
 
       setProductosPorProveedor(map);
     } catch {
-      setError("No se pudo cargar el modulo de proveedores.");
+      setError("No se pudo cargar el módulo de proveedores.");
     } finally {
       setCargando(false);
     }
@@ -229,7 +229,7 @@ export default function ProveedoresScreen({ navigation }) {
       [
         `Empresa: ${proveedor.empresa || "-"}`,
         `Estado: ${proveedor.estado || "-"}`,
-        `Telefono: ${proveedor.telefono || "-"}`,
+        `Teléfono: ${proveedor.telefono || "-"}`,
         `Correo: ${proveedor.correo || "-"}`,
         "",
         "Productos asignados:",
@@ -275,7 +275,7 @@ export default function ProveedoresScreen({ navigation }) {
               await cargarDatos();
               Alert.alert("Proveedores", data?.message || "Accion ejecutada correctamente.");
             } catch {
-              setMensaje("Error de conexion al eliminar proveedor.");
+              setMensaje("Error de conexión al eliminar proveedor.");
             }
           }
         }
@@ -290,7 +290,7 @@ export default function ProveedoresScreen({ navigation }) {
     }
 
     if (!productosSeleccionados.length) {
-      setMensaje("Selecciona al menos un producto del catalogo.");
+      setMensaje("Selecciona al menos un producto del catálogo.");
       return;
     }
 
@@ -352,7 +352,7 @@ export default function ProveedoresScreen({ navigation }) {
       await cargarDatos();
       Alert.alert("Proveedores", creando ? "Proveedor registrado correctamente." : "Proveedor actualizado correctamente.");
     } catch {
-      setMensaje("Error de conexion al guardar proveedor.");
+      setMensaje("Error de conexión al guardar proveedor.");
     } finally {
       setGuardando(false);
     }
@@ -365,7 +365,7 @@ export default function ProveedoresScreen({ navigation }) {
           <View style={styles.headerRow}>
             <View style={styles.headerTextWrap}>
               <Text style={styles.headerTitle}>Proveedores</Text>
-              <Text style={styles.headerSubtitle}>Gestion de proveedores y sus productos</Text>
+              <Text style={styles.headerSubtitle}>Gestión de proveedores y sus productos</Text>
             </View>
             <TouchableOpacity style={styles.refreshIconBtn} onPress={cargarDatos} disabled={cargando}>
               {cargando ? <ActivityIndicator size="small" color="#1d4ed8" /> : <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />}
@@ -379,7 +379,7 @@ export default function ProveedoresScreen({ navigation }) {
             <Text style={styles.kpiValue}>{proveedoresActivos}</Text>
           </View>
           <View style={styles.kpiCard}>
-            <Text style={styles.kpiLabel}>Cobertura del catalogo</Text>
+            <Text style={styles.kpiLabel}>Cobertura del catálogo</Text>
             <Text style={styles.kpiValue}>{coberturaCatalogo.porcentaje}%</Text>
             <Text style={styles.kpiHint}>{coberturaCatalogo.texto}</Text>
           </View>
@@ -398,7 +398,7 @@ export default function ProveedoresScreen({ navigation }) {
 
           <View style={styles.row}>
             <View style={styles.col}>
-              <Text style={styles.label}>Telefono</Text>
+              <Text style={styles.label}>Teléfono</Text>
               <TextInput style={styles.input} value={telefono} onChangeText={setTelefono} placeholder="555 333 2211" />
             </View>
             <View style={styles.col}>
@@ -424,8 +424,8 @@ export default function ProveedoresScreen({ navigation }) {
             </>
           ) : null}
 
-          <Text style={styles.label}>Direccion</Text>
-          <TextInput style={[styles.input, styles.textarea]} value={direccion} onChangeText={setDireccion} multiline placeholder="Calle, numero, colonia, ciudad" />
+          <Text style={styles.label}>Dirección</Text>
+          <TextInput style={[styles.input, styles.textarea]} value={direccion} onChangeText={setDireccion} multiline placeholder="Calle, número, colonia, ciudad" />
 
           <Text style={styles.label}>Productos que vende *</Text>
           {cargando ? (
@@ -446,7 +446,7 @@ export default function ProveedoresScreen({ navigation }) {
                       <Ionicons name={checked ? "checkbox-outline" : "square-outline"} size={20} color={checked ? "#16a34a" : "#64748b"} />
                       <View style={{ marginLeft: 8 }}>
                         <Text style={styles.productName}>{p.nombre}</Text>
-                        <Text style={styles.productMeta}>{p.codigo || "Sin codigo"}</Text>
+                        <Text style={styles.productMeta}>{p.codigo || "Sin código"}</Text>
                       </View>
                     </TouchableOpacity>
 
@@ -483,7 +483,7 @@ export default function ProveedoresScreen({ navigation }) {
           <Text style={styles.cardTitle}>Proveedores registrados</Text>
           <View style={styles.providersListBox}>
             {!proveedores.length ? (
-              <Text style={styles.providersEmpty}>Aun no hay proveedores registrados.</Text>
+              <Text style={styles.providersEmpty}>Aún no hay proveedores registrados.</Text>
             ) : (
               <ScrollView
                 nestedScrollEnabled

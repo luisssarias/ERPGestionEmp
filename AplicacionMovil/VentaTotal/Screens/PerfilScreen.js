@@ -17,7 +17,7 @@ import { clearSession, getStoredToken, getStoredUser, saveSession } from "../uti
 
 export default function PerfilScreen({ navigation }) {
   const [usuario, setUsuario] = useState(null);
-  const [estadoSesion, setEstadoSesion] = useState("Cargando sesion...");
+  const [estadoSesion, setEstadoSesion] = useState("Cargando sesión...");
   const [cargando, setCargando] = useState(true);
   const [usuarios, setUsuarios] = useState([]);
   const [cargandoUsuarios, setCargandoUsuarios] = useState(false);
@@ -82,16 +82,16 @@ export default function PerfilScreen({ navigation }) {
       }
 
       if (!response.ok) {
-        setEstadoSesion("Sesion local activa");
+        setEstadoSesion("Sesión local activa");
         setCargando(false);
         return;
       }
 
       const data = await response.json();
       setUsuario((prev) => ({ ...prev, ...data }));
-      setEstadoSesion("Sesion activa");
+      setEstadoSesion("Sesión activa");
     } catch {
-      setEstadoSesion("Sin conexion (datos locales)");
+      setEstadoSesion("Sin conexión (datos locales)");
     } finally {
       setCargando(false);
     }
@@ -175,7 +175,7 @@ export default function PerfilScreen({ navigation }) {
     }
 
     if (contrasenaEdit && contrasenaEdit.length < 6) {
-      setMensajeModal("La contrasena debe tener al menos 6 caracteres.");
+      setMensajeModal("La contraseña debe tener al menos 6 caracteres.");
       return;
     }
 
@@ -187,7 +187,7 @@ export default function PerfilScreen({ navigation }) {
       const idUsuarioNumero = usuario?.id_usuario;
 
       if (!token || !idUsuarioNumero) {
-        setMensajeModal("No se encontro sesion valida para actualizar perfil.");
+        setMensajeModal("No se encontró sesión válida para actualizar perfil.");
         return;
       }
 
@@ -239,12 +239,12 @@ export default function PerfilScreen({ navigation }) {
 
       setUsuario(usuarioActualizado);
       await saveSession({ token, usuario: usuarioActualizado });
-      setEstadoSesion("Sesion activa");
+      setEstadoSesion("Sesión activa");
       setModalVisible(false);
       setContrasenaEdit("");
       Alert.alert("Perfil actualizado", "Tus datos se guardaron correctamente.");
     } catch {
-      setMensajeModal("Error de conexion al guardar.");
+      setMensajeModal("Error de conexión al guardar.");
     } finally {
       setGuardando(false);
     }
@@ -292,12 +292,12 @@ export default function PerfilScreen({ navigation }) {
     }
 
     if (modoUsuario === "crear" && !contrasenaUsuario) {
-      setMensajeModalUsuario("La contrasena es obligatoria al crear.");
+      setMensajeModalUsuario("La contraseña es obligatoria al crear.");
       return;
     }
 
     if (contrasenaUsuario && contrasenaUsuario.length < 6) {
-      setMensajeModalUsuario("La contrasena debe tener al menos 6 caracteres.");
+      setMensajeModalUsuario("La contraseña debe tener al menos 6 caracteres.");
       return;
     }
 
@@ -379,7 +379,7 @@ export default function PerfilScreen({ navigation }) {
       await cargarUsuarios();
       Alert.alert("Usuarios", modoUsuario === "crear" ? "Usuario creado." : "Usuario actualizado.");
     } catch {
-      setMensajeModalUsuario("Error de conexion al guardar usuario.");
+      setMensajeModalUsuario("Error de conexión al guardar usuario.");
     } finally {
       setGuardandoUsuario(false);
     }
@@ -439,7 +439,7 @@ export default function PerfilScreen({ navigation }) {
       await cargarUsuarios();
       Alert.alert("Usuarios", "Usuario eliminado correctamente.");
     } catch {
-      Alert.alert("Usuarios", "Error de conexion al eliminar usuario.");
+      Alert.alert("Usuarios", "Error de conexión al eliminar usuario.");
     }
   };
 
@@ -455,7 +455,7 @@ export default function PerfilScreen({ navigation }) {
           <View style={styles.headerRow}>
             <View style={styles.headerTextWrap}>
               <Text style={styles.headerTitle}>Perfil</Text>
-              <Text style={styles.headerSubtitle}>Gestiona tu sesion y usuarios del sistema</Text>
+              <Text style={styles.headerSubtitle}>Gestiona tu sesión y usuarios del sistema</Text>
             </View>
             <TouchableOpacity style={styles.refreshIconBtn} onPress={refrescarTodo} disabled={cargando || cargandoUsuarios}>
               {(cargando || cargandoUsuarios)
@@ -471,7 +471,7 @@ export default function PerfilScreen({ navigation }) {
           </View>
 
           <View style={styles.usuarioBlock}>
-            <Text style={styles.usuarioTitulo}>Usuario en sesion</Text>
+            <Text style={styles.usuarioTitulo}>Usuario en sesión</Text>
             <Text style={styles.usuarioNombre}>{nombre}</Text>
             <Text style={styles.usuarioCorreo}>{correo}</Text>
           </View>
@@ -512,7 +512,7 @@ export default function PerfilScreen({ navigation }) {
 
         <TouchableOpacity style={styles.logout} onPress={cerrarSesion}>
           <Ionicons name="log-out-outline" size={20} color="white" />
-          <Text style={styles.logoutText}>Cerrar sesion</Text>
+          <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
 
         <View style={styles.usuariosCard}>
@@ -598,7 +598,7 @@ export default function PerfilScreen({ navigation }) {
               editable={!guardando}
             />
 
-            <Text style={styles.modalLabel}>Contrasena (opcional)</Text>
+            <Text style={styles.modalLabel}>Contraseña (opcional)</Text>
             <TextInput
               value={contrasenaEdit}
               onChangeText={setContrasenaEdit}
@@ -672,7 +672,7 @@ export default function PerfilScreen({ navigation }) {
               editable={!guardandoUsuario}
             />
 
-            <Text style={styles.modalLabel}>Telefono</Text>
+            <Text style={styles.modalLabel}>Teléfono</Text>
             <TextInput
               value={telefonoUsuario}
               onChangeText={setTelefonoUsuario}
@@ -683,7 +683,7 @@ export default function PerfilScreen({ navigation }) {
             />
 
             <Text style={styles.modalLabel}>
-              Contrasena {modoUsuario === "crear" ? "*" : "(opcional)"}
+              Contraseña {modoUsuario === "crear" ? "*" : "(opcional)"}
             </Text>
             <TextInput
               value={contrasenaUsuario}

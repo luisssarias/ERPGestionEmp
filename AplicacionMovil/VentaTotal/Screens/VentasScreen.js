@@ -22,11 +22,11 @@ const FACTURACION_DEFAULTS = {
 
 function crearFormularioFacturacionInicial() {
 	return {
-		nombre_cliente: "Publico General",
+		nombre_cliente: "Público General",
 		correo: "",
 		telefono: "",
 		rfc: "XAXX010101000",
-		razon_social: "Publico General"
+		razon_social: "Público General"
 	};
 }
 
@@ -181,7 +181,7 @@ export default function VentasScreen({ navigation }) {
 	const categorias = useMemo(() => {
 		const values = new Set();
 		productos.forEach((item) => {
-			const categoria = String(item?.categoria?.nombre || "Sin categoria");
+			const categoria = String(item?.categoria?.nombre || "Sin categoría");
 			values.add(categoria);
 		});
 
@@ -194,7 +194,7 @@ export default function VentasScreen({ navigation }) {
 		return productos.filter((item) => {
 			const nombre = String(item?.nombre || "").toLowerCase();
 			const codigo = String(item?.codigo || "").toLowerCase();
-			const categoria = String(item?.categoria?.nombre || "Sin categoria");
+			const categoria = String(item?.categoria?.nombre || "Sin categoría");
 			const coincideCategoria = categoriaFiltro === "TODAS" || categoria === categoriaFiltro;
 
 			return coincideCategoria && (!texto || nombre.includes(texto) || codigo.includes(texto));
@@ -211,7 +211,7 @@ export default function VentasScreen({ navigation }) {
 		const stock = Number(producto.stock || 0);
 
 		if (cantidadActual >= stock) {
-			Alert.alert("Stock", "No puedes agregar mas unidades que el stock disponible.");
+			Alert.alert("Stock", "No puedes agregar más unidades que el stock disponible.");
 			return;
 		}
 
@@ -293,7 +293,7 @@ export default function VentasScreen({ navigation }) {
 					id_venta: idVenta || null,
 					fecha: item?.fecha || "-",
 					metodo_pago: item?.metodo_pago || "-",
-					cliente: item?.cliente || "Publico General",
+					cliente: item?.cliente || "Público General",
 					totalArticulos: 0,
 					total: Number(item?.total || 0),
 					esta_facturada: Number(item?.esta_facturada || 0) === 1 || Number(item?.id_dato_fiscal || 0) > 0
@@ -320,7 +320,7 @@ export default function VentasScreen({ navigation }) {
 	const abrirDetalleVenta = useCallback(async (idVenta) => {
 		const id = Number(idVenta || 0);
 		if (!id) {
-			Alert.alert("Ventas", "ID de venta invalido.");
+			Alert.alert("Ventas", "ID de venta inválido.");
 			return;
 		}
 
@@ -422,7 +422,7 @@ export default function VentasScreen({ navigation }) {
 			await cargarProductos();
 			Alert.alert("Venta registrada", `Venta #${data?.id_venta || "N/A"} guardada correctamente.`);
 		} catch {
-			Alert.alert("Ventas", "Error de conexion al registrar la venta.");
+			Alert.alert("Ventas", "Error de conexión al registrar la venta.");
 		}
 	}, [apiBaseUrl, carritoItems, cargarProductos, metodoPago, navigation, resolverApiBase]);
 
@@ -463,8 +463,8 @@ export default function VentasScreen({ navigation }) {
 				<body>
 					<h1>Factura ${factura?.folio || ""}</h1>
 					<div class="meta">Venta #${factura?.id_venta || "-"} | Fecha: ${formatearFecha(factura?.fecha)}</div>
-					<div class="meta">Cliente: ${factura?.cliente?.nombre || "Publico General"} | RFC: ${factura?.datos_fiscales?.rfc || "-"}</div>
-					<div class="meta">Metodo: ${factura?.comprobante?.metodo_pago || "-"} | Forma: ${factura?.comprobante?.forma_pago || "-"}</div>
+					<div class="meta">Cliente: ${factura?.cliente?.nombre || "Público General"} | RFC: ${factura?.datos_fiscales?.rfc || "-"}</div>
+					<div class="meta">Método: ${factura?.comprobante?.metodo_pago || "-"} | Forma: ${factura?.comprobante?.forma_pago || "-"}</div>
 
 					<table>
 						<thead>
@@ -508,7 +508,7 @@ export default function VentasScreen({ navigation }) {
 	const facturarVenta = useCallback((idVenta) => {
 		const id = Number(idVenta || 0);
 		if (!id) {
-			Alert.alert("Ventas", "ID de venta invalido.");
+			Alert.alert("Ventas", "ID de venta inválido.");
 			return;
 		}
 
@@ -527,22 +527,22 @@ export default function VentasScreen({ navigation }) {
 	const guardarFacturacionDesdeModal = useCallback(async () => {
 		const id = Number(ventaFacturacionId || 0);
 		if (!id) {
-			Alert.alert("Facturacion", "No se encontro el ID de venta para facturar.");
+			Alert.alert("Facturación", "No se encontró el ID de venta para facturar.");
 			return;
 		}
 
 		if (!String(formFacturacion.nombre_cliente || "").trim()) {
-			Alert.alert("Facturacion", "Ingresa el nombre del cliente.");
+			Alert.alert("Facturación", "Ingresa el nombre del cliente.");
 			return;
 		}
 
 		if (!String(formFacturacion.rfc || "").trim()) {
-			Alert.alert("Facturacion", "Ingresa el RFC.");
+			Alert.alert("Facturación", "Ingresa el RFC.");
 			return;
 		}
 
 		if (!String(formFacturacion.razon_social || "").trim()) {
-			Alert.alert("Facturacion", "Ingresa la razon social.");
+			Alert.alert("Facturación", "Ingresa la razón social.");
 			return;
 		}
 
@@ -589,15 +589,15 @@ export default function VentasScreen({ navigation }) {
 			const data = await response.json();
 
 			if (!response.ok) {
-				Alert.alert("Facturacion", data?.message || "No se pudo facturar esta venta.");
+				Alert.alert("Facturación", data?.message || "No se pudo facturar esta venta.");
 				return;
 			}
 
 			setModalFacturacionVisible(false);
-			Alert.alert("Facturacion", `Factura generada. Folio: ${data?.folio || "N/A"}`);
+			Alert.alert("Facturación", `Factura generada. Folio: ${data?.folio || "N/A"}`);
 			await cargarProductos();
 		} catch {
-			Alert.alert("Facturacion", "Error de conexion al facturar la venta.");
+			Alert.alert("Facturación", "Error de conexión al facturar la venta.");
 		} finally {
 			setGuardandoFacturacion(false);
 		}
@@ -606,7 +606,7 @@ export default function VentasScreen({ navigation }) {
 	const descargarFacturaVenta = useCallback(async (idVenta) => {
 		const id = Number(idVenta || 0);
 		if (!id) {
-			Alert.alert("Facturas", "ID de venta invalido.");
+			Alert.alert("Facturas", "ID de venta inválido.");
 			return;
 		}
 
@@ -647,7 +647,7 @@ export default function VentasScreen({ navigation }) {
 
 			await compartirFacturaComoPdf(data);
 		} catch {
-			Alert.alert("Facturas", "Error de conexion al descargar factura.");
+			Alert.alert("Facturas", "Error de conexión al descargar factura.");
 		} finally {
 			setProcesandoAccionVenta(false);
 		}
@@ -694,7 +694,7 @@ export default function VentasScreen({ navigation }) {
 					<View style={styles.searchBox}>
 						<Ionicons name="search-outline" size={18} color="#64748b" />
 						<TextInput
-							placeholder="Buscar por nombre o codigo..."
+							placeholder="Buscar por nombre o código..."
 							style={styles.searchInput}
 							placeholderTextColor="#94a3b8"
 							value={busqueda}
@@ -758,7 +758,7 @@ export default function VentasScreen({ navigation }) {
 
 								<View style={{ flex: 1 }}>
 									<Text style={styles.productName}>{item.nombre}</Text>
-									<Text style={styles.productCategory}>{item?.categoria?.nombre || "Sin categoria"}</Text>
+									<Text style={styles.productCategory}>{item?.categoria?.nombre || "Sin categoría"}</Text>
 									<Text style={styles.productPrice}>${Number(item.precio || 0).toFixed(2)}</Text>
 									<Text style={styles.productStock}>Stock: {Number(item.stock || 0)}</Text>
 								</View>
@@ -873,7 +873,7 @@ export default function VentasScreen({ navigation }) {
 
 							{!cargandoHistorial && !errorHistorial && !ventasAgrupadas.length ? (
 								<View style={styles.estadoBloque}>
-									<Text style={styles.estadoTexto}>Aun no hay ventas registradas.</Text>
+									<Text style={styles.estadoTexto}>Aún no hay ventas registradas.</Text>
 								</View>
 							) : null}
 
@@ -950,7 +950,7 @@ export default function VentasScreen({ navigation }) {
 						{!cargandoDetalleVenta && !errorDetalleVenta && detalleVentaActual ? (
 							<ScrollView style={styles.modalBody} showsVerticalScrollIndicator={false}>
 								<Text style={styles.modalMeta}>{formatearFecha(detalleVentaActual?.fecha)} | {detalleVentaActual?.metodo_pago || "-"}</Text>
-								<Text style={styles.modalMeta}>Cliente: {detalleVentaActual?.cliente || "Publico General"}</Text>
+								<Text style={styles.modalMeta}>Cliente: {detalleVentaActual?.cliente || "Público General"}</Text>
 
 								{(Array.isArray(detalleVentaActual?.items) ? detalleVentaActual.items : []).map((item, idx) => (
 									<View key={`det-${idx}`} style={styles.modalItemRow}>
@@ -1005,12 +1005,12 @@ export default function VentasScreen({ navigation }) {
 								placeholder="RFC"
 							/>
 
-							<Text style={styles.factLabel}>Razon social</Text>
+							<Text style={styles.factLabel}>Razón social</Text>
 							<TextInput
 								style={styles.factInput}
 								value={formFacturacion.razon_social}
 								onChangeText={(text) => actualizarCampoFacturacion("razon_social", text)}
-								placeholder="Razon social"
+								placeholder="Razón social"
 							/>
 
 							<Text style={styles.factLabel}>Correo (opcional)</Text>
@@ -1023,13 +1023,13 @@ export default function VentasScreen({ navigation }) {
 								placeholder="correo@dominio.com"
 							/>
 
-							<Text style={styles.factLabel}>Telefono (opcional)</Text>
+							<Text style={styles.factLabel}>Teléfono (opcional)</Text>
 							<TextInput
 								style={styles.factInput}
 								value={formFacturacion.telefono}
 								onChangeText={(text) => actualizarCampoFacturacion("telefono", text)}
 								keyboardType="phone-pad"
-								placeholder="Telefono"
+								placeholder="Teléfono"
 							/>
 
 							<TouchableOpacity

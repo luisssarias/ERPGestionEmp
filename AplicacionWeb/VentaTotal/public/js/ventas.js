@@ -87,7 +87,7 @@ async function cargarUsuarioSesion() {
                 return;
             }
 
-            throw new Error("No se pudo obtener la sesion");
+            throw new Error("No se pudo obtener la sesión");
         }
 
         const usuario = await response.json();
@@ -103,7 +103,7 @@ async function cargarUsuarioSesion() {
         console.error(error);
 
         if (topbarUsuarioNombre) {
-            topbarUsuarioNombre.textContent = "Sin sesion";
+            topbarUsuarioNombre.textContent = "Sin sesión";
         }
 
         if (topbarUsuarioRol) {
@@ -155,11 +155,11 @@ function llenarCategorias(lista) {
 
     lista.forEach((producto) => {
         if (producto.categoria && producto.categoria.id_categoria) {
-            mapa.set(String(producto.categoria.id_categoria), producto.categoria.nombre || "Sin categoria");
+            mapa.set(String(producto.categoria.id_categoria), producto.categoria.nombre || "Sin categoría");
         }
     });
 
-    const opciones = ['<option value="">Todas las Categorias</option>'];
+    const opciones = ['<option value="">Todas las Categorías</option>'];
 
     Array.from(mapa.entries())
         .sort((a, b) => String(a[1]).localeCompare(String(b[1]), "es"))
@@ -221,7 +221,7 @@ function actualizarEstadoBotonFacturar() {
 async function abrirModalDetalleVenta(idVenta) {
     const id = Number(idVenta || 0);
     if (!id) {
-        alert("ID de venta invalido.");
+        alert("ID de venta inválido.");
         return;
     }
 
@@ -267,7 +267,7 @@ async function abrirModalDetalleVenta(idVenta) {
         }
 
         if (detalleVentaMeta) {
-            detalleVentaMeta.textContent = `${formatearFecha(data?.fecha)} | Cliente: ${data?.cliente || "Publico General"} | Metodo: ${data?.metodo_pago || "-"}`;
+            detalleVentaMeta.textContent = `${formatearFecha(data?.fecha)} | Cliente: ${data?.cliente || "Público General"} | Método: ${data?.metodo_pago || "-"}`;
         }
 
         const items = Array.isArray(data?.items) ? data.items : [];
@@ -304,27 +304,27 @@ function abrirModalFacturacion(idVentaForzada = null, desdeVentaExitosa = false)
 
     const idVenta = Number(idVentaForzada || ultimaVentaRegistradaId || 0);
     if (idVenta <= 0) {
-        alert("Aun no hay ventas registradas para facturar.");
+        alert("Aún no hay ventas registradas para facturar.");
         return;
     }
 
     factIdVenta.value = String(idVenta);
-    factNombreCliente.value = "Publico General";
+    factNombreCliente.value = "Público General";
     factCorreo.value = "";
     factTelefono.value = "";
     factRfc.value = "XAXX010101000";
-    factRazonSocial.value = "Publico General";
+    factRazonSocial.value = "Público General";
     mensajeFacturacion.textContent = "";
 
     if (modalFacturacionTitulo) {
         modalFacturacionTitulo.innerHTML = desdeVentaExitosa
             ? '<i class="fa-solid fa-circle-check"></i> Venta exitosa'
-            : '<i class="fa-solid fa-file-invoice"></i> Generar Facturacion';
+            : '<i class="fa-solid fa-file-invoice"></i> Generar Facturación';
     }
 
     if (modalFacturacionSubtitulo) {
         modalFacturacionSubtitulo.textContent = desdeVentaExitosa
-            ? "Deseas generar la factura de esta venta? Completa los datos para continuar."
+            ? "¿Deseas generar la factura de esta venta? Completa los datos para continuar."
             : "Completa los datos para generar la factura.";
     }
 
@@ -353,7 +353,7 @@ async function guardarFacturacionDesdeModal(event) {
     };
 
     if (!ventaObjetivo) {
-        mensajeFacturacion.textContent = "Ingresa un ID de venta valido.";
+        mensajeFacturacion.textContent = "Ingresa un ID de venta válido.";
         return;
     }
 
@@ -367,7 +367,7 @@ async function guardarFacturacionDesdeModal(event) {
     }
 
     btnGuardarFacturacion.disabled = true;
-    mensajeFacturacion.textContent = "Generando facturacion...";
+    mensajeFacturacion.textContent = "Generando facturación...";
 
     try {
         const response = await fetch(`${API_BASE}/ventas/${ventaObjetivo}/facturar`, {
@@ -393,19 +393,19 @@ async function guardarFacturacionDesdeModal(event) {
         }
 
         if (!response.ok) {
-            mensajeFacturacion.textContent = data?.message || "No se pudo generar la facturacion.";
+            mensajeFacturacion.textContent = data?.message || "No se pudo generar la facturación.";
             return;
         }
 
         ultimaVentaRegistradaId = Number(data?.id_venta || ventaObjetivo);
         ultimaFacturaGenerada = data;
-        alert(`Facturacion generada. Folio: ${data?.folio || "N/A"}`);
+        alert(`Facturación generada. Folio: ${data?.folio || "N/A"}`);
         cerrarModalFacturacion();
         descargarFacturaPdf();
         await cargarDetalleVentas();
     } catch (error) {
         console.error(error);
-        mensajeFacturacion.textContent = "Error de conexion al generar la facturacion.";
+        mensajeFacturacion.textContent = "Error de conexión al generar la facturación.";
     } finally {
         btnGuardarFacturacion.disabled = false;
         actualizarEstadoBotonFacturar();
@@ -414,7 +414,7 @@ async function guardarFacturacionDesdeModal(event) {
 
 function descargarFacturaPdf() {
     if (!ultimaFacturaGenerada) {
-        alert("Primero debes generar una facturacion.");
+        alert("Primero debes generar una facturación.");
         return;
     }
 
@@ -457,7 +457,7 @@ function descargarFacturaPdf() {
     y += 5;
     doc.text(`C.P.: ${factura?.emisor?.codigo_postal || "-"}`, 14, y);
     y += 5;
-    doc.text(`Regimen fiscal: ${factura?.emisor?.regimen_fiscal || "-"}`, 14, y);
+    doc.text(`Régimen fiscal: ${factura?.emisor?.regimen_fiscal || "-"}`, 14, y);
     y += 7;
 
     doc.setFontSize(12);
@@ -466,7 +466,7 @@ function descargarFacturaPdf() {
     doc.setFontSize(10);
     doc.text(`Forma de pago: ${factura?.comprobante?.forma_pago || "-"}`, 14, y);
     y += 5;
-    doc.text(`Metodo de pago: ${factura?.comprobante?.metodo_pago || "-"}`, 14, y);
+    doc.text(`Método de pago: ${factura?.comprobante?.metodo_pago || "-"}`, 14, y);
     y += 5;
     doc.text(`Moneda: ${factura?.comprobante?.moneda || "MXN"}`, 14, y);
     y += 7;
@@ -479,7 +479,7 @@ function descargarFacturaPdf() {
     y += 5;
     doc.text(`Correo: ${factura?.cliente?.correo || "-"}`, 14, y);
     y += 5;
-    doc.text(`Telefono: ${factura?.cliente?.telefono || "-"}`, 14, y);
+    doc.text(`Teléfono: ${factura?.cliente?.telefono || "-"}`, 14, y);
     y += 7;
 
     doc.setFontSize(12);
@@ -488,7 +488,7 @@ function descargarFacturaPdf() {
     doc.setFontSize(10);
     doc.text(`RFC: ${factura?.datos_fiscales?.rfc || "-"}`, 14, y);
     y += 5;
-    doc.text(`Razon social: ${factura?.datos_fiscales?.razon_social || "-"}`, 14, y);
+    doc.text(`Razón social: ${factura?.datos_fiscales?.razon_social || "-"}`, 14, y);
     y += 8;
 
     doc.setFontSize(11);
@@ -556,7 +556,7 @@ function agregarProductoAlCarrito(idProducto) {
     const yaExisteEnCarrito = Object.prototype.hasOwnProperty.call(carrito, key);
 
     if (yaExisteEnCarrito && cantidadActual >= stock) {
-        alert("No puedes agregar mas unidades que el stock disponible.");
+        alert("No puedes agregar más unidades que el stock disponible.");
         return;
     }
 
@@ -643,7 +643,7 @@ function calcularTotalesCarrito() {
 async function descargarFacturaExistente(idVenta) {
     const id = Number(idVenta || 0);
     if (!id) {
-        alert("ID de venta invalido para descargar factura.");
+        alert("ID de venta inválido para descargar factura.");
         return;
     }
 
@@ -675,7 +675,7 @@ async function descargarFacturaExistente(idVenta) {
         descargarFacturaPdf();
     } catch (error) {
         console.error(error);
-        alert("Error de conexion al descargar la factura.");
+        alert("Error de conexión al descargar la factura.");
     }
 }
 
@@ -734,7 +734,7 @@ async function cargarDetalleVentas() {
                 ventasAgrupadas.set(idVenta, {
                     id_venta: idVenta,
                     fecha: item?.fecha || null,
-                    cliente: item?.cliente || "Publico General",
+                    cliente: item?.cliente || "Público General",
                     metodo_pago: item?.metodo_pago || "-",
                     total: Number(item?.total || 0),
                     totalArticulos: 0,
@@ -762,7 +762,7 @@ async function cargarDetalleVentas() {
                 <tr>
                     <td>#${escapeHtml(venta.id_venta)}</td>
                     <td>${escapeHtml(formatearFecha(venta.fecha))}</td>
-                    <td>${escapeHtml(venta.cliente || "Publico General")}</td>
+                    <td>${escapeHtml(venta.cliente || "Público General")}</td>
                     <td>${escapeHtml(venta.totalArticulos || 0)}</td>
                     <td>${escapeHtml(formatearMoneda(venta.total || 0))}</td>
                     <td>${escapeHtml(venta.metodo_pago || "-")}</td>
@@ -837,7 +837,7 @@ async function confirmarVenta() {
         abrirModalFacturacion(ultimaVentaRegistradaId, true);
     } catch (error) {
         console.error(error);
-        alert("Error de conexion al registrar la venta.");
+        alert("Error de conexión al registrar la venta.");
     } finally {
         btnConfirmarVenta.disabled = false;
     }
@@ -900,7 +900,7 @@ function renderProductos() {
     contenedorGrid.innerHTML = lista.map((producto) => {
         const precio = Number(producto.precio || 0).toFixed(2);
         const stock = Number(producto.stock || 0);
-        const categoria = producto.categoria?.nombre || "Sin categoria";
+        const categoria = producto.categoria?.nombre || "Sin categoría";
         const imagen = resolverImagen(producto);
         const cantidadEnCarrito = getCantidadEnCarrito(producto.id_producto);
         const llegoAlStock = cantidadEnCarrito >= stock;

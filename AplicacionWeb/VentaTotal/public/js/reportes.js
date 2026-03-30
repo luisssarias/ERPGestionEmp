@@ -83,7 +83,7 @@ function requestJson(path) {
         if (response.status === 401) {
             localStorage.removeItem("token");
             window.location.href = "login.html";
-            throw new Error("Sesion expirada");
+            throw new Error("Sesión expirada");
         }
 
         if (!response.ok) {
@@ -110,7 +110,7 @@ function cargarCategoriasFiltro() {
 
     productos.forEach((item) => {
         if (item?.categoria?.id_categoria) {
-            categorias.set(String(item.categoria.id_categoria), item.categoria.nombre || "Sin categoria");
+            categorias.set(String(item.categoria.id_categoria), item.categoria.nombre || "Sin categoría");
         }
     });
 
@@ -397,7 +397,7 @@ function renderCharts(ventasFiltradas, entradasFiltradas) {
 
         const idProducto = Number(item?.id_producto || 0);
         const producto = productoById.get(idProducto);
-        const categoria = producto?.categoria?.nombre || "Sin categoria";
+        const categoria = producto?.categoria?.nombre || "Sin categoría";
         categoriasMap.set(categoria, Number(categoriasMap.get(categoria) || 0) + Number(item?.cantidad || 0));
     });
 
@@ -561,7 +561,7 @@ function exportarReporteCompletoPdf(resumen) {
     pdf.text("Fecha", 16, y);
     pdf.text("N. Ventas", 56, y);
     pdf.text("Total Diario", 98, y);
-    pdf.text("Metodo Predominante", 142, y);
+    pdf.text("Método Predominante", 142, y);
     y += 5;
 
     resumen.resumenDiario.forEach((item) => {
@@ -573,7 +573,7 @@ function exportarReporteCompletoPdf(resumen) {
             pdf.text("Fecha", 16, y);
             pdf.text("N. Ventas", 56, y);
             pdf.text("Total Diario", 98, y);
-            pdf.text("Metodo Predominante", 142, y);
+            pdf.text("Método Predominante", 142, y);
             y += 5;
         }
 
@@ -641,7 +641,7 @@ async function cargarUsuario() {
         topbarUsuarioNombre.textContent = user?.nombre || "Usuario";
         topbarUsuarioRol.textContent = "Administrador";
     } catch {
-        topbarUsuarioNombre.textContent = "Sin sesion";
+        topbarUsuarioNombre.textContent = "Sin sesión";
     }
 }
 

@@ -266,7 +266,7 @@ function renderResultadosProducto(lista) {
         .map((producto) => `
             <button type="button" class="item-resultado" data-id="${producto.id_producto}">
                 <span>${escapeHtml(producto.nombre)}</span>
-                <span class="meta">${escapeHtml(producto.codigo || "Sin codigo")} | Stock ${escapeHtml(producto.stock || 0)}</span>
+                <span class="meta">${escapeHtml(producto.codigo || "Sin código")} | Stock ${escapeHtml(producto.stock || 0)}</span>
             </button>
         `)
         .join("");
@@ -274,8 +274,8 @@ function renderResultadosProducto(lista) {
 
 function renderProductoSeleccionado() {
     if (!selectedProducto) {
-        if (infoNombre) infoNombre.textContent = "Ningun producto seleccionado";
-        if (infoCodigo) infoCodigo.textContent = "Codigo: -";
+        if (infoNombre) infoNombre.textContent = "Ningún producto seleccionado";
+        if (infoCodigo) infoCodigo.textContent = "Código: -";
         if (infoPrecioCompra) infoPrecioCompra.textContent = "Precio proveedor: -";
         if (infoStockActual) infoStockActual.textContent = "0";
         if (infoAlertaStock) {
@@ -286,10 +286,10 @@ function renderProductoSeleccionado() {
     }
 
     if (infoNombre) {
-        const extra = selectedProductosEntrada.length > 1 ? ` +${selectedProductosEntrada.length - 1} mas` : "";
+        const extra = selectedProductosEntrada.length > 1 ? ` +${selectedProductosEntrada.length - 1} más` : "";
         infoNombre.textContent = `${selectedProducto.nombre || "-"}${extra}`;
     }
-    if (infoCodigo) infoCodigo.textContent = `Codigo: ${selectedProducto.codigo || "-"}`;
+    if (infoCodigo) infoCodigo.textContent = `Código: ${selectedProducto.codigo || "-"}`;
     if (infoPrecioCompra) infoPrecioCompra.textContent = `Precio proveedor: $${formatMoney(selectedPrecioCompra)}`;
     if (infoStockActual) infoStockActual.textContent = String(selectedProducto.stock || 0);
 
@@ -476,7 +476,7 @@ function renderHistorial() {
             .map((item, index) => `
                 <tr>
                     <td>${escapeHtml(formatDateTime(item.fecha))}</td>
-                    <td>${escapeHtml(item._items?.length > 1 ? `${item.producto || "-"} +${item._items.length - 1} mas` : (item.producto || "-"))}</td>
+                    <td>${escapeHtml(item._items?.length > 1 ? `${item.producto || "-"} +${item._items.length - 1} más` : (item.producto || "-"))}</td>
                     <td>${escapeHtml(item.proveedor || item.proveedor_nombre || "-")}</td>
                     <td><span class="cantidad">${escapeHtml(item._items?.reduce((sum, row) => sum + Number(row.cantidad || 0), 0) || "-")}</span></td>
                     <td>$${escapeHtml(formatMoney(item._total_compra || 0))}</td>
@@ -586,7 +586,7 @@ async function cargarUsuarioSesion() {
                 return;
             }
 
-            throw new Error("No se pudo obtener la sesion");
+            throw new Error("No se pudo obtener la sesión");
         }
 
         const usuario = await response.json();
@@ -603,7 +603,7 @@ async function cargarUsuarioSesion() {
         console.error(error);
 
         if (topbarUsuarioNombre) {
-            topbarUsuarioNombre.textContent = "Sin sesion";
+            topbarUsuarioNombre.textContent = "Sin sesión";
         }
 
         if (topbarUsuarioRol) {
@@ -680,7 +680,7 @@ async function cargarCatalogoProductos() {
                 return;
             }
 
-            throw new Error("No se pudieron cargar productos de catalogo");
+            throw new Error("No se pudieron cargar productos de catálogo");
         }
 
         catalogoProductos = await response.json();
