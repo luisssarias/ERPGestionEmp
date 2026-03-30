@@ -251,7 +251,7 @@ export default function ProveedoresScreen({ navigation }) {
               }
 
               await cargarDatos();
-              Alert.alert("Proveedores", "Proveedor eliminado correctamente.");
+              Alert.alert("Proveedores", data?.message || "Accion ejecutada correctamente.");
             } catch {
               setMensaje("Error de conexion al eliminar proveedor.");
             }
@@ -340,8 +340,15 @@ export default function ProveedoresScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Proveedores</Text>
-          <Text style={styles.headerSubtitle}>Modulo dedicado con CRUD + asignacion de productos</Text>
+          <View style={styles.headerRow}>
+            <View style={styles.headerTextWrap}>
+              <Text style={styles.headerTitle}>Proveedores</Text>
+              <Text style={styles.headerSubtitle}>Gestion de proveedores y sus productos</Text>
+            </View>
+            <TouchableOpacity style={styles.refreshIconBtn} onPress={cargarDatos} disabled={cargando}>
+              {cargando ? <ActivityIndicator size="small" color="#1d4ed8" /> : <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />}
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.kpiRow}>
@@ -354,12 +361,6 @@ export default function ProveedoresScreen({ navigation }) {
             <Text style={styles.kpiValue}>{coberturaCatalogo.porcentaje}%</Text>
             <Text style={styles.kpiHint}>{coberturaCatalogo.texto}</Text>
           </View>
-        </View>
-
-        <View style={styles.refreshRow}>
-          <TouchableOpacity style={styles.refreshBtn} onPress={cargarDatos} disabled={cargando}>
-            {cargando ? <ActivityIndicator size="small" color="#1d4ed8" /> : <Text style={styles.refreshBtnText}>Actualizar</Text>}
-          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>
@@ -485,16 +486,16 @@ export default function ProveedoresScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f1f5f9" },
   header: { backgroundColor: "#2c4da7", padding: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 },
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  headerTextWrap: { flex: 1, paddingRight: 12 },
   headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
   headerSubtitle: { color: "#dbeafe", marginTop: 4 },
+  refreshIconBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#eff6ff", alignItems: "center", justifyContent: "center" },
   kpiRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 16, paddingHorizontal: 16 },
   kpiCard: { width: "48%", backgroundColor: "white", borderRadius: 12, padding: 14, borderLeftWidth: 5, borderLeftColor: "#16a34a" },
   kpiLabel: { color: "#64748b", fontSize: 12 },
   kpiValue: { color: "#0f172a", fontSize: 24, fontWeight: "700", marginTop: 4 },
   kpiHint: { color: "#64748b", fontSize: 11, marginTop: 4 },
-  refreshRow: { marginTop: 8, paddingHorizontal: 16, alignItems: "flex-end" },
-  refreshBtn: { backgroundColor: "#eff6ff", borderWidth: 1, borderColor: "#bfdbfe", borderRadius: 10, minWidth: 110, paddingHorizontal: 14, paddingVertical: 9, alignItems: "center", justifyContent: "center" },
-  refreshBtnText: { color: "#1d4ed8", fontWeight: "700" },
   card: { backgroundColor: "white", marginHorizontal: 16, marginTop: 14, borderRadius: 16, padding: 16 },
   cardTitle: { fontSize: 17, fontWeight: "700", color: "#0f172a", marginBottom: 10 },
   label: { color: "#334155", fontWeight: "600", marginBottom: 6, marginTop: 8 },

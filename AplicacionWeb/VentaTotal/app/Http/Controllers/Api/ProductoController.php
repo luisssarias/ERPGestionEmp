@@ -12,15 +12,38 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductoController extends Controller
 {
-    private function getOrCreateEstadoActivoId(): int
+    private function getOrCreateEstadoId(string $nombre): int
     {
-        $activo = EstadoProducto::whereRaw('LOWER(nombre) = ?', ['activo'])->first();
+        $estado = EstadoProducto::whereRaw('LOWER(nombre) = ?', [strtolower($nombre)])
+            ->first();
 
-        if (!$activo) {
-            $activo = EstadoProducto::create(['nombre' => 'Activo']);
+        if (!$estado) {
+            $estado = EstadoProducto::create(['nombre' => $nombre]);
         }
 
-        return (int) $activo->id_estado;
+        return (int) $estado->id_estado;
+    }
+
+    private function getOrCreateEstadoActivoId(): int
+    {
+        return $this->getOrCreateEstadoId('Activo');
+    }
+
+    private function getOrCreateEstadoAgotadoId(): int
+    {
+        return $this->getOrCreateEstadoId('Agotado');
+    }
+
+    private function syncEstadoPorStock(Producto $producto): void
+    {
+        $targetEstadoId = (int) $producto->stock <= 0
+            ? $this->getOrCreateEstadoAgotadoId()
+            : $this->getOrCreateEstadoActivoId();
+
+        if ((int) $producto->id_estado !== $targetEstadoId) {
+            $producto->id_estado = $targetEstadoId;
+            $producto->save();
+        }
     }
 
     private function generarSiguienteCodigo(): string
@@ -45,9 +68,16 @@ class ProductoController extends Controller
 
     public function index()
     {
-        return Producto::with(['categoria', 'estado'])
+        $productos = Producto::with(['categoria', 'estado'])
             ->orderByDesc('id_producto')
             ->get();
+
+        $productos->each(function ($producto) {
+            $this->syncEstadoPorStock($producto);
+            $producto->loadMissing(['categoria', 'estado']);
+        });
+
+        return $productos;
     }
 
     public function categorias()
@@ -69,10 +99,8 @@ class ProductoController extends Controller
 
     public function estados()
     {
-        if (EstadoProducto::count() === 0) {
-            EstadoProducto::create(['nombre' => 'Activo']);
-            EstadoProducto::create(['nombre' => 'Inactivo']);
-        }
+        $this->getOrCreateEstadoActivoId();
+        $this->getOrCreateEstadoAgotadoId();
 
         return EstadoProducto::orderBy('id_estado')->get();
     }
@@ -89,13 +117,16 @@ class ProductoController extends Controller
         ]);
 
         $data['codigo'] = $this->generarSiguienteCodigo();
-        $data['id_estado'] = $this->getOrCreateEstadoActivoId();
+        $data['id_estado'] = (int) ($data['stock'] ?? 0) <= 0
+            ? $this->getOrCreateEstadoAgotadoId()
+            : $this->getOrCreateEstadoActivoId();
 
         if ($request->hasFile('imagen')) {
             $data['imagen'] = $request->file('imagen')->store('productos', 'public');
         }
 
         $producto = Producto::create($data);
+        $this->syncEstadoPorStock($producto);
 
         return response()->json($producto->load(['categoria', 'estado']), 201);
     }
@@ -127,6 +158,7 @@ class ProductoController extends Controller
         }
 
         $producto->update($data);
+        $this->syncEstadoPorStock($producto);
 
         return $producto->fresh()->load(['categoria', 'estado']);
     }

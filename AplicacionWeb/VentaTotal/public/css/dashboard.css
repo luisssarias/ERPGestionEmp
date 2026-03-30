@@ -137,6 +137,8 @@ right:-2px;
 display:flex;
 align-items:center;
 gap:10px;
+text-decoration:none;
+color:inherit;
 }
 
 .avatar{
@@ -304,18 +306,22 @@ font-size:13px;
 
 .acciones{
 display:flex;
-gap:18px;
-font-size:18px;
+justify-content:flex-start;
 }
 
-.editar{
-color:#2563eb;
-cursor:pointer;
+.btn-ver-dashboard{
+display:inline-block;
+background:#dbeafe;
+color:#1d4ed8;
+text-decoration:none;
+font-weight:700;
+font-size:12px;
+padding:6px 12px;
+border-radius:8px;
 }
 
-.eliminar{
-color:#dc2626;
-cursor:pointer;
+.btn-ver-dashboard:hover{
+background:#bfdbfe;
 }
 
 .stock-bajo{

@@ -15,7 +15,6 @@ const cardShortcutIngresos = document.getElementById("cardShortcutIngresos");
 
 const buscarProducto = document.getElementById("buscarDashboardProducto");
 const filtroCategoria = document.getElementById("filtroDashboardCategoria");
-const filtroEstado = document.getElementById("filtroDashboardEstado");
 const estadoTabla = document.getElementById("estadoDashboardTabla");
 const tablaBody = document.querySelector(".tabla-productos tbody");
 
@@ -80,15 +79,10 @@ async function requestJson(path) {
 
 function llenarFiltros() {
     const categoriasMap = new Map();
-    const estadosMap = new Map();
 
     productos.forEach((item) => {
         if (item?.categoria?.id_categoria) {
             categoriasMap.set(String(item.categoria.id_categoria), item.categoria.nombre || "Sin categoria");
-        }
-
-        if (item?.estado?.id_estado) {
-            estadosMap.set(String(item.estado.id_estado), item.estado.nombre || "Sin estado");
         }
     });
 
@@ -99,21 +93,12 @@ function llenarFiltros() {
             opcionesCategorias.push(`<option value="${escapeHtml(id)}">${escapeHtml(nombre)}</option>`);
         });
 
-    const opcionesEstados = ['<option value="">Todos los Estados</option>'];
-    Array.from(estadosMap.entries())
-        .sort((a, b) => String(a[1]).localeCompare(String(b[1]), "es"))
-        .forEach(([id, nombre]) => {
-            opcionesEstados.push(`<option value="${escapeHtml(id)}">${escapeHtml(nombre)}</option>`);
-        });
-
     filtroCategoria.innerHTML = opcionesCategorias.join("");
-    filtroEstado.innerHTML = opcionesEstados.join("");
 }
 
 function getProductosFiltrados() {
     const texto = String(buscarProducto?.value || "").trim().toLowerCase();
     const categoria = String(filtroCategoria?.value || "");
-    const estado = String(filtroEstado?.value || "");
 
     return productos.filter((item) => {
         const coincideTexto = !texto
@@ -121,9 +106,8 @@ function getProductosFiltrados() {
             || String(item?.codigo || "").toLowerCase().includes(texto);
 
         const coincideCategoria = !categoria || String(item?.id_categoria || "") === categoria;
-        const coincideEstado = !estado || String(item?.id_estado || "") === estado;
 
-        return coincideTexto && coincideCategoria && coincideEstado;
+        return coincideTexto && coincideCategoria;
     });
 }
 
@@ -153,8 +137,7 @@ function renderTabla() {
                 <td>${escapeHtml(money(item?.precio || 0))}</td>
                 <td class="${claseStock}">${escapeHtml(stock)}</td>
                 <td class="acciones">
-                    <a href="productos.html" title="Ir a productos"><i class="fa-solid fa-pen editar"></i></a>
-                    <a href="productos.html" title="Ir a productos"><i class="fa-solid fa-trash eliminar"></i></a>
+                    <a class="btn-ver-dashboard" href="productos.html" title="Ver en productos">Ver</a>
                 </td>
             </tr>
         `;
@@ -273,7 +256,6 @@ async function cargarUsuarioSesion() {
 function setupEventos() {
     buscarProducto?.addEventListener("input", renderTabla);
     filtroCategoria?.addEventListener("change", renderTabla);
-    filtroEstado?.addEventListener("change", renderTabla);
 
     cardShortcutProductos?.addEventListener("click", () => {
         window.location.href = "productos.html";

@@ -17,7 +17,6 @@ export default function HomeScreen({ navigation }) {
 	const [errorCarga, setErrorCarga] = useState("");
 	const [busqueda, setBusqueda] = useState("");
 	const [categoriaFiltro, setCategoriaFiltro] = useState("TODAS");
-	const [estadoFiltro, setEstadoFiltro] = useState("TODOS");
 
 	const resolverApiBase = useCallback(async () => {
 		const candidatos = getApiCandidates();
@@ -100,15 +99,6 @@ export default function HomeScreen({ navigation }) {
 		return ["TODAS", ...Array.from(values).sort((a, b) => a.localeCompare(b, "es"))];
 	}, [productos]);
 
-	const estados = useMemo(() => {
-		const values = new Set();
-		productos.forEach((item) => {
-			values.add(String(item?.estado?.nombre || "Sin estado"));
-		});
-
-		return ["TODOS", ...Array.from(values).sort((a, b) => a.localeCompare(b, "es"))];
-	}, [productos]);
-
 	const productosFiltrados = useMemo(() => {
 		const texto = busqueda.trim().toLowerCase();
 
@@ -116,15 +106,13 @@ export default function HomeScreen({ navigation }) {
 			const nombre = String(item?.nombre || "").toLowerCase();
 			const codigo = String(item?.codigo || "").toLowerCase();
 			const categoria = String(item?.categoria?.nombre || "Sin categoria");
-			const estado = String(item?.estado?.nombre || "Sin estado");
 
 			const coincideTexto = !texto || nombre.includes(texto) || codigo.includes(texto);
 			const coincideCategoria = categoriaFiltro === "TODAS" || categoria === categoriaFiltro;
-			const coincideEstado = estadoFiltro === "TODOS" || estado === estadoFiltro;
 
-			return coincideTexto && coincideCategoria && coincideEstado;
+			return coincideTexto && coincideCategoria;
 		});
-	}, [busqueda, categoriaFiltro, estadoFiltro, productos]);
+	}, [busqueda, categoriaFiltro, productos]);
 
 	const resumenHoy = useMemo(() => {
 		const hoy = new Date();
@@ -215,8 +203,15 @@ export default function HomeScreen({ navigation }) {
 		<SafeAreaView style={styles.container}>
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 				<View style={styles.header}>
-					<Text style={styles.headerTitle}>Dashboard</Text>
-					<Text style={styles.headerSubtitle}>Hola, {usuarioNombre}</Text>
+					<View style={styles.headerRow}>
+						<View style={styles.headerTextWrap}>
+							<Text style={styles.headerTitle}>Dashboard</Text>
+							<Text style={styles.headerSubtitle}>Hola, {usuarioNombre}</Text>
+						</View>
+						<TouchableOpacity style={styles.refreshIconBtn} onPress={cargarDashboard} disabled={cargando}>
+							{cargando ? <ActivityIndicator size="small" color="#1d4ed8" /> : <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />}
+						</TouchableOpacity>
+					</View>
 				</View>
 
 				{cargando ? (
@@ -348,22 +343,6 @@ export default function HomeScreen({ navigation }) {
 								})}
 							</ScrollView>
 
-							<ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow}>
-								{estados.map((estado) => {
-									const activa = estadoFiltro === estado;
-
-									return (
-										<TouchableOpacity
-											key={estado}
-											style={[styles.chipSec, activa && styles.chipSecActive]}
-											onPress={() => setEstadoFiltro(estado)}
-										>
-											<Text style={[styles.chipSecText, activa && styles.chipSecTextActive]}>{estado}</Text>
-										</TouchableOpacity>
-									);
-								})}
-							</ScrollView>
-
 							{!productosFiltrados.length ? (
 								<Text style={styles.sinDatos}>No hay productos con ese filtro.</Text>
 							) : (
@@ -376,6 +355,9 @@ export default function HomeScreen({ navigation }) {
 										<View style={{ alignItems: "flex-end" }}>
 											<Text style={styles.productPrice}>${Number(item?.precio || 0).toFixed(2)}</Text>
 											<Text style={[styles.productStock, Number(item?.stock || 0) < 5 && styles.productStockBajo]}>Stock: {Number(item?.stock || 0)}</Text>
+											<TouchableOpacity style={styles.btnVerProducto} onPress={() => navigation.navigate("Productos")}>
+												<Text style={styles.btnVerProductoText}>Ver</Text>
+											</TouchableOpacity>
 										</View>
 									</View>
 								))
@@ -397,8 +379,18 @@ const styles = StyleSheet.create({
 		borderBottomLeftRadius: 20,
 		borderBottomRightRadius: 20
 	},
+	headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+	headerTextWrap: { flex: 1, paddingRight: 12 },
 	headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
 	headerSubtitle: { color: "#dbeafe", marginTop: 4 },
+	refreshIconBtn: {
+		width: 34,
+		height: 34,
+		borderRadius: 17,
+		backgroundColor: "#eff6ff",
+		alignItems: "center",
+		justifyContent: "center"
+	},
 	estadoBloque: {
 		backgroundColor: "#fff",
 		margin: 16,
@@ -526,5 +518,17 @@ const styles = StyleSheet.create({
 	productPrice: { fontWeight: "800", color: "#1d4ed8" },
 	productStock: { fontSize: 12, color: "#334155", marginTop: 2 },
 	productStockBajo: { color: "#dc2626", fontWeight: "700" },
+	btnVerProducto: {
+		marginTop: 8,
+		backgroundColor: "#dbeafe",
+		paddingHorizontal: 12,
+		paddingVertical: 5,
+		borderRadius: 8
+	},
+	btnVerProductoText: {
+		color: "#1d4ed8",
+		fontSize: 12,
+		fontWeight: "700"
+	},
 	sinDatos: { color: "#64748b", marginTop: 8 }
 });

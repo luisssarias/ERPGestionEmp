@@ -107,6 +107,8 @@ color:white;
 display:flex;
 gap:10px;
 align-items:center;
+text-decoration:none;
+color:inherit;
 }
 
 .content{
@@ -116,12 +118,38 @@ padding:30px;
 .usuario-activo{
 display:flex;
 align-items:center;
+justify-content:space-between;
 gap:15px;
+flex-wrap:wrap;
 background:white;
 padding:20px;
 border-radius:15px;
 margin-top:20px;
 box-shadow:0 5px 20px rgba(0,0,0,0.05);
+}
+
+.usuario-activo-info{
+display:flex;
+align-items:center;
+gap:15px;
+}
+
+.btn-cerrar-sesion{
+display:inline-flex;
+align-items:center;
+gap:8px;
+border:none;
+background:#ef4444;
+color:white;
+padding:10px 14px;
+border-radius:10px;
+cursor:pointer;
+font-weight:600;
+box-shadow:0 8px 18px rgba(239,68,68,0.28);
+}
+
+.btn-cerrar-sesion:hover{
+background:#dc2626;
 }
 
 .avatar-grande{

@@ -143,6 +143,8 @@ color:white;
 display:flex;
 gap:10px;
 align-items:center;
+	text-decoration:none;
+	color:inherit;
 }
 
 /* CONTENIDO */
@@ -383,6 +385,11 @@ font-size:13px;
 .estado.activo{
 background:#dcfce7;
 color:#166534;
+}
+
+.estado.agotado{
+background:#fee2e2;
+color:#b91c1c;
 }
 
 .acciones{

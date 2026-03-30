@@ -452,8 +452,17 @@ export default function PerfilScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Perfil</Text>
-          <Text style={styles.headerSubtitle}>Gestiona tu sesion y usuarios del sistema</Text>
+          <View style={styles.headerRow}>
+            <View style={styles.headerTextWrap}>
+              <Text style={styles.headerTitle}>Perfil</Text>
+              <Text style={styles.headerSubtitle}>Gestiona tu sesion y usuarios del sistema</Text>
+            </View>
+            <TouchableOpacity style={styles.refreshIconBtn} onPress={refrescarTodo} disabled={cargando || cargandoUsuarios}>
+              {(cargando || cargandoUsuarios)
+                ? <ActivityIndicator size="small" color="#1d4ed8" />
+                : <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />}
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.usuarioActivo}>
@@ -492,11 +501,6 @@ export default function PerfilScreen({ navigation }) {
             <Text style={styles.infoText}>ID usuario: {idUsuario}</Text>
           </View>
         </View>
-
-        <TouchableOpacity style={styles.secondaryButton} onPress={refrescarTodo}>
-          <Ionicons name="refresh-outline" size={20} color="#2563eb" />
-          <Text style={styles.secondaryText}>Actualizar perfil</Text>
-        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.secondaryButton}
@@ -739,9 +743,22 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20
   },
 
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+
+  headerTextWrap: { flex: 1, paddingRight: 12 },
+
   headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
 
   headerSubtitle: { color: "#dbeafe", marginTop: 4 },
+
+  refreshIconBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#eff6ff",
+    alignItems: "center",
+    justifyContent: "center"
+  },
 
   usuarioActivo: {
     flexDirection: "row",

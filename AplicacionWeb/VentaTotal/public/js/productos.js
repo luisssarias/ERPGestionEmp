@@ -11,7 +11,6 @@ const tbody = document.querySelector(".tabla tbody");
 const estadoTabla = document.getElementById("estadoTabla");
 const buscarProducto = document.getElementById("buscarProducto");
 const filtroCategoria = document.getElementById("filtroCategoria");
-const filtroEstado = document.getElementById("filtroEstado");
 const totalProductos = document.getElementById("totalProductos");
 const stockBajo = document.getElementById("stockBajo");
 const cardTotalProductos = document.getElementById("cardTotalProductos");
@@ -43,7 +42,6 @@ const mensajeCategoria = document.getElementById("mensajeCategoria");
 
 let productos = [];
 let categorias = [];
-let estados = [];
 let soloStockBajo = false;
 
 if (!token) {
@@ -174,7 +172,7 @@ function getEstadoClass(nombreEstado) {
     const nombre = (nombreEstado || "").toLowerCase();
 
     if (nombre.includes("activo")) return "estado activo";
-    if (nombre.includes("inactivo")) return "estado";
+    if (nombre.includes("agotado")) return "estado agotado";
     return "estado";
 }
 
@@ -188,7 +186,6 @@ function getStockClass(stock) {
 function renderProductos() {
     const texto = buscarProducto.value.trim().toLowerCase();
     const categoriaSeleccionada = filtroCategoria.value;
-    const estadoSeleccionado = filtroEstado.value;
 
     const filtrados = productos.filter((producto) => {
         const coincideStockBajo = !soloStockBajo || Number(producto.stock || 0) < 5;
@@ -200,10 +197,7 @@ function renderProductos() {
         const coincideCategoria = !categoriaSeleccionada
             || String(producto.id_categoria || "") === categoriaSeleccionada;
 
-        const coincideEstado = !estadoSeleccionado
-            || String(producto.id_estado || "") === estadoSeleccionado;
-
-        return coincideStockBajo && coincideTexto && coincideCategoria && coincideEstado;
+        return coincideStockBajo && coincideTexto && coincideCategoria;
     });
 
     actualizarEstadisticas(productos);
@@ -219,9 +213,7 @@ function renderProductos() {
             ? producto.categoria.nombre
             : "Sin categoría";
 
-        const estado = producto.estado && producto.estado.nombre
-            ? producto.estado.nombre
-            : "Sin estado";
+        const estado = Number(producto.stock || 0) <= 0 ? "Agotado" : "Activo";
 
         const precio = Number(producto.precio || 0).toFixed(2);
         const stock = Number(producto.stock || 0);
@@ -253,7 +245,7 @@ function llenarSelect(selectElement, items, placeholder) {
     const opciones = [`<option value="">${escapeHtml(placeholder)}</option>`];
 
     items.forEach((item) => {
-        const id = item.id_categoria || item.id_estado;
+        const id = item.id_categoria;
         opciones.push(`<option value="${id}">${escapeHtml(item.nombre)}</option>`);
     });
 
@@ -263,7 +255,6 @@ function llenarSelect(selectElement, items, placeholder) {
 function renderCatalogos() {
     llenarSelect(filtroCategoria, categorias, "Todas las Categorías");
     llenarSelect(categoriaProductoInput, categorias, "Selecciona una categoría");
-    llenarSelect(filtroEstado, estados, "Todos los Estados");
 }
 
 async function cargarUsuarioSesion() {
@@ -294,23 +285,19 @@ async function cargarUsuarioSesion() {
 }
 
 async function cargarCatalogos() {
-    const [categoriasResponse, estadosResponse] = await Promise.all([
-        fetch(`${API_BASE}/categorias`, { method: "GET", headers: getHeaders() }),
-        fetch(`${API_BASE}/estados-producto`, { method: "GET", headers: getHeaders() }),
-    ]);
+    const categoriasResponse = await fetch(`${API_BASE}/categorias`, { method: "GET", headers: getHeaders() });
 
-    if (!categoriasResponse.ok || !estadosResponse.ok) {
-        if (categoriasResponse.status === 401 || estadosResponse.status === 401) {
+    if (!categoriasResponse.ok) {
+        if (categoriasResponse.status === 401) {
             localStorage.removeItem("token");
             window.location.href = "login.html";
             return;
         }
 
-        throw new Error("No se pudieron cargar categorías y estados");
+        throw new Error("No se pudieron cargar categorías");
     }
 
     categorias = await categoriasResponse.json();
-    estados = await estadosResponse.json();
     renderCatalogos();
 }
 
@@ -566,7 +553,6 @@ tbody.addEventListener("click", (event) => {
 
 buscarProducto.addEventListener("input", renderProductos);
 filtroCategoria.addEventListener("change", renderProductos);
-filtroEstado.addEventListener("change", renderProductos);
 
 if (cardStockBajo) {
     cardStockBajo.addEventListener("click", () => {
@@ -649,7 +635,7 @@ async function init() {
         await cargarCatalogos();
     } catch (error) {
         console.error(error);
-        marcarCargandoTabla("No se pudieron cargar categorías/estados.");
+        marcarCargandoTabla("No se pudieron cargar categorías.");
         return;
     }
 

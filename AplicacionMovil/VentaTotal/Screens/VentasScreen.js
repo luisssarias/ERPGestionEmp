@@ -279,6 +279,7 @@ export default function VentasScreen({ navigation }) {
 	const subtotalCarrito = carritoItems.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
 	const ivaCarrito = subtotalCarrito * 0.16;
 	const totalCarrito = subtotalCarrito + ivaCarrito;
+	const ventaLista = totalProductosCarrito > 0;
 
 	const ventasAgrupadas = useMemo(() => {
 		const grupos = new Map();
@@ -368,17 +369,63 @@ export default function VentasScreen({ navigation }) {
 		}
 	}, [apiBaseUrl, navigation, resolverApiBase]);
 
-	const confirmarVenta = () => {
+	const confirmarVenta = useCallback(async () => {
 		if (!carritoItems.length) {
 			Alert.alert("Ventas", "Agrega productos al carrito para continuar.");
 			return;
 		}
 
-		Alert.alert(
-			"Venta",
-			`Interfaz lista similar web. Metodo: ${metodoPago}. Total: $${totalCarrito.toFixed(2)}`
-		);
-	};
+		try {
+			const token = await getStoredToken();
+
+			if (!token) {
+				await clearSession();
+				navigation.replace("Login");
+				return;
+			}
+
+			const baseUrl = apiBaseUrl || (await resolverApiBase());
+			setApiBaseUrl(baseUrl);
+
+			const payload = {
+				metodo_pago: metodoPago,
+				items: carritoItems.map((item) => ({
+					id_producto: Number(item.id_producto),
+					cantidad: Number(item.cantidad),
+					precio_compra: Number(item.precio)
+				}))
+			};
+
+			const response = await fetch(`${baseUrl}/api/ventas`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Accept: "application/json",
+					Authorization: `Bearer ${token}`
+				},
+				body: JSON.stringify(payload)
+			});
+
+			if (response.status === 401) {
+				await clearSession();
+				navigation.replace("Login");
+				return;
+			}
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				Alert.alert("Ventas", data?.message || "No se pudo registrar la venta.");
+				return;
+			}
+
+			setCarrito({});
+			await cargarProductos();
+			Alert.alert("Venta registrada", `Venta #${data?.id_venta || "N/A"} guardada correctamente.`);
+		} catch {
+			Alert.alert("Ventas", "Error de conexion al registrar la venta.");
+		}
+	}, [apiBaseUrl, carritoItems, cargarProductos, metodoPago, navigation, resolverApiBase]);
 
 	const formatearMoneda = useCallback((valor) => {
 		return `$${Number(valor || 0).toFixed(2)}`;
@@ -625,8 +672,15 @@ export default function VentasScreen({ navigation }) {
 	return (
 		<SafeAreaView style={styles.container}>
 			<View style={styles.header}>
-				<Text style={styles.headerTitle}>Ventas</Text>
-				<Text style={styles.headerSubtitle}>Registra ventas y agrega productos al carrito</Text>
+				<View style={styles.headerRow}>
+					<View style={styles.headerTextWrap}>
+						<Text style={styles.headerTitle}>Ventas</Text>
+						<Text style={styles.headerSubtitle}>Registra ventas y agrega productos al carrito</Text>
+					</View>
+					<TouchableOpacity style={styles.refreshIconBtn} onPress={cargarProductos} disabled={cargando}>
+						{cargando ? <ActivityIndicator size="small" color="#1d4ed8" /> : <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />}
+					</TouchableOpacity>
+				</View>
 			</View>
 
 			<ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -777,9 +831,13 @@ export default function VentasScreen({ navigation }) {
 						})}
 					</View>
 
-					<TouchableOpacity style={styles.btnConfirmar} onPress={confirmarVenta}>
+					<TouchableOpacity
+						style={[styles.btnConfirmar, ventaLista ? styles.btnConfirmarActivo : styles.btnConfirmarInactivo]}
+						onPress={confirmarVenta}
+						disabled={!ventaLista}
+					>
 						<Ionicons name="cash-outline" size={16} color="#fff" />
-						<Text style={styles.btnConfirmarText}>Confirmar Venta</Text>
+						<Text style={styles.btnConfirmarText}>{ventaLista ? "Confirmar Venta" : "Agrega productos"}</Text>
 					</TouchableOpacity>
 
 					<TouchableOpacity style={styles.btnCancelar} onPress={limpiarCarrito}>
@@ -790,8 +848,8 @@ export default function VentasScreen({ navigation }) {
 				<View style={styles.panel}>
 					<View style={styles.historialHeader}>
 						<Text style={styles.panelTitle}>Historial de Ventas</Text>
-						<TouchableOpacity onPress={cargarProductos}>
-							<Text style={styles.recargarHistorialText}>Recargar</Text>
+						<TouchableOpacity style={styles.recargarHistorialBtn} onPress={cargarProductos}>
+							<Ionicons name="refresh-outline" size={16} color="#2c4da7" />
 						</TouchableOpacity>
 					</View>
 
@@ -1001,8 +1059,11 @@ const styles = StyleSheet.create({
 		borderBottomLeftRadius: 20,
 		borderBottomRightRadius: 20
 	},
+	headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+	headerTextWrap: { flex: 1, paddingRight: 12 },
 	headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
 	headerSubtitle: { color: "#dbeafe", marginTop: 4 },
+	refreshIconBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#eff6ff", alignItems: "center", justifyContent: "center" },
 	scrollContent: { padding: 16, paddingBottom: 28 },
 	pageHeaderSimple: {
 		marginBottom: 12,
@@ -1157,12 +1218,22 @@ const styles = StyleSheet.create({
 	metodoBtnTextActive: { color: "#1d4ed8" },
 	btnConfirmar: {
 		marginTop: 12,
-		backgroundColor: "#8fbf94",
 		borderRadius: 12,
 		paddingVertical: 12,
 		alignItems: "center",
 		justifyContent: "center",
 		flexDirection: "row"
+	},
+	btnConfirmarInactivo: {
+		backgroundColor: "#94a3b8",
+		opacity: 0.92
+	},
+	btnConfirmarActivo: {
+		backgroundColor: "#16a34a",
+		shadowColor: "#16a34a",
+		shadowOpacity: 0.35,
+		shadowRadius: 10,
+		elevation: 6
 	},
 	btnConfirmarText: { color: "#fff", fontWeight: "800", marginLeft: 6 },
 	btnCancelar: {
@@ -1180,10 +1251,13 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 		alignItems: "center"
 	},
-	recargarHistorialText: {
-		color: "#2c4da7",
-		fontWeight: "700",
-		fontSize: 12
+	recargarHistorialBtn: {
+		width: 30,
+		height: 30,
+		borderRadius: 15,
+		alignItems: "center",
+		justifyContent: "center",
+		backgroundColor: "#eef2ff"
 	},
 	ventaCard: {
 		backgroundColor: "#f8fafc",

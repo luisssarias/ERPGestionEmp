@@ -89,10 +89,18 @@ background:white;
 border-bottom:1px solid #e2e8f0;
 }
 
+.top-right{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
 .profile{
 display:flex;
 align-items:center;
 gap:10px;
+text-decoration:none;
+color:inherit;
 }
 
 .avatar{
@@ -127,6 +135,13 @@ gap:15px;
 margin-bottom:22px;
 }
 
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:15px;
+margin-bottom:22px;
+}
+
 .kpi-card{
 background:white;
 border-radius:16px;
@@ -134,7 +149,22 @@ padding:18px;
 box-shadow:0 5px 20px rgba(0,0,0,0.05);
 }
 
+.stat-card{
+background:white;
+border-radius:16px;
+padding:18px;
+box-shadow:0 5px 20px rgba(0,0,0,0.05);
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
 .kpi-card p{
+color:#64748b;
+font-size:13px;
+}
+
+.stat-card p{
 color:#64748b;
 font-size:13px;
 }
@@ -144,10 +174,39 @@ font-size:26px;
 margin:6px 0;
 }
 
+.stat-card h3{
+font-size:26px;
+margin:6px 0;
+}
+
 .kpi-card span{
 font-size:12px;
 color:#64748b;
 }
+
+.stat-card span{
+font-size:12px;
+color:#64748b;
+}
+
+.up{
+color:#16a34a;
+}
+
+.icon{
+width:58px;
+height:58px;
+border-radius:16px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-size:22px;
+}
+
+.blue{ background:#3b82f6; }
+.green{ background:#16a34a; }
+.purple{ background:#7c3aed; }
 
 .kpi-card.accent{
 border-left:5px solid #2563eb;

@@ -621,8 +621,8 @@ if (listaProveedores) {
             if (!confirmar) return;
 
             try {
-                await eliminarProveedor(id);
-                mostrarMensaje("Proveedor eliminado correctamente.", true);
+                const resultado = await eliminarProveedor(id);
+                mostrarMensaje(resultado?.message || "Accion ejecutada correctamente.", true);
                 resetFormProveedor();
                 await cargarProveedores();
             } catch (errorData) {

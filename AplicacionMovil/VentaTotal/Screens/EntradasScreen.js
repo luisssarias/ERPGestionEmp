@@ -377,8 +377,15 @@ export default function EntradasScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Entradas de Inventario</Text>
-          <Text style={styles.headerSubtitle}>Registro de entradas e historial</Text>
+          <View style={styles.headerRow}>
+            <View style={styles.headerTextWrap}>
+              <Text style={styles.headerTitle}>Entradas de Inventario</Text>
+              <Text style={styles.headerSubtitle}>Registro de entradas e historial</Text>
+            </View>
+            <TouchableOpacity style={styles.refreshIconBtn} onPress={cargarDatos} disabled={guardandoEntrada}>
+              <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.kpiRow}>
@@ -495,19 +502,6 @@ export default function EntradasScreen({ navigation }) {
         <View style={[styles.card, { marginBottom: 20 }]}>
           <Text style={styles.cardTitle}>Historial de Entradas</Text>
 
-          <TouchableOpacity
-            style={styles.refreshLink}
-            onPress={async () => {
-              const headers = await getHeaders(false);
-              if (!headers) return;
-              const baseUrl = apiBaseUrl || (await resolverApiBase());
-              setApiBaseUrl(baseUrl);
-              await cargarHistorial(baseUrl, headers);
-            }}
-          >
-            <Text style={styles.refreshLinkText}>Actualizar historial</Text>
-          </TouchableOpacity>
-
           {!historialCompras.length ? (
             <Text style={styles.emptyText}>Sin entradas registradas.</Text>
           ) : historialCompras.map((compra) => (
@@ -574,8 +568,11 @@ export default function EntradasScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f1f5f9" },
   header: { backgroundColor: "#2c4da7", padding: 20, borderBottomLeftRadius: 20, borderBottomRightRadius: 20 },
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  headerTextWrap: { flex: 1, paddingRight: 12 },
   headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
   headerSubtitle: { color: "#dbeafe", marginTop: 4 },
+  refreshIconBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#eff6ff", alignItems: "center", justifyContent: "center" },
   kpiRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 16, paddingHorizontal: 16 },
   kpiCard: { width: "48%", backgroundColor: "white", borderRadius: 12, padding: 14, borderLeftWidth: 5, borderLeftColor: "#16a34a" },
   kpiLabel: { color: "#64748b", fontSize: 12 },
@@ -610,8 +607,6 @@ const styles = StyleSheet.create({
   entryProductNameOn: { color: "#166534" },
   totalBox: { borderWidth: 1, borderColor: "#bfdbfe", borderRadius: 10, backgroundColor: "#eff6ff", paddingVertical: 12, alignItems: "center" },
   totalText: { color: "#1e40af", fontWeight: "700", fontSize: 18 },
-  refreshLink: { alignSelf: "flex-start", marginBottom: 8 },
-  refreshLinkText: { color: "#1d4ed8", fontWeight: "600" },
   providerItem: { borderWidth: 1, borderColor: "#e2e8f0", borderRadius: 10, padding: 10, marginTop: 8 },
   providerTitle: { fontWeight: "700", color: "#0f172a" },
   providerInfo: { marginTop: 3, color: "#64748b", fontSize: 12 },

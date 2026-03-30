@@ -7,6 +7,7 @@ use App\Models\Producto;
 use App\Models\ProductoProveedor;
 use App\Models\ProveedorProductoMap;
 use App\Models\Proveedor;
+use App\Models\Compra;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -94,8 +95,22 @@ class ProveedorController extends Controller
 
     public function destroy($id)
     {
+        $proveedor = Proveedor::findOrFail($id);
+
+        $tieneCompras = Compra::where('id_proveedor', $proveedor->id_proveedor)->exists();
+
+        if ($tieneCompras) {
+            $proveedor->estado = 'Inactivo';
+            $proveedor->save();
+
+            return response()->json([
+                'message' => 'El proveedor tiene entradas/compras registradas y fue cambiado a Inactivo.',
+                'deleted' => false,
+                'deactivated' => true,
+            ], 200);
+        }
+
         try {
-            $proveedor = Proveedor::findOrFail($id);
             $idsProductoProveedor = ProductoProveedor::where('id_proveedor', $proveedor->id_proveedor)
                 ->pluck('id_producto_proveedor');
 
@@ -108,10 +123,14 @@ class ProveedorController extends Controller
 
             return response()->json([
                 'message' => 'Proveedor eliminado correctamente',
+                'deleted' => true,
+                'deactivated' => false,
             ], 200);
         } catch (QueryException $e) {
             return response()->json([
                 'message' => 'No se puede eliminar el proveedor porque tiene registros relacionados.',
+                'deleted' => false,
+                'deactivated' => false,
             ], 409);
         }
     }

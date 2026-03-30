@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Cliente;
 use App\Models\DatoFiscal;
 use App\Models\DetalleVenta;
+use App\Models\EstadoProducto;
 use App\Models\MovimientoInventario;
 use App\Models\Producto;
 use App\Models\Venta;
@@ -14,6 +15,32 @@ use Illuminate\Support\Facades\DB;
 
 class VentaController extends Controller
 {
+    private function getOrCreateEstadoId(string $nombre): int
+    {
+        $estado = EstadoProducto::whereRaw('LOWER(nombre) = ?', [strtolower($nombre)])->first();
+
+        if (!$estado) {
+            $estado = EstadoProducto::create(['nombre' => $nombre]);
+        }
+
+        return (int) $estado->id_estado;
+    }
+
+    private function syncEstadoProductoPorStock(int $idProducto): void
+    {
+        $producto = Producto::find($idProducto);
+        if (!$producto) return;
+
+        $targetEstadoId = (int) $producto->stock <= 0
+            ? $this->getOrCreateEstadoId('Agotado')
+            : $this->getOrCreateEstadoId('Activo');
+
+        if ((int) $producto->id_estado !== $targetEstadoId) {
+            $producto->id_estado = $targetEstadoId;
+            $producto->save();
+        }
+    }
+
     private function construirDetalleFactura(int $idVenta, string $claveProducto, string $claveUnidad)
     {
         return DB::table('detalle_venta as dv')
@@ -158,6 +185,7 @@ class VentaController extends Controller
                 ]);
 
                 Producto::where('id_producto', $item['id_producto'])->decrement('stock', $item['cantidad']);
+                $this->syncEstadoProductoPorStock((int) $item['id_producto']);
 
                 MovimientoInventario::create([
                     'id_producto' => $item['id_producto'],

@@ -538,8 +538,15 @@ export default function ReportesScreen({ navigation }) {
 		<SafeAreaView style={styles.container}>
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
 				<View style={styles.header}>
-					<Text style={styles.headerTitle}>Reportes</Text>
-					<Text style={styles.headerSubtitle}>Hola, {usuarioNombre}</Text>
+					<View style={styles.headerRow}>
+						<View style={styles.headerTextWrap}>
+							<Text style={styles.headerTitle}>Reportes</Text>
+							<Text style={styles.headerSubtitle}>Hola, {usuarioNombre}</Text>
+						</View>
+						<TouchableOpacity style={styles.refreshIconBtn} onPress={cargarDatos} disabled={cargando}>
+							{cargando ? <ActivityIndicator size="small" color="#1d4ed8" /> : <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />}
+						</TouchableOpacity>
+					</View>
 				</View>
 
 				{cargando ? (
@@ -758,6 +765,8 @@ const styles = StyleSheet.create({
 		borderBottomLeftRadius: 18,
 		borderBottomRightRadius: 18,
 	},
+	headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+	headerTextWrap: { flex: 1, paddingRight: 12 },
 	headerTitle: {
 		color: "#fff",
 		fontSize: 22,
@@ -767,6 +776,7 @@ const styles = StyleSheet.create({
 		color: "#dbeafe",
 		marginTop: 4,
 	},
+	refreshIconBtn: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#eff6ff", alignItems: "center", justifyContent: "center" },
 	estadoBloque: {
 		marginHorizontal: 16,
 		marginTop: 16,

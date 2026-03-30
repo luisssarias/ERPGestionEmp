@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Compra;
 use App\Models\DetalleCompra;
+use App\Models\EstadoProducto;
 use App\Models\MovimientoInventario;
 use App\Models\Producto;
 use App\Models\ProveedorProductoMap;
@@ -13,6 +14,32 @@ use Illuminate\Support\Facades\DB;
 
 class EntradaController extends Controller
 {
+    private function getOrCreateEstadoId(string $nombre): int
+    {
+        $estado = EstadoProducto::whereRaw('LOWER(nombre) = ?', [strtolower($nombre)])->first();
+
+        if (!$estado) {
+            $estado = EstadoProducto::create(['nombre' => $nombre]);
+        }
+
+        return (int) $estado->id_estado;
+    }
+
+    private function syncEstadoProductoPorStock(int $idProducto): void
+    {
+        $producto = Producto::find($idProducto);
+        if (!$producto) return;
+
+        $targetEstadoId = (int) $producto->stock <= 0
+            ? $this->getOrCreateEstadoId('Agotado')
+            : $this->getOrCreateEstadoId('Activo');
+
+        if ((int) $producto->id_estado !== $targetEstadoId) {
+            $producto->id_estado = $targetEstadoId;
+            $producto->save();
+        }
+    }
+
     private function resolverRelacion(int $idProveedor, int $idProducto)
     {
         $relacion = DB::table('proveedor_producto_map as ppm')
@@ -196,6 +223,7 @@ class EntradaController extends Controller
                 ]);
 
                 Producto::where('id_producto', $item['id_producto'])->increment('stock', $item['cantidad']);
+                $this->syncEstadoProductoPorStock((int) $item['id_producto']);
 
                 $detalles[] = $detalle;
                 $movimientos[] = $item;

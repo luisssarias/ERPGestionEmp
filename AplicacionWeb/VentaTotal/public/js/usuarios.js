@@ -21,6 +21,7 @@ const usuarioSesionNombre = document.getElementById("usuarioSesionNombre");
 const usuarioSesionCorreo = document.getElementById("usuarioSesionCorreo");
 const topbarUsuarioNombre = document.getElementById("topbarUsuarioNombre");
 const topbarUsuarioRol = document.getElementById("topbarUsuarioRol");
+const btnCerrarSesionUsuario = document.getElementById("btnCerrarSesionUsuario");
 
 let usuarios = [];
 
@@ -147,6 +148,20 @@ async function cargarUsuarios() {
     } catch (error) {
         console.error(error);
         marcarCargandoTabla("Error al cargar usuarios. Verifica que el backend esté en ejecución.");
+    }
+}
+
+async function cerrarSesion() {
+    try {
+        await fetch(`${API_BASE}/logout`, {
+            method: "POST",
+            headers: getHeaders(),
+        });
+    } catch (error) {
+        console.error(error);
+    } finally {
+        localStorage.removeItem("token");
+        window.location.href = "login.html";
     }
 }
 
@@ -316,6 +331,12 @@ tbody.addEventListener("click", (event) => {
 btnNuevoUsuario.addEventListener("click", abrirModalNuevo);
 cerrarUsuario.addEventListener("click", cerrarModal);
 cancelarUsuario.addEventListener("click", cerrarModal);
+
+btnCerrarSesionUsuario?.addEventListener("click", () => {
+    const confirmar = confirm("¿Deseas cerrar sesión?");
+    if (!confirmar) return;
+    void cerrarSesion();
+});
 
 window.addEventListener("click", (event) => {
     if (event.target === modalUsuario) {

@@ -523,8 +523,15 @@ export default function ProductosScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Productos</Text>
-          <Text style={styles.headerSubtitle}>Administra tu inventario y categorias</Text>
+          <View style={styles.headerRow}>
+            <View style={styles.headerTextWrap}>
+              <Text style={styles.headerTitle}>Productos</Text>
+              <Text style={styles.headerSubtitle}>Administra tu inventario y categorias</Text>
+            </View>
+            <TouchableOpacity style={styles.refreshIconBtn} onPress={cargarDatos} disabled={cargando}>
+              {cargando ? <ActivityIndicator size="small" color="#1d4ed8" /> : <Ionicons name="refresh-outline" size={16} color="#1d4ed8" />}
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.body}>
@@ -895,9 +902,22 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20
   },
 
+  headerRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+
+  headerTextWrap: { flex: 1, paddingRight: 12 },
+
   headerTitle: { color: "white", fontSize: 20, fontWeight: "bold" },
 
   headerSubtitle: { color: "#dbeafe", marginTop: 4 },
+
+  refreshIconBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#eff6ff",
+    alignItems: "center",
+    justifyContent: "center"
+  },
 
   content: {
     paddingBottom: 110

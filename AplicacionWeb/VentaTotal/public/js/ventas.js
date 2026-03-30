@@ -38,19 +38,22 @@ const factCorreo = document.getElementById("factCorreo");
 const factTelefono = document.getElementById("factTelefono");
 const factRfc = document.getElementById("factRfc");
 const factRazonSocial = document.getElementById("factRazonSocial");
-const factUsoCfdi = document.getElementById("factUsoCfdi");
-const factEmisorNombre = document.getElementById("factEmisorNombre");
-const factEmisorRfc = document.getElementById("factEmisorRfc");
-const factEmisorCp = document.getElementById("factEmisorCp");
-const factRegimenFiscal = document.getElementById("factRegimenFiscal");
-const factFormaPago = document.getElementById("factFormaPago");
-const factMetodoPagoCfdi = document.getElementById("factMetodoPagoCfdi");
-const factMoneda = document.getElementById("factMoneda");
-const factLugarExpedicion = document.getElementById("factLugarExpedicion");
-const factClaveProducto = document.getElementById("factClaveProducto");
-const factClaveUnidad = document.getElementById("factClaveUnidad");
 const btnGuardarFacturacion = document.getElementById("btnGuardarFacturacion");
 const mensajeFacturacion = document.getElementById("mensajeFacturacion");
+
+const FACTURA_SIM_DEFAULTS = {
+    uso_cfdi: "G03",
+    emisor_nombre: "VentaTotal SA de CV",
+    emisor_rfc: "AAA010101AAA",
+    emisor_codigo_postal: "64000",
+    emisor_regimen_fiscal: "601 General de Ley Personas Morales",
+    forma_pago: "01 Efectivo",
+    metodo_pago_cfdi: "PUE Pago en una sola exhibicion",
+    moneda: "MXN",
+    lugar_expedicion: "Monterrey, Nuevo Leon",
+    clave_producto: "01010101",
+    clave_unidad: "H87",
+};
 
 let productos = [];
 let carrito = {};
@@ -206,11 +209,13 @@ function formatearFecha(fechaIso) {
 }
 
 function actualizarEstadoBotonFacturar() {
-    // Sin boton de facturacion en carrito; se conserva el estado interno de venta.
-}
+    if (!btnConfirmarVenta) return;
 
-function actualizarEstadoBotonPdf() {
-    // El PDF se descarga automaticamente tras facturar.
+    const { items } = calcularTotalesCarrito();
+    const tieneItemsValidos = items.some((item) => Number(item.cantidad || 0) > 0);
+
+    btnConfirmarVenta.disabled = !tieneItemsValidos;
+    btnConfirmarVenta.classList.toggle("is-ready", tieneItemsValidos);
 }
 
 async function abrirModalDetalleVenta(idVenta) {
@@ -309,17 +314,6 @@ function abrirModalFacturacion(idVentaForzada = null, desdeVentaExitosa = false)
     factTelefono.value = "";
     factRfc.value = "XAXX010101000";
     factRazonSocial.value = "Publico General";
-    factUsoCfdi.value = "G03";
-    factEmisorNombre.value = "VentaTotal SA de CV";
-    factEmisorRfc.value = "AAA010101AAA";
-    factEmisorCp.value = "64000";
-    factRegimenFiscal.value = "601 General de Ley Personas Morales";
-    factFormaPago.value = "01 Efectivo";
-    factMetodoPagoCfdi.value = "PUE Pago en una sola exhibicion";
-    factMoneda.value = "MXN";
-    factLugarExpedicion.value = "Monterrey, Nuevo Leon";
-    factClaveProducto.value = "01010101";
-    factClaveUnidad.value = "H87";
     mensajeFacturacion.textContent = "";
 
     if (modalFacturacionTitulo) {
@@ -352,17 +346,7 @@ async function guardarFacturacionDesdeModal(event) {
         telefono: String(factTelefono.value || "").trim() || null,
         rfc: String(factRfc.value || "").trim().toUpperCase(),
         razon_social: String(factRazonSocial.value || "").trim(),
-        uso_cfdi: String(factUsoCfdi.value || "").trim().toUpperCase(),
-        emisor_nombre: String(factEmisorNombre.value || "").trim(),
-        emisor_rfc: String(factEmisorRfc.value || "").trim().toUpperCase(),
-        emisor_codigo_postal: String(factEmisorCp.value || "").trim(),
-        emisor_regimen_fiscal: String(factRegimenFiscal.value || "").trim(),
-        forma_pago: String(factFormaPago.value || "").trim(),
-        metodo_pago_cfdi: String(factMetodoPagoCfdi.value || "").trim(),
-        moneda: String(factMoneda.value || "").trim().toUpperCase(),
-        lugar_expedicion: String(factLugarExpedicion.value || "").trim(),
-        clave_producto: String(factClaveProducto.value || "").trim().toUpperCase(),
-        clave_unidad: String(factClaveUnidad.value || "").trim().toUpperCase(),
+        ...FACTURA_SIM_DEFAULTS,
     };
 
     if (!ventaObjetivo) {
@@ -374,17 +358,6 @@ async function guardarFacturacionDesdeModal(event) {
         !payload.nombre_cliente
         || !payload.rfc
         || !payload.razon_social
-        || !payload.uso_cfdi
-        || !payload.emisor_nombre
-        || !payload.emisor_rfc
-        || !payload.emisor_codigo_postal
-        || !payload.emisor_regimen_fiscal
-        || !payload.forma_pago
-        || !payload.metodo_pago_cfdi
-        || !payload.moneda
-        || !payload.lugar_expedicion
-        || !payload.clave_producto
-        || !payload.clave_unidad
     ) {
         mensajeFacturacion.textContent = "Completa los campos obligatorios para facturar.";
         return;
@@ -423,7 +396,6 @@ async function guardarFacturacionDesdeModal(event) {
 
         ultimaVentaRegistradaId = Number(data?.id_venta || ventaObjetivo);
         ultimaFacturaGenerada = data;
-        actualizarEstadoBotonPdf();
         alert(`Facturacion generada. Folio: ${data?.folio || "N/A"}`);
         cerrarModalFacturacion();
         descargarFacturaPdf();
@@ -494,8 +466,6 @@ function descargarFacturaPdf() {
     doc.text(`Metodo de pago: ${factura?.comprobante?.metodo_pago || "-"}`, 14, y);
     y += 5;
     doc.text(`Moneda: ${factura?.comprobante?.moneda || "MXN"}`, 14, y);
-    y += 5;
-    doc.text(`Lugar de expedicion: ${factura?.comprobante?.lugar_expedicion || "-"}`, 14, y);
     y += 7;
 
     doc.setFontSize(12);
@@ -516,8 +486,6 @@ function descargarFacturaPdf() {
     doc.text(`RFC: ${factura?.datos_fiscales?.rfc || "-"}`, 14, y);
     y += 5;
     doc.text(`Razon social: ${factura?.datos_fiscales?.razon_social || "-"}`, 14, y);
-    y += 5;
-    doc.text(`Uso CFDI: ${factura?.datos_fiscales?.uso_cfdi || "-"}`, 14, y);
     y += 8;
 
     doc.setFontSize(11);
@@ -526,15 +494,11 @@ function descargarFacturaPdf() {
     doc.setFontSize(8);
 
     const colProductoX = 14;
-    const colClaveProdX = 92;
-    const colClaveUndX = 118;
-    const colCantX = 143;
-    const colPUnitX = 165;
+    const colCantX = 126;
+    const colPUnitX = 160;
     const colSubtotalX = 196;
 
     doc.text("Producto", colProductoX, y);
-    doc.text("Clave Prod", colClaveProdX, y);
-    doc.text("Clave Und", colClaveUndX, y);
     doc.text("Cant", colCantX, y);
     doc.text("P.Unit", colPUnitX, y, { align: "right" });
     doc.text("Subtotal", colSubtotalX, y, { align: "right" });
@@ -550,8 +514,6 @@ function descargarFacturaPdf() {
 
         const nombre = String(item?.producto || "Producto").slice(0, 28);
         doc.text(nombre, colProductoX, y);
-        doc.text(String(item?.clave_producto || "-").slice(0, 10), colClaveProdX, y);
-        doc.text(String(item?.clave_unidad || "-").slice(0, 8), colClaveUndX, y);
         doc.text(String(item?.cantidad || 0), colCantX, y);
         doc.text(formatearMoneda(item?.precio_unitario || 0), colPUnitX, y, { align: "right" });
         doc.text(formatearMoneda(item?.subtotal || 0), colSubtotalX, y, { align: "right" });
@@ -585,17 +547,21 @@ function agregarProductoAlCarrito(idProducto) {
     const producto = getProductoById(idProducto);
     if (!producto) return;
 
+    const key = String(idProducto);
     const stock = Number(producto.stock || 0);
     const cantidadActual = getCantidadEnCarrito(idProducto);
+    const yaExisteEnCarrito = Object.prototype.hasOwnProperty.call(carrito, key);
 
-    if (cantidadActual >= stock) {
+    if (yaExisteEnCarrito && cantidadActual >= stock) {
         alert("No puedes agregar mas unidades que el stock disponible.");
         return;
     }
 
+    const nuevaCantidad = yaExisteEnCarrito ? (cantidadActual + 1) : 0;
+
     carrito = {
         ...carrito,
-        [String(idProducto)]: cantidadActual + 1,
+        [key]: Math.min(nuevaCantidad, stock),
     };
 
     renderCarrito();
@@ -618,15 +584,21 @@ function actualizarCantidadCarrito(idProducto, cantidadTexto) {
     const producto = getProductoById(idProducto);
     if (!producto) return;
 
-    const stock = Number(producto.stock || 0);
-    const cantidad = Number(cantidadTexto || 0);
+    const texto = String(cantidadTexto ?? "").trim();
 
-    if (!Number.isFinite(cantidad) || cantidad <= 0) {
-        quitarProductoDelCarrito(idProducto);
+    // Permite borrar temporalmente el input para capturar un nuevo valor (ej. 20).
+    if (texto === "") {
         return;
     }
 
-    const cantidadNormalizada = Math.min(Math.floor(cantidad), stock);
+    const stock = Number(producto.stock || 0);
+    const cantidad = Number(texto);
+
+    if (!Number.isFinite(cantidad)) {
+        return;
+    }
+
+    const cantidadNormalizada = Math.max(0, Math.min(Math.floor(cantidad), stock));
 
     carrito = {
         ...carrito,
@@ -805,15 +777,16 @@ async function cargarDetalleVentas() {
 
 async function confirmarVenta() {
     const { items, subtotal, iva, total } = calcularTotalesCarrito();
+    const itemsParaVenta = items.filter((item) => Number(item.cantidad) > 0);
 
-    if (!items.length) {
+    if (!itemsParaVenta.length) {
         alert("Agrega al menos un producto al carrito antes de confirmar la venta.");
         return;
     }
 
     const payload = {
         metodo_pago: metodoPagoVenta?.value || "Efectivo",
-        items: items.map((item) => ({
+        items: itemsParaVenta.map((item) => ({
             id_producto: item.id_producto,
             cantidad: item.cantidad,
             precio_compra: item.precio,
@@ -886,7 +859,7 @@ function renderCarrito() {
                     <button type="button" class="qty-btn" data-action="decrease" data-id="${item.id_producto}">-</button>
                     <input
                         type="number"
-                        min="1"
+                        min="0"
                         max="${item.stock}"
                         value="${item.cantidad}"
                         class="qty-input"
@@ -906,6 +879,7 @@ function renderCarrito() {
     subtotalVenta.textContent = formatearMoneda(subtotal);
     ivaVenta.textContent = formatearMoneda(iva);
     totalVenta.textContent = formatearMoneda(total);
+    actualizarEstadoBotonFacturar();
 }
 
 function renderProductos() {
@@ -1028,6 +1002,34 @@ carritoItems?.addEventListener("input", (event) => {
     const idProducto = Number(event.target.dataset.id || 0);
     if (!idProducto) return;
 
+    const producto = getProductoById(idProducto);
+    if (!producto) return;
+
+    const texto = String(event.target.value ?? "").trim();
+    if (texto === "") {
+        return;
+    }
+
+    const cantidad = Number(texto);
+    if (!Number.isFinite(cantidad)) {
+        return;
+    }
+
+    const stock = Number(producto.stock || 0);
+    const cantidadNormalizada = Math.max(0, Math.min(Math.floor(cantidad), stock));
+
+    carrito = {
+        ...carrito,
+        [String(idProducto)]: cantidadNormalizada,
+    };
+});
+
+carritoItems?.addEventListener("change", (event) => {
+    if (!event.target.classList.contains("qty-input")) return;
+
+    const idProducto = Number(event.target.dataset.id || 0);
+    if (!idProducto) return;
+
     actualizarCantidadCarrito(idProducto, event.target.value);
 });
 
@@ -1099,7 +1101,6 @@ formFacturacion?.addEventListener("submit", (event) => {
 
 renderCarrito();
 actualizarEstadoBotonFacturar();
-actualizarEstadoBotonPdf();
 void cargarUsuarioSesion();
 void cargarProductos();
 void cargarDetalleVentas();
