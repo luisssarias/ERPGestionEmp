@@ -169,6 +169,16 @@ align-items:center;
 box-shadow:0 5px 20px rgba(0,0,0,0.05);
 }
 
+.card-shortcut{
+cursor:pointer;
+transition:transform .18s ease, box-shadow .18s ease;
+}
+
+.card-shortcut:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 24px rgba(15,23,42,0.12);
+}
+
 .card h2{
 font-size:32px;
 margin:8px 0;
@@ -213,6 +223,11 @@ box-shadow:0 5px 20px rgba(0,0,0,0.05);
 
 .grafica-card h3{
 margin-bottom:20px;
+}
+
+.chart-host{
+width:100%;
+height:320px;
 }
 
 .productos{
@@ -313,4 +328,10 @@ border-radius:20px;
 padding:30px;
 margin: 0px;
 box-shadow:0 8px 25px rgba(0,0,0,0.05);
+}
+
+.estado-dashboard{
+margin-top:14px;
+font-size:14px;
+color:#64748b;
 }

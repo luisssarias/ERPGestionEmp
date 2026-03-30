@@ -36,7 +36,7 @@
 <span>Productos</span>
 </a>
 
-<a class="menu" href="reportes.html">
+<a class="menu" href="entradas.html">
 <i class="fa-solid fa-arrow-down"></i>
 <span>Entradas</span>
 </a>
@@ -81,8 +81,8 @@
 <i class="fa-regular fa-user"></i>
 </div>
 <div>
-<h4>Admin</h4>
-<p>Administrador</p>
+<h4 id="topbarUsuarioNombre">Usuario</h4>
+<p id="topbarUsuarioRol">Administrador</p>
 </div>
 </div>
 
@@ -93,11 +93,11 @@
 
 <section class="cards">
 
-<div class="card">
+<div class="card card-shortcut" id="cardShortcutProductos">
 <div>
 <p>Total Productos</p>
-<h2>1,248</h2>
-<span class="up">↑ +12.5%</span>
+<h2 id="kpiTotalProductos">0</h2>
+<span class="up">Inventario activo</span>
 </div>
 <div class="icon blue">
 <i class="fa-solid fa-box"></i>
@@ -105,11 +105,11 @@
 </div>
 
 
-<div class="card">
+<div class="card card-shortcut" id="cardShortcutStock">
 <div>
 <p>Stock Bajo</p>
-<h2>23</h2>
-<span class="down">↓ 5 productos</span>
+<h2 id="kpiStockBajo">0</h2>
+<span class="down">Productos con menos de 5 unidades</span>
 </div>
 <div class="icon red">
 <i class="fa-solid fa-arrow-trend-down"></i>
@@ -117,11 +117,11 @@
 </div>
 
 
-<div class="card">
+<div class="card card-shortcut" id="cardShortcutVentas">
 <div>
 <p>Ventas Hoy</p>
-<h2>156</h2>
-<span class="up">↑ +8.3%</span>
+<h2 id="kpiVentasHoy">0</h2>
+<span class="up">Ventas registradas hoy</span>
 </div>
 <div class="icon green">
 <i class="fa-solid fa-cart-shopping"></i>
@@ -129,11 +129,11 @@
 </div>
 
 
-<div class="card">
+<div class="card card-shortcut" id="cardShortcutIngresos">
 <div>
 <p>Ingresos del Día</p>
-<h2>$18,459</h2>
-<span class="up">↑ +15.2%</span>
+<h2 id="kpiIngresosHoy">$0.00</h2>
+<span class="up">Total facturado hoy</span>
 </div>
 <div class="icon purple">
 <i class="fa-solid fa-dollar-sign"></i>
@@ -155,14 +155,14 @@
 
 <div class="filtros">
 
-<input type="text" placeholder="Buscar por nombre o código...">
+<input id="buscarDashboardProducto" type="text" placeholder="Buscar por nombre o código...">
 
-<select>
-<option>Todas las Categorías</option>
+<select id="filtroDashboardCategoria">
+<option value="">Todas las Categorías</option>
 </select>
 
-<select>
-<option>Todos los Estados</option>
+<select id="filtroDashboardEstado">
+<option value="">Todos los Estados</option>
 </select>
 
 </div>
@@ -183,21 +183,11 @@
 
 <tbody>
 
-<tr>
-<td>PROD001</td>
-<td>Laptop Dell XPS 15</td>
-<td><span class="categoria">Electrónica</span></td>
-<td>$1299.99</td>
-<td>15</td>
-<td class="acciones">
-<i class="fa-solid fa-pen editar"></i>
-<i class="fa-solid fa-trash eliminar"></i>
-</td>
-</tr>
-
 </tbody>
 
 </table>
+
+<p id="estadoDashboardTabla" class="estado-dashboard">Cargando productos...</p>
 
 </div>
 </section>
@@ -208,7 +198,7 @@
 
 <h3>Productos Más Vendidos</h3>
 
-<canvas id="ventasChart"></canvas>
+<div id="ventasChart" class="chart-host"></div>
 
 </div>
 
@@ -217,78 +207,15 @@
 
 <h3>Inventario por Categoría</h3>
 
-<canvas id="inventarioChart"></canvas>
+<div id="inventarioChart" class="chart-host"></div>
 
 </div>
 
 </section>
 
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-
-const ventas = document.getElementById('ventasChart');
-
-new Chart(ventas, {
-type: 'bar',
-data: {
-labels: [
-'Laptop Dell XPS',
-'Mouse Logitech',
-'Teclado RGB',
-'Monitor Samsung',
-'Auriculares Sony',
-'Webcam Logitech'
-],
-datasets: [{
-data: [45,120,75,35,90,55],
-backgroundColor:'#4f7dd6',
-borderRadius:8
-}]
-},
-options:{
-plugins:{legend:{display:false}},
-scales:{
-y:{beginAtZero:true}
-}
-}
-});
-
-
-const inventario = document.getElementById('inventarioChart');
-
-new Chart(inventario, {
-type:'pie',
-data:{
-labels:[
-'Electrónica',
-'Accesorios',
-'Audio',
-'Almacenamiento',
-'Redes'
-],
-datasets:[{
-data:[34,28,15,10,13],
-backgroundColor:[
-'#4f7dd6',
-'#3aa675',
-'#e39d3a',
-'#7a5de8',
-'#e04c3f'
-]
-}]
-},
-options:{
-plugins:{
-legend:{
-position:'bottom'
-}
-}
-}
-});
-
-</script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="js/dashboard.js"></script>
 
 </main>
 
