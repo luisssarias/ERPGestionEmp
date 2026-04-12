@@ -91,202 +91,206 @@
 
 <div class="content">
 
-<div class="page-header">
-<h2>Reportes y Análisis de Ventas</h2>
-<p>Dashboard ejecutivo con indicadores clave de rendimiento</p>
-</div>
+<div id="reportePdf" class="reporte-pdf">
 
-<!-- FILTROS -->
-<div class="filtros-card">
+	<div class="page-header">
+	<h2>Reportes y Análisis de Ventas</h2>
+	<p>Dashboard ejecutivo con indicadores clave de rendimiento</p>
+	</div>
 
-<h3><i class="fa-solid fa-calendar"></i> Filtros de Reporte</h3>
+	<!-- FILTROS -->
+	<div class="filtros-card">
 
-<div class="filtros-grid">
+	<h3><i class="fa-solid fa-calendar"></i> Filtros de Reporte</h3>
 
-<div>
-<label>Fecha Desde</label>
-<input id="filtroDesdeReporte" type="date">
-</div>
+	<div class="filtros-grid">
 
-<div>
-<label>Fecha Hasta</label>
-<input id="filtroHastaReporte" type="date">
-</div>
+	<div>
+	<label>Fecha Desde</label>
+	<input id="filtroDesdeReporte" type="date">
+	</div>
 
-<div>
-<label>Mes</label>
-<select id="filtroMesReporte">
-<option value="">Todos</option>
-<option value="1">Enero</option>
-<option value="2">Febrero</option>
-<option value="3">Marzo</option>
-<option value="4">Abril</option>
-<option value="5">Mayo</option>
-<option value="6">Junio</option>
-<option value="7">Julio</option>
-<option value="8">Agosto</option>
-<option value="9">Septiembre</option>
-<option value="10">Octubre</option>
-<option value="11">Noviembre</option>
-<option value="12">Diciembre</option>
-</select>
-</div>
+	<div>
+	<label>Fecha Hasta</label>
+	<input id="filtroHastaReporte" type="date">
+	</div>
 
-<div>
-<label>Categoría</label>
-<select id="filtroCategoriaReporte">
-<option value="">Todas</option>
-</select>
-</div>
+	<div>
+	<label>Mes</label>
+	<select id="filtroMesReporte">
+	<option value="">Todos</option>
+	<option value="1">Enero</option>
+	<option value="2">Febrero</option>
+	<option value="3">Marzo</option>
+	<option value="4">Abril</option>
+	<option value="5">Mayo</option>
+	<option value="6">Junio</option>
+	<option value="7">Julio</option>
+	<option value="8">Agosto</option>
+	<option value="9">Septiembre</option>
+	<option value="10">Octubre</option>
+	<option value="11">Noviembre</option>
+	<option value="12">Diciembre</option>
+	</select>
+	</div>
 
-<div class="filtros-acciones">
-<label>&nbsp;</label>
-<button class="btn-reporte" id="btnGenerarReporte">
-Generar Reporte
-</button>
-</div>
+	<div>
+	<label>Categoría</label>
+	<select id="filtroCategoriaReporte">
+	<option value="">Todas</option>
+	</select>
+	</div>
 
-</div>
+	<div class="filtros-acciones">
+	<label>&nbsp;</label>
+	<button class="btn-reporte" id="btnGenerarReporte">
+	Generar Reporte PDF
+	</button>
+	</div>
 
-</div>
+	</div>
 
-
-<!-- KPI -->
-<div class="kpi-grid">
-
-<div class="kpi-card">
-<div>
-<p>Total de Ventas</p>
-<h2 id="kpiTotalVentas">0</h2>
-<span class="up">Ventas en el periodo</span>
-</div>
-<div class="icon blue">
-<i class="fa-solid fa-cart-shopping"></i>
-</div>
-</div>
-
-<div class="kpi-card">
-<div>
-<p>Ingresos Totales</p>
-<h2 id="kpiIngresosTotales">$0.00</h2>
-<span class="up">Total generado</span>
-</div>
-<div class="icon green">
-<i class="fa-solid fa-dollar-sign"></i>
-</div>
-</div>
-
-<div class="kpi-card">
-<div>
-<p>Producto Destacado</p>
-<h2 id="kpiProductoDestacado">-</h2>
-<span id="kpiProductoDestacadoMeta">0 unidades vendidas</span>
-</div>
-<div class="icon purple">
-<i class="fa-solid fa-award"></i>
-</div>
-</div>
-
-<div class="kpi-card">
-<div>
-<p>Stock Bajo</p>
-<h2 id="kpiStockBajo">0</h2>
-<span class="down">Productos por debajo de 5</span>
-</div>
-<div class="icon red">
-<i class="fa-solid fa-circle-exclamation"></i>
-</div>
-</div>
-
-<div class="kpi-card">
-<div>
-<p>Promedio Diario</p>
-<h2 id="kpiPromedioDiario">$0.00</h2>
-<span class="up">Ingreso promedio por día</span>
-</div>
-<div class="icon blue">
-<i class="fa-solid fa-chart-line"></i>
-</div>
-</div>
-
-</div>
+	</div>
 
 
-<!-- GRAFICAS 1 -->
-<div class="graficas-grid">
+	<!-- KPI -->
+	<div class="kpi-grid">
 
-<div class="grafica-card">
-<h3>Productos Más Vendidos</h3>
-<canvas id="ventasChart"></canvas>
-</div>
+	<div class="kpi-card">
+	<div>
+	<p>Total de Ventas</p>
+	<h2 id="kpiTotalVentas">0</h2>
+	<span class="up">Ventas en el periodo</span>
+	</div>
+	<div class="icon blue">
+	<i class="fa-solid fa-cart-shopping"></i>
+	</div>
+	</div>
 
-<div class="grafica-card">
-<h3>Ventas por Categoría</h3>
-<canvas id="categoriaChart"></canvas>
-</div>
+	<div class="kpi-card">
+	<div>
+	<p>Ingresos Totales</p>
+	<h2 id="kpiIngresosTotales">$0.00</h2>
+	<span class="up">Total generado</span>
+	</div>
+	<div class="icon green">
+	<i class="fa-solid fa-dollar-sign"></i>
+	</div>
+	</div>
 
-</div>
+	<div class="kpi-card">
+	<div>
+	<p>Producto Destacado</p>
+	<h2 id="kpiProductoDestacado">-</h2>
+	<span id="kpiProductoDestacadoMeta">0 unidades vendidas</span>
+	</div>
+	<div class="icon purple">
+	<i class="fa-solid fa-award"></i>
+	</div>
+	</div>
 
+	<div class="kpi-card">
+	<div>
+	<p>Stock Bajo</p>
+	<h2 id="kpiStockBajo">0</h2>
+	<span class="down">Productos por debajo de 5</span>
+	</div>
+	<div class="icon red">
+	<i class="fa-solid fa-circle-exclamation"></i>
+	</div>
+	</div>
 
-<!-- GRAFICAS 2 -->
-<div class="graficas-grid">
+	<div class="kpi-card">
+	<div>
+	<p>Promedio Diario</p>
+	<h2 id="kpiPromedioDiario">$0.00</h2>
+	<span class="up">Ingreso promedio por día</span>
+	</div>
+	<div class="icon blue">
+	<i class="fa-solid fa-chart-line"></i>
+	</div>
+	</div>
 
-<div class="grafica-card">
-<h3>Tendencia de Ventas Mensuales</h3>
-<canvas id="tendenciaVentas"></canvas>
-</div>
-
-<div class="grafica-card">
-
-<div class="grafica-header">
-
-<h3>Ventas vs Entradas (Gastos)</h3>
-
-<div class="ganancia">
-<p>Ganancia Neta</p>
-<h4 id="kpiGananciaNeta">$0.00</h4>
-</div>
-
-</div>
-
-<canvas id="ventasEntradas"></canvas>
-
-</div>
-
-</div>
-
-
-<!-- TABLA DETALLE -->
-<div class="tabla-card">
-
-<div class="tabla-header">
-
-<div>
-<h3>Detalle de Ventas Diarias</h3>
-<p>Resumen de transacciones por día</p>
-</div>
-
-</div>
+	</div>
 
 
-<table class="tabla-reportes">
+	<!-- GRAFICAS 1 -->
+	<div class="graficas-grid">
 
-<thead>
-<tr>
-<th>FECHA</th>
-<th>N° DE VENTAS</th>
-<th>TOTAL DIARIO</th>
-<th>MÉTODO DE PAGO PREDOMINANTE</th>
-</tr>
-</thead>
+	<div class="grafica-card">
+	<h3>Productos Más Vendidos</h3>
+	<canvas id="ventasChart"></canvas>
+	</div>
 
-<tbody id="tablaReportesBody">
+	<div class="grafica-card">
+	<h3>Ventas por Categoría</h3>
+	<canvas id="categoriaChart"></canvas>
+	</div>
 
-</tbody>
+	</div>
 
-</table>
 
-<p id="estadoTablaReportes" class="estado-reportes">Cargando reporte...</p>
+	<!-- GRAFICAS 2 -->
+	<div class="graficas-grid">
+
+	<div class="grafica-card">
+	<h3>Tendencia de Ventas Mensuales</h3>
+	<canvas id="tendenciaVentas"></canvas>
+	</div>
+
+	<div class="grafica-card">
+
+	<div class="grafica-header">
+
+	<h3>Ventas vs Entradas (Gastos)</h3>
+
+	<div class="ganancia">
+	<p>Ganancia Neta</p>
+	<h4 id="kpiGananciaNeta">$0.00</h4>
+	</div>
+
+	</div>
+
+	<canvas id="ventasEntradas"></canvas>
+
+	</div>
+
+	</div>
+
+
+	<!-- TABLA DETALLE -->
+	<div class="tabla-card">
+
+	<div class="tabla-header">
+
+	<div>
+	<h3>Detalle de Ventas Diarias</h3>
+	<p>Resumen de transacciones por día</p>
+	</div>
+
+	</div>
+
+
+	<table class="tabla-reportes">
+
+	<thead>
+	<tr>
+	<th>FECHA</th>
+	<th>N° DE VENTAS</th>
+	<th>TOTAL DIARIO</th>
+	<th>MÉTODO DE PAGO PREDOMINANTE</th>
+	</tr>
+	</thead>
+
+	<tbody id="tablaReportesBody">
+
+	</tbody>
+
+	</table>
+
+	<p id="estadoTablaReportes" class="estado-reportes">Cargando reporte...</p>
+
+	</div>
 
 </div>
 

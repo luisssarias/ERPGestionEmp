@@ -496,9 +496,16 @@ function renderCharts(ventasFiltradas, entradasFiltradas) {
     });
 }
 
-function exportarReporteCompletoPdf(resumen) {
-    if (!resumen || !Array.isArray(resumen.resumenDiario) || !resumen.resumenDiario.length) {
-        alert("No hay datos para generar el PDF del reporte.");
+async function exportarReporteCompletoPdf() {
+    const reporteNodo = document.getElementById("reportePdf");
+
+    if (!reporteNodo) {
+        alert("No se encontro el bloque del reporte para exportar.");
+        return;
+    }
+
+    if (!window.html2canvas) {
+        alert("No se pudo inicializar html2canvas para la captura.");
         return;
     }
 
@@ -507,90 +514,42 @@ function exportarReporteCompletoPdf(resumen) {
         return;
     }
 
+    const canvas = await window.html2canvas(reporteNodo, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF("p", "mm", "a4");
 
+    const margin = 8;
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const renderWidth = pdfWidth - (margin * 2);
+    const renderHeight = (canvas.height * renderWidth) / canvas.width;
+    const pageContentHeight = pdfHeight - (margin * 2);
+
+    let heightLeft = renderHeight;
+    let y = margin;
+
+    pdf.addImage(imgData, "PNG", margin, y, renderWidth, renderHeight, undefined, "FAST");
+    heightLeft -= pageContentHeight;
+
+    while (heightLeft > 0) {
+        pdf.addPage();
+        y = margin - (renderHeight - heightLeft);
+        pdf.addImage(imgData, "PNG", margin, y, renderWidth, renderHeight, undefined, "FAST");
+        heightLeft -= pageContentHeight;
+    }
+
     const fechaActual = new Date();
-    const nombreUsuario = topbarUsuarioNombre?.textContent || "Usuario";
-    const fechaDesde = filtroDesde?.value || "Inicio";
-    const fechaHasta = filtroHasta?.value || "Hoy";
-    const mesSeleccionado = filtroMes?.selectedOptions?.[0]?.textContent || "Todos";
-    const categoriaSeleccionada = filtroCategoria?.selectedOptions?.[0]?.textContent || "Todas";
-
-    let y = 14;
-
-    pdf.setFontSize(18);
-    pdf.text("Reporte Ejecutivo - VentaTotal", 14, y);
-    y += 7;
-
-    pdf.setFontSize(10);
-    pdf.text(`Emitido por: ${nombreUsuario}`, 14, y);
-    y += 5;
-    pdf.text(`Fecha de emision: ${fechaActual.toLocaleString("es-MX")}`, 14, y);
-    y += 5;
-    pdf.text(`Rango: ${fechaDesde} a ${fechaHasta} | Mes: ${mesSeleccionado} | Categoria: ${categoriaSeleccionada}`, 14, y);
-    y += 8;
-
-    pdf.setFontSize(12);
-    pdf.text("KPIs", 14, y);
-    y += 6;
-
-    pdf.setFontSize(10);
-    const kpis = [
-        `Total de ventas: ${resumen.totalVentas || 0}`,
-        `Ingresos totales: ${money(resumen.ingresos)}`,
-        `Producto destacado: ${resumen.productoDestacado || "-"} (${resumen.productoDestacadoCantidad || 0} unidades)`,
-        `Stock bajo: ${resumen.stockBajo || 0}`,
-        `Promedio diario: ${money(resumen.promedioDiario)}`,
-        `Ganancia neta: ${money(resumen.gananciaNeta)}`,
-    ];
-
-    kpis.forEach((linea) => {
-        pdf.text(linea, 16, y);
-        y += 5;
-    });
-
-    y += 3;
-    pdf.setFontSize(12);
-    pdf.text("Detalle de ventas diarias", 14, y);
-    y += 6;
-
-    pdf.setFontSize(9);
-    pdf.setFillColor(241, 245, 249);
-    pdf.rect(14, y - 4, 182, 6, "F");
-    pdf.text("Fecha", 16, y);
-    pdf.text("N. Ventas", 56, y);
-    pdf.text("Total Diario", 98, y);
-    pdf.text("Método Predominante", 142, y);
-    y += 5;
-
-    resumen.resumenDiario.forEach((item) => {
-        if (y > 278) {
-            pdf.addPage();
-            y = 16;
-            pdf.setFillColor(241, 245, 249);
-            pdf.rect(14, y - 4, 182, 6, "F");
-            pdf.text("Fecha", 16, y);
-            pdf.text("N. Ventas", 56, y);
-            pdf.text("Total Diario", 98, y);
-            pdf.text("Método Predominante", 142, y);
-            y += 5;
-        }
-
-        pdf.text(String(item.fecha || "-"), 16, y);
-        pdf.text(String(item.numeroVentas || 0), 56, y);
-        pdf.text(money(item.totalDia), 98, y);
-        pdf.text(String(item.metodoPredominante || "-").slice(0, 28), 142, y);
-        y += 5;
-    });
-
-    y += 2;
-    pdf.setFontSize(10);
-    pdf.text(`Total ventas: ${ultimoResumenTotales.ventas || 0}`, 14, y);
-    y += 5;
-    pdf.text(`Total ingresos: ${money(ultimoResumenTotales.ingresos || 0)}`, 14, y);
-
-    const nombre = `reporte_${fechaActual.getFullYear()}${String(fechaActual.getMonth() + 1).padStart(2, "0")}${String(fechaActual.getDate()).padStart(2, "0")}_${String(fechaActual.getHours()).padStart(2, "0")}${String(fechaActual.getMinutes()).padStart(2, "0")}.pdf`;
+    const nombre = `reporte_captura_${fechaActual.getFullYear()}${String(fechaActual.getMonth() + 1).padStart(2, "0")}${String(fechaActual.getDate()).padStart(2, "0")}_${String(fechaActual.getHours()).padStart(2, "0")}${String(fechaActual.getMinutes()).padStart(2, "0")}.pdf`;
     pdf.save(nombre);
 }
 
@@ -603,8 +562,8 @@ function setupEventos() {
         btnGenerar.textContent = "Generando PDF...";
 
         try {
-            const resultado = renderReporte();
-            exportarReporteCompletoPdf(resultado?.resumen || null);
+            renderReporte();
+            await exportarReporteCompletoPdf();
         } finally {
             btnGenerar.disabled = false;
             btnGenerar.textContent = textoOriginal;
