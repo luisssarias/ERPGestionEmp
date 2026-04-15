@@ -11,7 +11,6 @@ const proveedorRfc = document.getElementById("proveedorRfc");
 const proveedorEstadoWrap = document.getElementById("proveedorEstadoWrap");
 const proveedorEstado = document.getElementById("proveedorEstado");
 const proveedorDireccion = document.getElementById("proveedorDireccion");
-const proveedorNotas = document.getElementById("proveedorNotas");
 const mensajeProveedor = document.getElementById("mensajeProveedor");
 const listaProveedores = document.getElementById("listaProveedores");
 const contadorProveedores = document.getElementById("contadorProveedores");
@@ -292,7 +291,6 @@ async function cargarProveedorEnFormulario(proveedor) {
     if (proveedorRfc) proveedorRfc.value = proveedor.rfc || "";
     if (proveedorEstado) proveedorEstado.value = normalizarEstado(proveedor.estado);
     if (proveedorDireccion) proveedorDireccion.value = proveedor.direccion || "";
-    if (proveedorNotas) proveedorNotas.value = proveedor.notas || "";
 
     if (btnGuardarProveedor) {
         btnGuardarProveedor.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Guardar cambios';
@@ -573,7 +571,6 @@ if (formProveedor) {
             direccion: proveedorDireccion ? proveedorDireccion.value.trim() || null : null,
             rfc: proveedorRfc ? proveedorRfc.value.trim() || null : null,
             estado: proveedorId ? normalizarEstado(proveedorEstado ? proveedorEstado.value : "Activo") : "Activo",
-            notas: proveedorNotas ? proveedorNotas.value.trim() || null : null,
         };
 
         if (!payload.nombre || !payload.empresa) {

@@ -9,11 +9,21 @@ use App\Models\Proveedor;
 use App\Models\ProveedorProductoMap;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ProveedorController extends Controller
 {
     private function backfillMapByNombre(int $idProveedor): void
     {
+        $tieneMapeo = DB::table('proveedor_producto_map as ppm')
+            ->join('productos_proveedor as pp', 'pp.id_producto_proveedor', '=', 'ppm.id_producto_proveedor')
+            ->where('pp.id_proveedor', $idProveedor)
+            ->exists();
+
+        if ($tieneMapeo) {
+            return;
+        }
+
         $pendientes = DB::table('productos_proveedor as pp')
             ->leftJoin('proveedor_producto_map as ppm', 'ppm.id_producto_proveedor', '=', 'pp.id_producto_proveedor')
             ->where('pp.id_proveedor', $idProveedor)
@@ -33,15 +43,6 @@ class ProveedorController extends Controller
                 'id_producto' => $producto->id_producto,
             ]);
         }
-    }
-
-    public function conexion()
-    {
-        return response()->json([
-            'ok' => true,
-            'message' => 'Conexion con tabla proveedores correcta',
-            'total' => Proveedor::count(),
-        ]);
     }
 
     public function index()
@@ -118,9 +119,9 @@ class ProveedorController extends Controller
         Proveedor::findOrFail($id);
         $this->backfillMapByNombre((int) $id);
 
-        return DB::table('productos_proveedor as pp')
-            ->leftJoin('proveedor_producto_map as ppm', 'ppm.id_producto_proveedor', '=', 'pp.id_producto_proveedor')
-            ->leftJoin('productos as p', 'p.id_producto', '=', 'ppm.id_producto')
+        return DB::table('proveedor_producto_map as ppm')
+            ->join('productos_proveedor as pp', 'pp.id_producto_proveedor', '=', 'ppm.id_producto_proveedor')
+            ->join('productos as p', 'p.id_producto', '=', 'ppm.id_producto')
             ->where('pp.id_proveedor', $id)
             ->select([
                 'pp.id_producto_proveedor',
@@ -164,36 +165,64 @@ class ProveedorController extends Controller
             ], 422);
         }
 
-        $inserts = [];
+        DB::transaction(function () use ($proveedor, $catalogo, $data, $idsProducto) {
+            $tieneTablaDetalleCompra = Schema::hasTable('detalle_compra');
 
-        foreach ($data['productos'] as $item) {
-            $producto = $catalogo->get((int) $item['id_producto']);
+            $mapeosActuales = DB::table('proveedor_producto_map as ppm')
+                ->join('productos_proveedor as pp', 'pp.id_producto_proveedor', '=', 'ppm.id_producto_proveedor')
+                ->where('pp.id_proveedor', $proveedor->id_proveedor)
+                ->select(['ppm.id_map', 'ppm.id_producto', 'ppm.id_producto_proveedor'])
+                ->get();
 
-            $inserts[] = [
-                'id_proveedor' => $proveedor->id_proveedor,
-                'nombre' => $producto->nombre,
-                'descripcion' => $producto->descripcion,
-                'precio_compra' => $item['precio_compra'],
-            ];
-        }
+            $mapeoPorProducto = $mapeosActuales->keyBy(fn ($row) => (int) $row->id_producto);
 
-        DB::transaction(function () use ($proveedor, $inserts, $data) {
-            $idsActuales = ProductoProveedor::where('id_proveedor', $proveedor->id_proveedor)
-                ->pluck('id_producto_proveedor');
+            foreach ($data['productos'] as $item) {
+                $idProducto = (int) $item['id_producto'];
+                $precioCompra = (float) $item['precio_compra'];
+                $productoCatalogo = $catalogo->get($idProducto);
+                $mapeo = $mapeoPorProducto->get($idProducto);
 
-            if ($idsActuales->isNotEmpty()) {
-                ProveedorProductoMap::whereIn('id_producto_proveedor', $idsActuales)->delete();
-            }
+                if ($mapeo) {
+                    ProductoProveedor::where('id_producto_proveedor', $mapeo->id_producto_proveedor)
+                        ->update([
+                            'precio_compra' => $precioCompra,
+                            'nombre' => $productoCatalogo->nombre,
+                            'descripcion' => $productoCatalogo->descripcion,
+                        ]);
+                    continue;
+                }
 
-            ProductoProveedor::where('id_proveedor', $proveedor->id_proveedor)->delete();
-
-            foreach ($inserts as $index => $insert) {
-                $productoProveedor = ProductoProveedor::create($insert);
+                $productoProveedor = ProductoProveedor::create([
+                    'id_proveedor' => $proveedor->id_proveedor,
+                    'nombre' => $productoCatalogo->nombre,
+                    'descripcion' => $productoCatalogo->descripcion,
+                    'precio_compra' => $precioCompra,
+                ]);
 
                 ProveedorProductoMap::create([
                     'id_producto_proveedor' => $productoProveedor->id_producto_proveedor,
-                    'id_producto' => (int) $data['productos'][$index]['id_producto'],
+                    'id_producto' => $idProducto,
                 ]);
+            }
+
+            $aRemover = $mapeosActuales->filter(
+                fn ($row) => !$idsProducto->contains((int) $row->id_producto)
+            );
+
+            foreach ($aRemover as $mapeo) {
+                $idProductoProveedor = (int) $mapeo->id_producto_proveedor;
+
+                ProveedorProductoMap::where('id_map', (int) $mapeo->id_map)->delete();
+
+                $tieneHistorial = $tieneTablaDetalleCompra
+                    ? DB::table('detalle_compra')
+                        ->where('id_producto_proveedor', $idProductoProveedor)
+                        ->exists()
+                    : false;
+
+                if (!$tieneHistorial) {
+                    ProductoProveedor::where('id_producto_proveedor', $idProductoProveedor)->delete();
+                }
             }
         });
 

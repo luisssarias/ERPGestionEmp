@@ -12,12 +12,6 @@ use App\Http\Controllers\Api\VentaController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::get('/test', function () {
-    return 'FUNCIONA';
-});
-
-Route::get('/proveedores/conexion', [ProveedorController::class, 'conexion']);
-
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me', [AuthController::class, 'me']);
